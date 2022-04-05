@@ -2,11 +2,12 @@
 #!/usr/bin/env python
 import sys, getopt, pybgpstream, maxminddb, json
 from sys import prefix
-from termcolor import colored, cprint
+from termcolor import cprint
 
 country_file = 'mmdb_files/latest.mmdb'
-start_time = ""
-end_time = ""
+json_out = ''
+start_time = ''
+end_time = ''
 isRecord = False
 
 
@@ -21,18 +22,24 @@ def print_help():
             -r, --record            Retrieve records in the interval --until_time and --from-time arguments (which are required)            
             --from_time             Beginning of the interval.  Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
             --until_time            Ending of the interval.     Timestamp format : YYYY-MM-DD hh:mm:ss
-            
-            -c, --country_file      MMDB Geo Open File which specify IP address geolocation per country
-                                    If not set, default file will be used''')
 
-def pprint(elem, country):
-    print(json.dumps({'type': elem.type, 'peer': elem.peer_address, 'peer_number': elem.peer_asn, 'country': country}))#'fields': elem.fields, 
+            --country_file          MMDB Geo Open File which specify IP address geolocation per country
+                                    If not set, default file will be used
+
+            --json_output_file      File in which to display JSON output
+                                    If not set, default sys.stdout will be used''')
+
+
+def pprint(e, f, f_json):
+    f_json.write(json.dumps({'time':e.time, 'type': e.type, 'peer': e.peer_address, 'peer_number': e.peer_asn, 'prefix': e._maybe_field('prefix'), 'country': f.get(e._maybe_field('prefix').split("/",1)[0])}))
+    #print(e.fields)
+
 
 def main(argv):
     global country_file, start_time, end_time, isRecord
-    
+
     try:
-        opts, args = getopt.getopt(argv, "hprc", ["record",'from_time','until_time','country_file','prefixes'])
+        opts, args = getopt.getopt(argv, "hpr", ["record",'from_time=','until_time=','country_file=','prefix=','json_output_file='])
     except getopt.GetoptError as err:
         cprint('Unrecognized parameter', 'red')
         print_help()
@@ -42,38 +49,43 @@ def main(argv):
         if opt in ('-h', '--help'):
             print_help()
             return
-        if opt in ('-r', '--record'):
+        elif opt in ('-r', '--record'):
             isRecord = True
-            if '--until_time' or '--from_time' not in opts:
-                cprint('--until_time and --from_time parameters are required when using record mode', 'red')
-                print_help()
-                return
-        if opt in ('-c', '--country_file='):
+        elif opt == '--country_file':
             country_file = arg
-        if opt in ('-p', '--prefix='):
+        elif opt in ('-p', '--prefix='):
             prefix = arg
-        if opt == '--from_time':
+        elif opt == '--from_time':
             start_time = arg
-        if opt == '--until_time':
+        elif opt == '--until_time':
             end_time = arg
-
-    print(opts)
-
-
-    # Load AS\Country File
-#    f = maxminddb.open_database(country_file)
+        elif opt == '--json_output_file':
+            json_out = arg
 
     if isRecord:
-        stream = pybgpstream.BGPStream(project="ris-live", record_type="updates", from_time=start_time, until_time=end_time)
-        for record in stream.records:
-            pprint(record,3)# f.get(record.fields["prefix"]))
+        if not (start_time != end_time != ''):
+            cprint('--until_time and --from_time parameters are required when using record mode', 'red')
+            print_help()
+            return
+
+    f_country = maxminddb.open_database(country_file)
+    print(f'Loaded MMDB country by ip file : {country_file}')
+
+    try:
+        f_json = open(json_out, 'w')
+    except:
+        f_json = sys.stdout
+
+
+    if isRecord:
+        print('Loading records ...')
+        stream = pybgpstream.BGPStream(collectors=["route-views.sg", "route-views.eqix"], record_type="updates", from_time=start_time, until_time=end_time)
     else:
-        # Start live BGP Stream
-        stream = pybgpstream.BGPStream(project="ris-live", record_type="updates")
-        print("dwwede")
-        for elem in stream:
-            print("fwef")
-            print(elem)# f.get(record.fields["prefix"]))
+        print('Loading live stream ...')
+        stream = pybgpstream.BGPStream(project="ris-live", collectors=[], record_type="updates")
+
+    for elem in stream:
+        pprint(elem,f_country,f_json)
 
 
 if __name__ == '__main__':
