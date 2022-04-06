@@ -22,7 +22,7 @@ Usage: bgp-filter.py [-h] [-p PREFIX] [-r --until_time=TIMESTAMP --from_time=TIM
 - [X] Initial script based on stream retrieve or records
 - [X] Country lookup using [geo open file](https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/)
 - [X] Save json output file option
-- [ ] Add .gitignore
+- [X] Add .gitignore
 - [ ] Use argparse
 - [ ] Create lib to centralize filtering
 - [ ] Add test cases
