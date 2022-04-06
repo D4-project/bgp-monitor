@@ -26,6 +26,8 @@ Usage: bgp-filter.py [-h] [-p PREFIX] [-r --until_time=TIMESTAMP --from_time=TIM
 - [ ] Use argparse
 - [ ] Create lib to centralize filtering
 - [ ] Add test cases
+- [X] Use black to reformat code
+- [ ] Use pre-commit to auto reformat
 - [ ] Output more data results
 - [ ] Correct intterupt of the program (not just CTRL + C)
 - [ ] CIDR block, ASN, country, etc... based filter
