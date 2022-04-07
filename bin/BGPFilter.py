@@ -1,8 +1,14 @@
-import sys, pybgpstream, maxminddb, json, os
+import json
+import os
+import sys
+
+import maxminddb
+import pybgpstream
 
 
 class BGPFilter:
     """BGP stream filter"""
+
     def __init__(self):
         self.__json_out = sys.stdout
         self.__isStarted = False
@@ -32,11 +38,11 @@ class BGPFilter:
     @property
     def country_file(self):
         return self.__country_file
-    
+
     @property
     def cidr_filter(self):
         return None
-    
+
     @property
     def countries_filter(self):
         return None
@@ -68,34 +74,32 @@ class BGPFilter:
                 self.__start_time = start
                 self.__end_time = end
 
-
     @json_out.setter
     def json_out(self, json_out):
-        '''Setter for JSON output
+        """Setter for JSON output
 
-            Default : sys.stdout
-        
-            Parameters:
-                json_output_file (File): Where to output json
-            Raises:
-                Exception: If unable to use
-        '''
+        Default : sys.stdout
+
+        Parameters:
+            json_output_file (File): Where to output json
+        Raises:
+            Exception: If unable to use
+        """
         if hasattr(json_out, "write"):
             self.__json_out = json_out
         else:
             raise FileNotFoundError(f"Is {json_out} a file ?")
-    
+
     @country_file.setter
     def country_file(self, country_file):
         """Define country mmdb file
-            
-            Parameters:
-                country_file (String): Path to current Geo Open MaxMindDB File
+
+        Parameters:
+            country_file (String): Path to current Geo Open MaxMindDB File
         """
         if not os.path.isfile(country_file):
             raise FileNotFoundError
         self._country_file = country_file
-
 
     @cidr_filter.setter
     def cidr(self, CIDR):
@@ -121,16 +125,14 @@ class BGPFilter:
                     "peer": e.peer_address,
                     "peer_asnumber": e.peer_asn,
                     "prefix": e._maybe_field("prefix"),
-                    "country": self.__f_country.get(
-                        e._maybe_field("prefix").split("/", 1)[0]
-                    ),
+                    "country": self.__f_country.get(e._maybe_field("prefix").split("/", 1)[0]),
                 }
             )
         )
         # print(e.fields)
 
     def start(self):
-        '''Start retrieving stream/records and filtering them'''
+        """Start retrieving stream/records and filtering them"""
         self.__isStarted = True
         self.__f_country = maxminddb.open_database(self.__country_file)
         print(f"Loaded MMDB country by ip file : {self.__country_file}")
