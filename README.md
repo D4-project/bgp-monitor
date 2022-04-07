@@ -31,14 +31,14 @@ optional arguments:
 - [X] Save json output file option
 - [X] Add .gitignore
 - [X] Use argparse
-- [ ] Create lib to centralize filtering
+- [X] Create lib to centralize filtering
 - [ ] Add test cases
 - [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
 - [X] Auto reformat using [pre-commit](https://pre-commit.com/)
-- [ ] Output more data results
-- [ ] Correct intterupt of the program (not just CTRL + C)
-- [ ] CIDR block, ASN, country, etc... based filter
+- [ ] CIDR block, ASN, country, etc... filtering options
 - [ ] collector/project options ?
+- [ ] Output more data results
+- [ ] Correct interrupt of the program (not just CTRL + C)
 - [ ] Generate requirements.txt
 
 ## Requirements
@@ -68,3 +68,6 @@ optional arguments:
 ~~~~
 
 ## Sources
+
+- Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
+- Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)

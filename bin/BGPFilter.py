@@ -2,7 +2,7 @@ import sys, pybgpstream, maxminddb, json, os
 
 
 class BGPFilter:
-    """Filter BGP stream"""
+    """BGP stream filter"""
     def __init__(self):
         self.__json_out = sys.stdout
         self.__isStarted = False
