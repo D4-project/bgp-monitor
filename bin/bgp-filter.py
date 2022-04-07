@@ -1,7 +1,6 @@
 #!/usr/bin/env python
-import sys
-import argparse
-
+import sys, argparse
+from BGPFilter import BGPFilter
 
 
 if __name__ == "__main__":
@@ -44,3 +43,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     print(args)
+
+    filter = BGPFilter()
+    filter.start()

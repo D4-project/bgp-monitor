@@ -1,54 +1,127 @@
-import sys, pybgpstream, maxminddb, json
+import sys, pybgpstream, maxminddb, json, os
 
 
 class BGPFilter:
-    def __init__(self, country_file, json_output_file):
-        """Filter BGP updates
-
-        Args:
-            country_file (String): Path to current Geo Open MaxMindDB File
-            json_output_file (File): Where to output json
-            record (Boolean): Switching to record mode (retrieve records instead of live stream)
-            from_time (TimeStamp): _description_
-            until_time (TimeStamp): _description_
-        """
-        self.country_file = country_file
-        self.isStarted = False
-        self.collectors = []
+    """Filter BGP stream"""
+    def __init__(self):
+        self.__json_out = sys.stdout
+        self.__isStarted = False
+        self.__collectors = []
         # self.setRecord(isRecord, start_time, end_time)
+        self.__isRecord = False
+        self.__start_time = ""
+        self.__end_time = ""
+        self.__country_file = "../mmdb_files/latest.mmdb"
 
-    def setJSONOut(self, json_output_file):
-        if hasattr(json_output_file, "write"):
-            self.json_out = json_output_file
-        else:
-            self.json_out = sys.stdout
-            raise Exception(f"Unable to use {json_output_file}.")
+    @property
+    def start_time(self):
+        return self.__start_time
 
-    def setRecord(self, isRecord, start, begin):
-        self.isRecord = isRecord
-        if self.isRecord:
-            if not (self.start_time != self.end_time != ""):
+    @property
+    def end_time(self):
+        return self.__end_time
+
+    @property
+    def isRecord(self):
+        return self.__isRecord
+
+    @property
+    def json_out(self):
+        return self.__json_out
+
+    @property
+    def country_file(self):
+        return self.__country_file
+    
+    @property
+    def cidr_filter(self):
+        return None
+    
+    @property
+    def countries_filter(self):
+        return None
+
+    @property
+    def asn_filter(self):
+        return None
+
+    def set_record_mode(self, isRecord, start, end):
+        """
+        Define if record mode or live stream.
+        start and begin will not be modified if isRecord == false
+        Args:
+            isRecord (bool)
+            start (string): Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
+            end (string): Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
+
+        Raises:
+            Exception: If start == end or not define
+        """
+        self.__isRecord = isRecord
+        if isRecord:
+            if not (start != end != ""):
+                # Check using a regex ?
                 raise Exception(
-                    "--until_time and --from_time parameters are required when using record mode",
-                    "red",
+                    "--until_time and --from_time parameters are required when using record mode"
                 )
             else:
-                self.start_time = start
-                self.end_time = begin
+                self.__start_time = start
+                self.__end_time = end
 
-    def __setCollectors(self):
+
+    @json_out.setter
+    def json_out(self, json_out):
+        '''Setter for JSON output
+
+            Default : sys.stdout
+        
+            Parameters:
+                json_output_file (File): Where to output json
+            Raises:
+                Exception: If unable to use
+        '''
+        if hasattr(json_out, "write"):
+            self.__json_out = json_out
+        else:
+            raise FileNotFoundError(f"Is {json_out} a file ?")
+    
+    @country_file.setter
+    def country_file(self, country_file):
+        """Define country mmdb file
+            
+            Parameters:
+                country_file (String): Path to current Geo Open MaxMindDB File
+        """
+        if not os.path.isfile(country_file):
+            raise FileNotFoundError
+        self._country_file = country_file
+
+
+    @cidr_filter.setter
+    def cidr(self, CIDR):
         pass
 
-    def __pprint(e, f, f_json):
-        f_json.write(
+    @countries_filter.setter
+    def countries(self, country_list):
+        pass
+
+    @asn_filter.setter
+    def asn_filter(self, asn_filter):
+        return None
+
+    def __setCollectors(self, collectors):
+        pass
+
+    def __pprint(self, e):
+        self.__json_out.write(
             json.dumps(
                 {
                     "time": e.time,
                     "type": e.type,
                     "peer": e.peer_address,
-                    "peer_number": e.peer_asn,
+                    "peer_asnumber": e.peer_asn,
                     "prefix": e._maybe_field("prefix"),
-                    "country": f.get(
+                    "country": self.__f_country.get(
                         e._maybe_field("prefix").split("/", 1)[0]
                     ),
                 }
@@ -57,17 +130,12 @@ class BGPFilter:
         # print(e.fields)
 
     def start(self):
-        self.f_country = maxminddb.open_database(self.country_file)
-        print(f"Loaded MMDB country by ip file : {self.country_file}")
+        '''Start retrieving stream/records and filtering them'''
+        self.__isStarted = True
+        self.__f_country = maxminddb.open_database(self.__country_file)
+        print(f"Loaded MMDB country by ip file : {self.__country_file}")
 
-        """
-        try:
-            self.f_json = open(self.json_out, 'w')
-        except:
-            self.f_json = sys.stdout
-        """
-
-        if self.isRecord:
+        if self.__isRecord:
             print("Loading records ...")
             self.stream = pybgpstream.BGPStream(
                 collectors=["route-views.sg", "route-views.eqix"],
@@ -79,12 +147,12 @@ class BGPFilter:
             print("Loading live stream ...")
             self.stream = pybgpstream.BGPStream(
                 project="ris-live",
-                collectors=self.collectors,
+                collectors=self.__collectors,
                 record_type="updates",
             )
 
         for elem in self.stream:
-            self.pprint(elem)
+            self.__pprint(elem)
 
     def stop(self):
-        pass
+        self.__isStarted = False
