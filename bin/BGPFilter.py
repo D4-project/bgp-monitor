@@ -18,8 +18,19 @@ class BGPFilter:
         self.__start_time = ""
         self.__end_time = ""
         self.__country_file = "mmdb_files/latest.mmdb"
-        self.__collectors = []
+        self.__collectors = None
         self.__countries_filter = []
+
+        self.__switcher = {
+            "A": self.__jprint_updateribs,
+            "R": self.__jprint_updateribs,
+            "S": self.__jprint_peer_state,
+            "W": self.__jprint_withdrawal,
+        }
+
+    ###############
+    #   GETTERS   #
+    ###############
 
     @property
     def start_time(self):
@@ -52,6 +63,10 @@ class BGPFilter:
     @property
     def asn_filter(self):
         return None
+
+    ###############
+    #   SETTERS   #
+    ###############
 
     def set_record_mode(self, isRecord, start, end):
         """
@@ -105,40 +120,74 @@ class BGPFilter:
 
     @cidr_filter.setter
     def cidr(self, CIDR):
+        """TODO"""
         pass
 
     @countries_filter.setter
     def countries(self, country_list):
+        """TODO"""
         for c in country_list:
             pycountry.countries.lookup(c)
         self.__countries = country_list
 
     @asn_filter.setter
     def asn_filter(self, asn_filter):
+        """TODO"""
         return None
 
     def __setCollectors(self, collectors):
+        """TODO"""
         pass
 
-    def __pprint(self, e):
-        print("type : " + e.type)
-        self.__json_out.write(
-            json.dumps(
-                {
-                    "time": e.time,
-                    "type": e.type,
-                    "peer": e.peer_address,
-                    "peer_asnumber": e.peer_asn,
-                    "prefix": e._maybe_field("prefix"),
-                    "country_code": self.__getCountryByPrefix(e.fields["prefix"]),
-                }
-            )
-        )
-        # print(e.fields)
+    ###############
+    #   PRINTERS   #
+    ###############
 
-    def __getCountryByPrefix(self, p):
+    def __jprint_updateribs(self, e):
+        return {
+            "type": e.type,
+            "time": e.time,
+            "peer": e.peer_address,
+            "peer_asn": e.peer_asn,
+            "as-path": e.fields["as-path"],
+            "next-hop": e.fields["next-hop"],
+            "prefix": e.fields["prefix"],
+            "country_code": self.__country_by_prefix(e.fields["prefix"]),
+            "collector": e.collector
+            # "communities": e.fields['communities'], #set not supported by json.dumps
+        }
+
+    def __jprint_withdrawal(self, e):
+        return {
+            "type": e.type,
+            "time": e.time,
+            "peer": e.peer_address,
+            "peer_asn": e.peer_asn,
+            "prefix": e.fields["prefix"],
+            "country_code": self.__country_by_prefix(e.fields["prefix"]),
+            "collector": e.collector,
+        }
+
+    def __jprint_peer_state(self, e):
+        return {
+            "type": e.type,
+            "time": e.time,
+            "peer": e.peer_address,
+            "peer_asn": e.peer_asn,
+            "old-state": e.fields["old-state"],
+            "new-state": e.fields["new-state"],
+            "collector": e.collector,
+        }
+
+    def __jprint(self, e):
+        self.__json_out.write(json.dumps(self.__switcher.get(e.type)(e)))
+
+    def __country_by_prefix(self, p):
         return self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
-        return "" if not p else self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
+
+    ####################
+    # PUBLIC FUNCTIONS #
+    ####################
 
     def start(self):
         """Start retrieving stream/records and filtering them"""
@@ -166,7 +215,7 @@ class BGPFilter:
 
         print("Let's go")
         for elem in self.stream:
-            self.__pprint(elem)
+            self.__jprint(elem)
 
     def stop(self):
         self.__isStarted = False
