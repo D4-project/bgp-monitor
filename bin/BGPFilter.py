@@ -17,7 +17,7 @@ class BGPFilter:
         self.__isRecord = False
         self.__start_time = ""
         self.__end_time = ""
-        self.__country_file = "../mmdb_files/latest.mmdb"
+        self.__country_file = "mmdb_files/latest.mmdb"
 
     @property
     def start_time(self):
@@ -125,11 +125,14 @@ class BGPFilter:
                     "peer": e.peer_address,
                     "peer_asnumber": e.peer_asn,
                     "prefix": e._maybe_field("prefix"),
-                    "country": self.__f_country.get(e._maybe_field("prefix").split("/", 1)[0]),
+                    "country_code": self.__getCountryByPrefix(e.fields["prefix"]),
                 }
             )
         )
         # print(e.fields)
+
+    def __getCountryByPrefix(self, p):
+        return "" if not p else self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
 
     def start(self):
         """Start retrieving stream/records and filtering them"""
@@ -138,6 +141,7 @@ class BGPFilter:
         print(f"Loaded MMDB country by ip file : {self.__country_file}")
 
         if self.__isRecord:
+            print(f"{self.__start_time} -- {self.__end_time}")
             print("Loading records ...")
             self.stream = pybgpstream.BGPStream(
                 collectors=["route-views.sg", "route-views.eqix"],

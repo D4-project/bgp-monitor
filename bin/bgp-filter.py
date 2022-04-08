@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-import sys, argparse
+import argparse
+import sys
+
 from BGPFilter import BGPFilter
 
 
@@ -7,10 +9,8 @@ if __name__ == "__main__":
     global country_file, start_time, end_time, isRecord
 
     parser = argparse.ArgumentParser(description="Tool for BGP filtering")
-    parser.add_argument(
-        "-p", "--prefix", action="store_true", help="Filter using specified prefix"
-    )
-    parser.add_argument('-v','--version',action='version', version='%(prog)s 1.0')
+    parser.add_argument("-p", "--prefix", action="store_true", help="Filter using specified prefix")
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0")
     parser.add_argument(
         "-r",
         "--record",
@@ -19,12 +19,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--from_time",
-        nargs=1,
+        type=str,
         help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
     )
     parser.add_argument(
         "--until_time",
-        nargs=1,
+        type=str,
         help="Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00",
     )
     parser.add_argument(
@@ -45,4 +45,6 @@ if __name__ == "__main__":
     print(args)
 
     filter = BGPFilter()
+    filter.json_out = args.json_output_file
+    filter.set_record_mode(args.record, args.from_time, args.until_time)
     filter.start()
