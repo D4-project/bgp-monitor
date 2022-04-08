@@ -5,14 +5,14 @@ BGP filter based on prefixes/network with country lookup
 ## Usage
 
 ~~~~shell
-usage: bgp-filter.py [-h] [-p] [-v] [-r] [--from_time FROM_TIME] [--until_time UNTIL_TIME] [--country_file [COUNTRY_FILE]] [--json_output_file [JSON_OUTPUT_FILE]]
+usage: bgp-filter.py [-h] [-v] [-r] [--from_time FROM_TIME] [--until_time UNTIL_TIME] [--country_file [COUNTRY_FILE]] [--json_output_file [JSON_OUTPUT_FILE]] [-p]
+                     [-c COUNTRY_F [COUNTRY_F ...]]
 
 Tool for BGP filtering
 
 optional arguments:
   -h, --help            show this help message and exit
-  -p, --prefix          Filter using specified prefix
-  -v, --version         show program\'s version number and exit
+  -v, --version         show program's version number and exit
   -r, --record          Retrieve records in the interval --until_time and --from-time arguments (which are required)
   --from_time FROM_TIME
                         Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
@@ -22,6 +22,9 @@ optional arguments:
                         MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used
   --json_output_file [JSON_OUTPUT_FILE]
                         File in which to display JSON output. If not set, default sys.stdout will be used
+  -p, --cidr_f          Filter using specified cidr
+  -c COUNTRY_F [COUNTRY_F ...], --country_f COUNTRY_F [COUNTRY_F ...]
+                        Filter using specified country codes
 ~~~~
 
 ## TODO
@@ -37,7 +40,7 @@ optional arguments:
 - [X] Auto reformat using [pre-commit](https://pre-commit.com/)
 - [ ] CIDR block, ASN, country, etc... filtering options
 - [ ] collector/project options ?
-- [ ] Output more data results
+- [X] Output more data results
 - [ ] Correct interrupt of the program (not just CTRL + C)
 - [ ] Generate requirements.txt
 
