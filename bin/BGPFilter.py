@@ -1,10 +1,10 @@
-import json
 import os
 import sys
-
+import json
 import maxminddb
-import pybgpstream
 import pycountry
+import pybgpstream
+
 from pytz import country_names
 
 
@@ -19,14 +19,7 @@ class BGPFilter:
         self.__end_time = ""
         self.__country_file = "mmdb_files/latest.mmdb"
         self.__collectors = None
-        self.__countries_filter = []
-
-        self.__switcher = {
-            "A": self.__jprint_updateribs,
-            "R": self.__jprint_updateribs,
-            "S": self.__jprint_peer_state,
-            "W": self.__jprint_withdrawal,
-        }
+        self.__countries_filter = None
 
     ###############
     #   GETTERS   #
@@ -124,11 +117,10 @@ class BGPFilter:
         pass
 
     @countries_filter.setter
-    def countries(self, country_list):
-        """TODO"""
+    def countries_filter(self, country_list):
         for c in country_list:
             pycountry.countries.lookup(c)
-        self.__countries = country_list
+        self.__countries_filter = country_list
 
     @asn_filter.setter
     def asn_filter(self, asn_filter):
@@ -140,50 +132,41 @@ class BGPFilter:
         pass
 
     ###############
-    #   PRINTERS   #
+    #   PRINTERS  #
     ###############
-
-    def __jprint_updateribs(self, e):
-        return {
-            "type": e.type,
-            "time": e.time,
-            "peer": e.peer_address,
-            "peer_asn": e.peer_asn,
-            "as-path": e.fields["as-path"],
-            "next-hop": e.fields["next-hop"],
-            "prefix": e.fields["prefix"],
-            "country_code": self.__country_by_prefix(e.fields["prefix"]),
-            "collector": e.collector
-            # "communities": e.fields['communities'], #set not supported by json.dumps
-        }
-
-    def __jprint_withdrawal(self, e):
-        return {
-            "type": e.type,
-            "time": e.time,
-            "peer": e.peer_address,
-            "peer_asn": e.peer_asn,
-            "prefix": e.fields["prefix"],
-            "country_code": self.__country_by_prefix(e.fields["prefix"]),
-            "collector": e.collector,
-        }
-
-    def __jprint_peer_state(self, e):
-        return {
-            "type": e.type,
-            "time": e.time,
-            "peer": e.peer_address,
-            "peer_asn": e.peer_asn,
-            "old-state": e.fields["old-state"],
-            "new-state": e.fields["new-state"],
-            "collector": e.collector,
-        }
-
-    def __jprint(self, e):
-        self.__json_out.write(json.dumps(self.__switcher.get(e.type)(e)))
 
     def __country_by_prefix(self, p):
         return self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
+
+    def __json_format(self, e):
+        res = {
+            "type": e.type,
+            "time": e.time,
+            "peer": e.peer_address,
+            "peer_asn": e.peer_asn,
+            "collector": e.collector,
+        }
+
+        if e.type in ["A", "R", "W"]:  # updateribs
+            res["prefix"] = e.fields["prefix"]
+            res["country_code"] = self.__country_by_prefix(e.fields["prefix"])
+        if e.type in ["A", "R"]:  # updateribs
+            res["as-path"] = e.fields["as-path"]
+            res["next-hop"] = e.fields["next-hop"]
+        elif e.type == "S":  # peer state
+            res["old-state"] = e.fields["old-state"]
+            res["new-state"] = e.fields["new-state"]
+
+        if (self.__countries_filter is not None) and (
+            res["country_code"] not in self.__countries_filter
+        ):
+            res = {}  # country filter
+
+        r = json.dumps(res)
+        return "" if r is None else r
+
+    def __jprint(self, e):
+        self.__json_out.write(self.__json_format(e))
 
     ####################
     # PUBLIC FUNCTIONS #
@@ -195,7 +178,7 @@ class BGPFilter:
         self.__json_out.write("{")
 
         self.__f_country = maxminddb.open_database(self.__country_file)
-        print(f"Loaded MMDB country by ip file : {self.__country_file}")
+        print(f"Loaded Geo Open database : {self.__country_file}")
 
         if self.__isRecord:
             print("Loading records ...")
