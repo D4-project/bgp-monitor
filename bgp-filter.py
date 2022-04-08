@@ -2,7 +2,7 @@
 import argparse
 import sys
 
-from BGPFilter import BGPFilter
+from bin.BGPFilter import BGPFilter
 
 
 if __name__ == "__main__":

@@ -4,6 +4,8 @@ import sys
 
 import maxminddb
 import pybgpstream
+import pycountry
+from pytz import country_names
 
 
 class BGPFilter:
@@ -12,12 +14,12 @@ class BGPFilter:
     def __init__(self):
         self.__json_out = sys.stdout
         self.__isStarted = False
-        self.__collectors = []
-        # self.setRecord(isRecord, start_time, end_time)
         self.__isRecord = False
         self.__start_time = ""
         self.__end_time = ""
         self.__country_file = "mmdb_files/latest.mmdb"
+        self.__collectors = []
+        self.__countries_filter = []
 
     @property
     def start_time(self):
@@ -40,11 +42,11 @@ class BGPFilter:
         return self.__country_file
 
     @property
-    def cidr_filter(self):
-        return None
+    def countries_filter(self):
+        return self.__countries_filter
 
     @property
-    def countries_filter(self):
+    def cidr_filter(self):
         return None
 
     @property
@@ -107,7 +109,9 @@ class BGPFilter:
 
     @countries_filter.setter
     def countries(self, country_list):
-        pass
+        for c in country_list:
+            pycountry.countries.lookup(c)
+        self.__countries = country_list
 
     @asn_filter.setter
     def asn_filter(self, asn_filter):
@@ -117,6 +121,7 @@ class BGPFilter:
         pass
 
     def __pprint(self, e):
+        print("type : " + e.type)
         self.__json_out.write(
             json.dumps(
                 {
@@ -132,16 +137,18 @@ class BGPFilter:
         # print(e.fields)
 
     def __getCountryByPrefix(self, p):
+        return self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
         return "" if not p else self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
 
     def start(self):
         """Start retrieving stream/records and filtering them"""
         self.__isStarted = True
+        self.__json_out.write("{")
+
         self.__f_country = maxminddb.open_database(self.__country_file)
         print(f"Loaded MMDB country by ip file : {self.__country_file}")
 
         if self.__isRecord:
-            print(f"{self.__start_time} -- {self.__end_time}")
             print("Loading records ...")
             self.stream = pybgpstream.BGPStream(
                 collectors=["route-views.sg", "route-views.eqix"],
@@ -157,8 +164,11 @@ class BGPFilter:
                 record_type="updates",
             )
 
+        print("Let's go")
         for elem in self.stream:
             self.__pprint(elem)
 
     def stop(self):
         self.__isStarted = False
+        self.__json_out.write("}")
+        self.close()
