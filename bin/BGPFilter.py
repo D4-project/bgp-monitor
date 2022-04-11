@@ -118,9 +118,10 @@ class BGPFilter:
 
     @countries_filter.setter
     def countries_filter(self, country_list):
-        for c in country_list:
-            pycountry.countries.lookup(c)
-        self.__countries_filter = country_list
+        if country_list is not None:
+            for c in country_list:
+                pycountry.countries.lookup(c)
+            self.__countries_filter = country_list
 
     @asn_filter.setter
     def asn_filter(self, asn_filter):
@@ -138,7 +139,7 @@ class BGPFilter:
     def __country_by_prefix(self, p):
         return self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
 
-    def __json_format(self, e):
+    def __jprint(self, e):
         res = {
             "type": e.type,
             "time": e.time,
@@ -163,10 +164,7 @@ class BGPFilter:
             res = {}  # country filter
 
         r = json.dumps(res)
-        return "" if r is None else r
-
-    def __jprint(self, e):
-        self.__json_out.write(self.__json_format(e))
+        self.__json_out.write("" if r == "{}" else (r + ","))
 
     ####################
     # PUBLIC FUNCTIONS #
