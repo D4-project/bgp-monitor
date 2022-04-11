@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import json
 import maxminddb
@@ -17,9 +18,11 @@ class BGPFilter:
         self.__isRecord = False
         self.__start_time = ""
         self.__end_time = ""
-        self.__country_file = "mmdb_files/latest.mmdb"
+        self.__f_country_path = "mmdb_files/latest.mmdb"
         self.__collectors = None
         self.__countries_filter = None
+        self.__asn_filter = None
+        self.__cidr_filter = None
 
     ###############
     #   GETTERS   #
@@ -43,7 +46,7 @@ class BGPFilter:
 
     @property
     def country_file(self):
-        return self.__country_file
+        return self.__f_country_path
 
     @property
     def countries_filter(self):
@@ -51,11 +54,11 @@ class BGPFilter:
 
     @property
     def cidr_filter(self):
-        return None
+        return self.__cidr_filter
 
     @property
     def asn_filter(self):
-        return None
+        return self.__asn_filter
 
     ###############
     #   SETTERS   #
@@ -121,12 +124,15 @@ class BGPFilter:
         if country_list is not None:
             for c in country_list:
                 pycountry.countries.lookup(c)
-            self.__countries_filter = country_list
+        self.__countries_filter = country_list
 
     @asn_filter.setter
-    def asn_filter(self, asn_filter):
-        """TODO"""
-        return None
+    def asn_filter(self, asn_list):
+        if asn_list is not None:
+            for a in asn_list:
+                if not re.match("^[0-9]{5}$", a):
+                    raise Exception(f"Invalid AS number format : {a}. Must be a 5 digit number.")
+        self.__asn_filter = "path _" + "|".join(asn_list) + "_"
 
     def __setCollectors(self, collectors):
         """TODO"""
@@ -139,7 +145,19 @@ class BGPFilter:
     def __country_by_prefix(self, p):
         return self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
 
+    def __check_filters(self, record, country_code):
+        if (self.__countries_filter is not None) and (country_code not in self.__countries_filter):
+            return False
+        if self.__asn_filter is not None and record.peer_asn not in self.__asn_filter:
+            return False
+        # Check for CIDR
+
+        return True
+
     def __jprint(self, e):
+        country_code = self.__country_by_prefix(e._maybe_field("prefix"))
+        if not self.__check_filters(e, country_code):
+            return
         res = {
             "type": e.type,
             "time": e.time,
@@ -149,22 +167,16 @@ class BGPFilter:
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
-            res["prefix"] = e.fields["prefix"]
-            res["country_code"] = self.__country_by_prefix(e.fields["prefix"])
+            res["prefix"] = e._maybe_field("prefix")
+            res["country_code"] = country_code
         if e.type in ["A", "R"]:  # updateribs
-            res["as-path"] = e.fields["as-path"]
-            res["next-hop"] = e.fields["next-hop"]
+            res["as-path"] = e._maybe_field("as-path")
+            res["next-hop"] = e._maybe_field("next-hop")
         elif e.type == "S":  # peer state
-            res["old-state"] = e.fields["old-state"]
-            res["new-state"] = e.fields["new-state"]
+            res["old-state"] = e._maybe_field("old-state")
+            res["new-state"] = e._maybe_field("new-state")
 
-        if (self.__countries_filter is not None) and (
-            res["country_code"] not in self.__countries_filter
-        ):
-            res = {}  # country filter
-
-        r = json.dumps(res)
-        self.__json_out.write("" if r == "{}" else (r + ","))
+        self.__json_out.write(json.dumps(res) + ",")
 
     ####################
     # PUBLIC FUNCTIONS #
@@ -173,10 +185,10 @@ class BGPFilter:
     def start(self):
         """Start retrieving stream/records and filtering them"""
         self.__isStarted = True
-        self.__json_out.write("{")
+        self.__json_out.write('{"data":[')
 
-        self.__f_country = maxminddb.open_database(self.__country_file)
-        print(f"Loaded Geo Open database : {self.__country_file}")
+        self.__f_country = maxminddb.open_database(self.__f_country_path)
+        print(f"Loaded Geo Open database : {self.__f_country_path}")
 
         if self.__isRecord:
             print("Loading records ...")
@@ -192,6 +204,7 @@ class BGPFilter:
                 project="ris-live",
                 collectors=self.__collectors,
                 record_type="updates",
+                filter=self.asn_filter,
             )
 
         print("Let's go")
@@ -200,5 +213,7 @@ class BGPFilter:
 
     def stop(self):
         self.__isStarted = False
-        self.__json_out.write("}")
-        self.close()
+        self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
+        self.__json_out.truncate()
+        self.__json_out.write("]}")
+        print("Cool ending")

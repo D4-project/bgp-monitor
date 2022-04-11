@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+import atexit
 import argparse
 import bin.BGPFilter
 
@@ -33,16 +34,22 @@ if __name__ == "__main__":
         help="MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used",
     )
     parser.add_argument(
+        "-jf",
         "--json_output_file",
         nargs="?",
         default=sys.stdout,
-        type=argparse.FileType("w"),
+        type=argparse.FileType("w+"),
         help="File in which to display JSON output. If not set, default sys.stdout will be used",
     )
 
-    parser.add_argument("-p", "--cidr_f", action="store_true", help="Filter using specified cidr")
-    parser.add_argument("-c", "--country_f", nargs="+", help="Filter using specified country codes")
-    #    parser.add_argument("-p", "--prefix", help="Filter using specified prefix")
+    parser.add_argument("-pf", "--cidr_f", action="store_true", help="Filter using specified cidr")
+    parser.add_argument("-cf", "--country_f", nargs="+", help="Filter using specified country codes")
+    parser.add_argument(
+        "-af",
+        "--asn_f",
+        nargs="+",
+        help="Filter using specified AS number list, skip records if their as-path ",
+    )
 
     args = parser.parse_args()
     print(args)
@@ -50,5 +57,8 @@ if __name__ == "__main__":
     filter = bin.BGPFilter.BGPFilter()
     filter.json_out = args.json_output_file
     filter.countries_filter = args.country_f
+    filter.asn_filter = args.asn_f
     filter.set_record_mode(args.record, args.from_time, args.until_time)
+
+    atexit.register(filter.stop)
     filter.start()
