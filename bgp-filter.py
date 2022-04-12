@@ -2,7 +2,6 @@
 
 import signal
 import sys
-import atexit
 import argparse
 import bin.BGPFilter
 

@@ -41,11 +41,11 @@ optional arguments:
 - [ ] Add test cases
 - [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
 - [X] Auto reformat using [pre-commit](https://pre-commit.com/)
-- [ ] CIDR block, ASN, country, etc... filtering options
+- [-] CIDR block, ASN, country, etc... filtering options
 - [ ] collector/project options ?
 - [X] Output more data results
 - [X] Correct interrupt of the program (CTRL + C -> clean json ending)
-- [ ] Generate requirements.txt
+- [X] Generate requirements.txt
 
 ## Exemple of Use
 
@@ -86,8 +86,8 @@ optional arguments:
   "next-hop": "202.79.197.159"
 }
 ~~~~
-See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
 
+See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
 
 ## Sources
 
