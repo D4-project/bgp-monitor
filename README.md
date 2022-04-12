@@ -57,16 +57,19 @@ optional arguments:
 
 ## Output
 
-- `type` : ...
-- `time` : ...
-- `peer` : ...
-- `peer_asn`: ...
-- `prefix` : ...
-- `country` : ...
-- `collector`:
-- `country_code`:
-- `as-path`: List separated by spaces of AS numbers, ordered by
-- `next-hop`: "202.79.197.159"
+- `type`
+  - R: RIB table entry
+  - A: prefix announcement
+  - W: prefix withdrawal
+  - S: peer state change
+- `time` : Timestamp
+- `peer` : The IP address of the peer that this element was received from.
+- `peer_asn`: The ASN of the peer that this element was received from.
+- `collector`: The name of the collector that generated this element.
+- `prefix` : The prefix of the source ASN that this element was generated from. [A and W types]
+- `country_code`: The country of the source ASN that this element was generated from. [A and W types]
+- `next-hop`: The next-hop IP address [A type]
+- `as-path`: String list separated by spaces of AS numbers, ordered by the near peer ASN to the source ASN. Therefore, Source ASN is at the end of the string. [A type]
 
 ## Example of data output
 
@@ -83,9 +86,12 @@ optional arguments:
   "next-hop": "202.79.197.159"
 }
 ~~~~
+See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
+
 
 ## Sources
 
 - Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
 - Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)
-- [BGPStream] (<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
+- [BGPStream Filtering] (<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
+- [BGPStream python library] (https://bgpstream.caida.org/docs/api/pybgpstream)
