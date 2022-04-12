@@ -5,19 +5,18 @@ BGP filter based on prefixes/network with country lookup
 ## Usage
 
 ~~~~shell
-usage: bgp-filter.py [-h] [-v] [-r] [--from_time FROM_TIME] [--until_time UNTIL_TIME] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-pf CIDR_FILTER] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]]
-                     [-af ASN_FILTER [ASN_FILTER ...]]
+usage: bgp-filter.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-pf CIDR_FILTER] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]] [-af ASN_FILTER [ASN_FILTER ...]] [--from_time FROM_TIME]
+                     [--until_time UNTIL_TIME]
+                     {record} ...
 
 Tool for BGP filtering
+
+positional arguments:
+  {record}
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program\'s version number and exit
-  -r, --record          Retrieve records in the interval --until_time and --from-time arguments (which are required)
-  --from_time FROM_TIME
-                        Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
-  --until_time UNTIL_TIME
-                        Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
   --country_file [COUNTRY_FILE]
                         MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used
   -jf [JSON_OUTPUT_FILE], --json_output_file [JSON_OUTPUT_FILE]
@@ -27,7 +26,15 @@ optional arguments:
   -cf COUNTRY_FILTER [COUNTRY_FILTER ...], --country_filter COUNTRY_FILTER [COUNTRY_FILTER ...]
                         Filter using specified country codes.
   -af ASN_FILTER [ASN_FILTER ...], --asn_filter ASN_FILTER [ASN_FILTER ...]
-                        Filter using specified AS number list, skip a record if its as-path doesn't contain one of specified AS numbers
+                        Filter using specified AS number list, skip a record if its as-path doesn\'t contain one of specified AS numbers
+
+record:
+  Retrieve records in the interval --until_time and --from-time arguments (which are required)
+
+  --from_time FROM_TIME
+                        Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
+  --until_time UNTIL_TIME
+                        Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
 ~~~~
 
 ## TODO
@@ -37,6 +44,7 @@ optional arguments:
 - [X] Save json output file option
 - [X] Add .gitignore
 - [X] Use argparse
+- [ ] Use subparser for prefix filter
 - [X] Create lib to centralize filtering
 - [ ] Add test cases
 - [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
@@ -48,6 +56,11 @@ optional arguments:
 - [X] Generate requirements.txt
 
 ## Exemple of Use
+
+
+`python3 bgp-filter.py -jf=result.json --cidr_filter 130.0.192.0/21 record --from_time="2015-08-01 07:50:00" --until_time="2015-08-01 08:50:00"`
+
+`cat result.json | python3 -mjson.tool > clean_result.json`
 
 ## Requirements
 
