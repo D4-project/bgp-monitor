@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import signal
 import sys
 import atexit
 import argparse
@@ -42,13 +43,20 @@ if __name__ == "__main__":
         help="File in which to display JSON output. If not set, default sys.stdout will be used",
     )
 
-    parser.add_argument("-pf", "--cidr_f", action="store_true", help="Filter using specified cidr")
-    parser.add_argument("-cf", "--country_f", nargs="+", help="Filter using specified country codes")
+    parser.add_argument(
+        "-pf",
+        "--cidr_filter",
+        type=str,
+        help="Filter using specified cidr. Keep records that exactly match to specified cidr. Format: ip/subnet | Example: 130.0.192.0/21",
+    )
+    parser.add_argument(
+        "-cf", "--country_filter", nargs="+", help="Filter using specified country codes."
+    )
     parser.add_argument(
         "-af",
-        "--asn_f",
+        "--asn_filter",
         nargs="+",
-        help="Filter using specified AS number list, skip records if their as-path ",
+        help="Filter using specified AS number list, skip a record if its as-path doesn't contain one of specified AS numbers",
     )
 
     args = parser.parse_args()
@@ -56,9 +64,14 @@ if __name__ == "__main__":
 
     filter = bin.BGPFilter.BGPFilter()
     filter.json_out = args.json_output_file
-    filter.countries_filter = args.country_f
-    filter.asn_filter = args.asn_f
+    filter.countries_filter = args.country_filter
+    filter.asn_filter = args.asn_filter
+    filter.cidr_filter = args.cidr_filter
     filter.set_record_mode(args.record, args.from_time, args.until_time)
 
-    atexit.register(filter.stop)
+    def stop(x, y):
+        filter.stop()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, stop)
     filter.start()

@@ -66,15 +66,15 @@ class BGPFilter:
 
     def set_record_mode(self, isRecord, start, end):
         """
-        Define if record mode or live stream.
-        start and begin will not be modified if isRecord == false
+        Define record mode or live stream.
+            start and begin will not be modified if isRecord is False
         Args:
             isRecord (bool)
             start (string): Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
             end (string): Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
 
         Raises:
-            Exception: If start == end or not define
+            Exception: If start == end or not defined
         """
         self.__isRecord = isRecord
         if isRecord:
@@ -89,10 +89,9 @@ class BGPFilter:
 
     @json_out.setter
     def json_out(self, json_out):
-        """Setter for JSON output
-
-        Default : sys.stdout
-
+        """
+        Setter for JSON output
+            Default : sys.stdout
         Parameters:
             json_output_file (File): Where to output json
         Raises:
@@ -104,23 +103,42 @@ class BGPFilter:
             raise FileNotFoundError(f"Is {json_out} a file ?")
 
     @country_file.setter
-    def country_file(self, country_file):
-        """Define country mmdb file
+    def country_file(self, country_file_path):
+        """
+        Setter for the GeoOpen country mmdb file
 
         Parameters:
-            country_file (String): Path to current Geo Open MaxMindDB File
+            country_file_path (String): Path to Geo Open MaxMindDB File
         """
-        if not os.path.isfile(country_file):
+        if not os.path.isfile(country_file_path):
             raise FileNotFoundError
-        self._country_file = country_file
+        self.__f_country_path = country_file_path
 
     @cidr_filter.setter
-    def cidr(self, CIDR):
-        """TODO"""
-        pass
+    def cidr_filter(self, CIDR):
+        """
+        CIDR filter option
+            Keep records that exactly match to specified cidr.
+
+        Parameters:
+            CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
+        """
+        if CIDR is not None and re.match(
+            r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", CIDR
+        ):
+            self.__cidr_filter = " and prefix exact " + CIDR
+        else:
+            self.__cidr_filter = ""
 
     @countries_filter.setter
     def countries_filter(self, country_list):
+        """
+        Filter using specified country.
+            Keep records that the origin of their prefix is contained in country_list.
+
+        Parameters:
+            country_list (list): List of country codes
+        """
         if country_list is not None:
             for c in country_list:
                 pycountry.countries.lookup(c)
@@ -128,11 +146,22 @@ class BGPFilter:
 
     @asn_filter.setter
     def asn_filter(self, asn_list):
-        if asn_list is not None:
+        """Filter using specified AS number list
+            Skip a record if its as-path doesn't contain one of specified AS numbers
+
+        Args:
+            asn_list (list): List of 5 digit AS numbers
+
+        Raises:
+            Exception: If a list item is'n't a 5 digit number
+        """
+        if asn_list is not None and len(asn_list) >= 1:
             for a in asn_list:
                 if not re.match("^[0-9]{5}$", a):
                     raise Exception(f"Invalid AS number format : {a}. Must be a 5 digit number.")
-        self.__asn_filter = "path _" + "|".join(asn_list) + "_"
+            self.__asn_filter = " and path (" + "|".join(asn_list) + ")"
+        else:
+            self.__asn_filter = ""
 
     def __setCollectors(self, collectors):
         """TODO"""
@@ -143,20 +172,27 @@ class BGPFilter:
     ###############
 
     def __country_by_prefix(self, p):
-        return self.__f_country.get(p.split("/", 1)[0])["country"]["iso_code"]
+        """
+        Parameters:
+            p (prefix): CIDR format. Example: 130.0.192.0/21
 
-    def __check_filters(self, record, country_code):
-        if (self.__countries_filter is not None) and (country_code not in self.__countries_filter):
-            return False
-        if self.__asn_filter is not None and record.peer_asn not in self.__asn_filter:
-            return False
-        # Check for CIDR
+        Returns:
+            string: country code of the given prefix. None if not found in GeoOpen database
+        """
+        r = self.__f_country.get(p.split("/", 1)[0])
+        return r["country"]["iso_code"] if r is not None else None
 
-        return True
+    def __check_filters(self, country_code):
+        return not (self.__countries_filter is not None and country_code not in self.__countries_filter)
 
     def __jprint(self, e):
+        """Print a BGPElem to json output file
+
+        Parameters:
+            e (BGPRecord): _description_
+        """
         country_code = self.__country_by_prefix(e._maybe_field("prefix"))
-        if not self.__check_filters(e, country_code):
+        if not self.__check_filters(country_code):
             return
         res = {
             "type": e.type,
@@ -183,7 +219,11 @@ class BGPFilter:
     ####################
 
     def start(self):
-        """Start retrieving stream/records and filtering them"""
+        """Start retrieving stream/records and filtering them
+        Load Geo Open database
+        Start stream with args
+        Print each record as JSON format
+        """
         self.__isStarted = True
         self.__json_out.write('{"data":[')
 
@@ -192,28 +232,39 @@ class BGPFilter:
 
         if self.__isRecord:
             print("Loading records ...")
-            self.stream = pybgpstream.BGPStream(
+            self._stream = pybgpstream.BGPStream(
                 collectors=["route-views.sg", "route-views.eqix"],
-                record_type="updates",
                 from_time=self.start_time,
                 until_time=self.end_time,
+                filter="type updates and elemtype announcements withdrawals"
+                + self.__asn_filter
+                + self.__cidr_filter,
             )
         else:
             print("Loading live stream ...")
-            self.stream = pybgpstream.BGPStream(
+            self._stream = pybgpstream.BGPStream(
                 project="ris-live",
-                collectors=self.__collectors,
-                record_type="updates",
-                filter=self.asn_filter,
+                collectors=["rrc00"],
+                filter="type updates and elemtype announcements withdrawals"
+                + self.__asn_filter
+                + self.__cidr_filter,
             )
 
         print("Let's go")
-        for elem in self.stream:
+        for elem in self._stream:
             self.__jprint(elem)
 
     def stop(self):
+        """
+        Stop BGPStream
+            Close JSON output file
+        """
         self.__isStarted = False
-        self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
-        self.__json_out.truncate()
+        if self.__json_out != sys.stdout:
+            self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
+            if self.__json_out.read() == ",":
+                self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
+                self.__json_out.truncate()
+
         self.__json_out.write("]}")
-        print("Cool ending")
+        print("Stream ended")
