@@ -95,13 +95,8 @@ class BGPFilter:
             Default : sys.stdout
         Parameters:
             json_output_file (File): Where to output json
-        Raises:
-            Exception: If unable to use
         """
-        if hasattr(json_out, "write"):
-            self.__json_out = json_out
-        else:
-            raise FileNotFoundError(f"Is {json_out} a file ?")
+        self.__json_out = json_out
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -115,8 +110,7 @@ class BGPFilter:
             raise FileNotFoundError
         self.__f_country_path = country_file_path
 
-    @cidr_filter.setter
-    def cidr_filter(self, args):
+    def set_cidr_filter(self, isCIDR, match_type, cidr_list):
         """
         CIDR filter option
             Keep records that match to one of specified cidr.
@@ -129,24 +123,18 @@ class BGPFilter:
                 any
             CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
         """
-        try:
-            match_type, CIDR_list = args
-        except ValueError:
-            raise ValueError("cidr_list and match_type are required args for cidr filter")
-        else:
-            if CIDR_list is not None and len(CIDR_list) >= 1:
-                #                self.__cidr_filter = " and prefix " + match_type
-                for c in CIDR_list:
-                    if not re.match(r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", c):
-                        raise Exception(f"Invalid CIDR format : {c}")
-                if match_type not in ["exact", "less", "more", "any"]:
-                    raise Exception("Match type must be one of ['exact', 'less', 'more', 'any']")
-                self.__cidr_match_type_filter = "prefix-" + match_type
-                self.__cidr_filter = CIDR_list
-
-    #                self.__cidr_filter += " (" + "|".join(CIDR_list) + ")"
-    #            else:
-    #                self.__cidr_filter = ""
+        if isCIDR:
+            if cidr_list is None or len(cidr_list) == 0:
+                raise Exception("Please specify one or more prefixes when filtering by prefix")
+            if match_type not in ["exact", "less", "more", "any"]:
+                raise Exception(
+                    "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
+                )
+            for c in cidr_list:
+                if not re.match(r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", c):
+                    raise Exception(f"Invalid CIDR format : {c}")
+            self.__cidr_match_type_filter = "prefix-" + match_type
+            self.__cidr_filter = cidr_list
 
     @countries_filter.setter
     def countries_filter(self, country_list):

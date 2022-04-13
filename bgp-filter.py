@@ -1,13 +1,24 @@
 #!/usr/bin/env python
 
+import datetime
 import signal
 import sys
 import argparse
+
+from yaml import parse
 import bin.BGPFilter
 
 
+def valid_date(s):
+    """Not used yet"""
+    try:
+        return datetime.strptime(s, "%Y-%m-%d")
+    except ValueError:
+        msg = "not a valid date: {!r}".format(s)
+        raise argparse.ArgumentTypeError(msg)
+
+
 if __name__ == "__main__":
-    global country_file, start_time, end_time, isRecord
 
     parser = argparse.ArgumentParser(description="Tool for BGP filtering")
     parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0")
@@ -38,40 +49,38 @@ if __name__ == "__main__":
         help="Filter using specified AS number list, skip a record if its as-path doesn't contain one of specified AS numbers",
     )
 
-    subparser = parser.add_subparsers()
-
-    cidrparser = subparser.add_parser("prefix")
-    cidrparser.add_argument("--cidr_list", nargs="+", dest="cidr_list", required=True)
-    cidrparser.add_argument("--match", choices=["exact", "less", "more"], required=True)
-
-    cidrgrp = parser.add_argument_group(
-        "prefix", "Filter using specified cidr list. Keep records that match to one of specified cidr"
+    parser.add_argument(
+        "-pf",
+        "--cidr_filter",
+        action="store_true",
+        help="Filter using specified cidr list. Keep records that match to one of specified cidr",
     )
-    cidrgrp.add_argument(
+    parser.add_argument(
+        "-cl",
         "--cidr_list",
         nargs="+",
         help="List of cidr. Format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21",
     )
-    cidrgrp.add_argument(
+    parser.add_argument(
         "--match",
-        choices=["exact", "less", "more"],
+        choices=["exact", "less", "more", "any"],
         help="Type of match -> exact: Exact match | less: Exact match or less specific | more: Exact match or more specific",
     )
 
-    recordparser = subparser.add_parser("record")
-    recordparser.add_argument("--from_time", type=str, dest="from_time", required=True)
-    recordparser.add_argument("--until_time", type=str, dest="until_time", required=True)
-    recordgrp = parser.add_argument_group(
-        "record",
-        "Retrieve records in the interval --until_time and --from-time arguments (which are required)",
+    parser.add_argument(
+        "-r",
+        "--record",
+        action="store_true",
+        help="Retrieve records in the interval --until_time and --from-time arguments (which are required)",
     )
-    recordgrp.add_argument(
-        "--from_time",
-        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
-    )
-    recordgrp.add_argument(
+
+    parser.add_argument(
         "--until_time",
         help="Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00",
+    )
+    parser.add_argument(
+        "--from_time",
+        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
     )
 
     args = parser.parse_args()
@@ -81,10 +90,9 @@ if __name__ == "__main__":
     filter.json_out = args.json_output_file
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
-    filter.cidr_filter = (args.match, args.cidr_list)
-    filter.set_record_mode(
-        (args.from_time is not None and args.until_time is not None), args.from_time, args.until_time
-    )
+    filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
+    # filter.cidr_filter = (args.match, args.cidr_list)
+    filter.set_record_mode(args.record, args.from_time, args.until_time)
 
     def stop(x, y):
         filter.stop()
