@@ -23,6 +23,7 @@ class BGPFilter:
         self.__countries_filter = None
         self.__asn_filter = None
         self.__cidr_filter = None
+        self.__cidr_match_type_filter = None
 
     ###############
     #   GETTERS   #
@@ -115,20 +116,37 @@ class BGPFilter:
         self.__f_country_path = country_file_path
 
     @cidr_filter.setter
-    def cidr_filter(self, CIDR):
+    def cidr_filter(self, args):
         """
         CIDR filter option
-            Keep records that exactly match to specified cidr.
+            Keep records that match to one of specified cidr.
 
         Parameters:
+            match_type: Type of match
+                exact: Exact match
+                less: Exact match or less specific
+                more: Exact match or more specific
+                any
             CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
         """
-        if CIDR is not None and re.match(
-            r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", CIDR
-        ):
-            self.__cidr_filter = " and prefix exact " + CIDR
+        try:
+            match_type, CIDR_list = args
+        except ValueError:
+            raise ValueError("cidr_list and match_type are required args for cidr filter")
         else:
-            self.__cidr_filter = ""
+            if CIDR_list is not None and len(CIDR_list) >= 1:
+                #                self.__cidr_filter = " and prefix " + match_type
+                for c in CIDR_list:
+                    if not re.match(r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", c):
+                        raise Exception(f"Invalid CIDR format : {c}")
+                if match_type not in ["exact", "less", "more", "any"]:
+                    raise Exception("Match type must be one of ['exact', 'less', 'more', 'any']")
+                self.__cidr_match_type_filter = "prefix-" + match_type
+                self.__cidr_filter = CIDR_list
+
+    #                self.__cidr_filter += " (" + "|".join(CIDR_list) + ")"
+    #            else:
+    #                self.__cidr_filter = ""
 
     @countries_filter.setter
     def countries_filter(self, country_list):
@@ -164,7 +182,6 @@ class BGPFilter:
             self.__asn_filter = ""
 
     def __setCollectors(self, collectors):
-        """TODO"""
         pass
 
     ###############
@@ -236,20 +253,18 @@ class BGPFilter:
                 collectors=["route-views.sg", "route-views.eqix"],
                 from_time=self.start_time,
                 until_time=self.end_time,
-                filter="type updates and elemtype announcements withdrawals"
-                + self.__asn_filter
-                + self.__cidr_filter,
+                filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
         else:
             print("Loading live stream ...")
             self._stream = pybgpstream.BGPStream(
                 project="ris-live",
                 collectors=["rrc00"],
-                filter="type updates and elemtype announcements withdrawals"
-                + self.__asn_filter
-                + self.__cidr_filter,
+                filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
 
+        if self.__cidr_match_type_filter is not None:
+            self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
         print("Let's go")
         for elem in self._stream:
             self.__jprint(elem)

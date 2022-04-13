@@ -28,14 +28,6 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "-pf",
-        "--cidr_filter",
-        type=str,
-        help="Filter using specified cidr. Keep records that exactly match to specified cidr. Format: ip/subnet | Example: 130.0.192.0/21",
-    )
-    # subparser for prefix / match (exact, more, or less)
-
-    parser.add_argument(
         "-cf", "--country_filter", nargs="+", help="Filter using specified country codes."
     )
 
@@ -47,6 +39,25 @@ if __name__ == "__main__":
     )
 
     subparser = parser.add_subparsers()
+
+    cidrparser = subparser.add_parser("prefix")
+    cidrparser.add_argument("--cidr_list", nargs="+", dest="cidr_list", required=True)
+    cidrparser.add_argument("--match", choices=["exact", "less", "more"], required=True)
+
+    cidrgrp = parser.add_argument_group(
+        "prefix", "Filter using specified cidr list. Keep records that match to one of specified cidr"
+    )
+    cidrgrp.add_argument(
+        "--cidr_list",
+        nargs="+",
+        help="List of cidr. Format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21",
+    )
+    cidrgrp.add_argument(
+        "--match",
+        choices=["exact", "less", "more"],
+        help="Type of match -> exact: Exact match | less: Exact match or less specific | more: Exact match or more specific",
+    )
+
     recordparser = subparser.add_parser("record")
     recordparser.add_argument("--from_time", type=str, dest="from_time", required=True)
     recordparser.add_argument("--until_time", type=str, dest="until_time", required=True)
@@ -64,12 +75,13 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    print(args)
 
     filter = bin.BGPFilter.BGPFilter()
     filter.json_out = args.json_output_file
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
-    filter.cidr_filter = args.cidr_filter
+    filter.cidr_filter = (args.match, args.cidr_list)
     filter.set_record_mode(
         (args.from_time is not None and args.until_time is not None), args.from_time, args.until_time
     )
