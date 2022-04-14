@@ -5,14 +5,10 @@ BGP filter based on prefixes/network with country lookup
 ## Usage
 
 ~~~~shell
-usage: bgp-filter.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-pf CIDR_FILTER] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]] [-af ASN_FILTER [ASN_FILTER ...]] [--from_time FROM_TIME]
-                     [--until_time UNTIL_TIME]
-                     {record} ...
+usage: bgp-filter.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]] [-af ASN_FILTER [ASN_FILTER ...]] [-pf] [-cl CIDR_LIST [CIDR_LIST ...]]
+                     [--match {exact,less,more,any}] [-r] [--until_time UNTIL_TIME] [--from_time FROM_TIME]
 
 Tool for BGP filtering
-
-positional arguments:
-  {record}
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -21,20 +17,20 @@ optional arguments:
                         MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used
   -jf [JSON_OUTPUT_FILE], --json_output_file [JSON_OUTPUT_FILE]
                         File in which to display JSON output. If not set, default sys.stdout will be used
-  -pf CIDR_FILTER, --cidr_filter CIDR_FILTER
-                        Filter using specified cidr. Keep records that exactly match to specified cidr. Format: ip/subnet | Example: 130.0.192.0/21
   -cf COUNTRY_FILTER [COUNTRY_FILTER ...], --country_filter COUNTRY_FILTER [COUNTRY_FILTER ...]
                         Filter using specified country codes.
   -af ASN_FILTER [ASN_FILTER ...], --asn_filter ASN_FILTER [ASN_FILTER ...]
                         Filter using specified AS number list, skip a record if its as-path doesn\'t contain one of specified AS numbers
-
-record:
-  Retrieve records in the interval --until_time and --from-time arguments (which are required)
-
-  --from_time FROM_TIME
-                        Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
+  -pf, --cidr_filter    Filter using specified cidr list. Keep records that match to one of specified cidr
+  -cl CIDR_LIST [CIDR_LIST ...], --cidr_list CIDR_LIST [CIDR_LIST ...]
+                        List of cidr. Format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21
+  --match {exact,less,more,any}
+                        Type of match -> exact: Exact match | less: Exact match or less specific | more: Exact match or more specific
+  -r, --record          Retrieve records in the interval --until_time and --from-time arguments (which are required)
   --until_time UNTIL_TIME
                         Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
+  --from_time FROM_TIME
+                        Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
 ~~~~
 
 ## TODO
@@ -57,15 +53,19 @@ record:
 ## Exemple of Use
 
 Filter that exact match 84.205.67.0/24 as source AS
+
 `python3 bgp-filter.py -pf --cidr_list 84.205.67.0/24 --match exact`
 
 Retrieve records instead of live stream
+
 `python3 bgp-filter.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"`
 
 Output result to result.json
+
 `python3 bgp-filter.py -jf result.json`
 
 If you wan't a human readable result, don't forget to reformat your file :
+
 `cat result.json | python3 -mjson.tool > clean_result.json`
 
 ## Requirements
