@@ -52,21 +52,25 @@ optional arguments:
 
 ## Exemple of Use
 
-Filter that exact match 84.205.67.0/24 as source AS
-
-`python3 bgp-filter.py -pf --cidr_list 84.205.67.0/24 --match exact`
+Filter that exact match 84.205.67.0/24 or 41.244.223.0/24 as source AS
+~~~shell
+python3 bgp-filter.py -pf --cidr_list 84.205.67.0/24 41.244.223.0/24 --match exact -jf res.json
+~~~
 
 Retrieve records instead of live stream
-
-`python3 bgp-filter.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"`
+~~~shell
+python3 bgp-filter.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
+~~~
 
 Output result to result.json
-
-`python3 bgp-filter.py -jf result.json`
+~~~shell
+python3 bgp-filter.py -jf result.json`
+~~~
 
 If you wan't a human readable result, don't forget to reformat your file :
-
-`cat result.json | python3 -mjson.tool > clean_result.json`
+~~~shell
+cat result.json | python3 -mjson.tool > clean_result.json
+~~~
 
 ## Requirements
 
