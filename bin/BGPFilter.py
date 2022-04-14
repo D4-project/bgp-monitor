@@ -2,10 +2,13 @@ import os
 import re
 import sys
 import json
+import threading
 import maxminddb
 import pycountry
 import pybgpstream
 
+# from collections import deque
+from queue import Queue
 from pytz import country_names
 
 
@@ -24,6 +27,7 @@ class BGPFilter:
         self.__asn_filter = None
         self.__cidr_filter = None
         self.__cidr_match_type_filter = None
+        self.__queue = Queue()
 
     ###############
     #   GETTERS   #
@@ -184,8 +188,11 @@ class BGPFilter:
         Returns:
             string: country code of the given prefix. None if not found in GeoOpen database
         """
-        r = self.__f_country.get(p.split("/", 1)[0])
-        return r["country"]["iso_code"] if r is not None else None
+        if p is None:
+            return None
+        else:
+            r = self.__f_country.get(p.split("/", 1)[0])
+            return r["country"]["iso_code"] if r is not None else None
 
     def __check_filters(self, country_code):
         return not (self.__countries_filter is not None and country_code not in self.__countries_filter)
@@ -194,11 +201,13 @@ class BGPFilter:
         """Print a BGPElem to json output file
 
         Parameters:
-            e (BGPRecord): _description_
+            e (BGPElem)
         """
+
         country_code = self.__country_by_prefix(e._maybe_field("prefix"))
         if not self.__check_filters(country_code):
             return
+
         res = {
             "type": e.type,
             "time": e.time,
@@ -219,6 +228,12 @@ class BGPFilter:
 
         self.__json_out.write(json.dumps(res) + ",")
 
+    def __print_queue(self):
+        while True:
+            element = self.__queue.get()
+            self.__jprint(element)
+            self.__queue.task_done()
+
     ####################
     # PUBLIC FUNCTIONS #
     ####################
@@ -236,7 +251,6 @@ class BGPFilter:
         print(f"Loaded Geo Open database : {self.__f_country_path}")
 
         if self.__isRecord:
-            print("Loading records ...")
             self._stream = pybgpstream.BGPStream(
                 collectors=["route-views.sg", "route-views.eqix"],
                 from_time=self.start_time,
@@ -250,12 +264,14 @@ class BGPFilter:
                 collectors=["rrc00"],
                 filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
-
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
-        print("Let's go")
+        print("Starting stream")
+
+        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
         for elem in self._stream:
-            self.__jprint(elem)
+            self.__queue.put(elem)
+            print(self.__queue.qsize())
 
     def stop(self):
         """
@@ -263,6 +279,8 @@ class BGPFilter:
             Close JSON output file
         """
         self.__isStarted = False
+        print("Finishing queue ...")
+        self.__queue.join()
         if self.__json_out != sys.stdout:
             self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
             if self.__json_out.read() == ",":

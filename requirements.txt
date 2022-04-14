@@ -2,3 +2,4 @@ maxminddb
 pycountry
 pybgpstream
 pytz
+pyyaml
