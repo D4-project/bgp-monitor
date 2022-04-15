@@ -7,7 +7,7 @@ import maxminddb
 import pycountry
 import pybgpstream
 
-# from collections import deque
+from datetime import datetime
 from queue import Queue
 from pytz import country_names
 
@@ -72,7 +72,7 @@ class BGPFilter:
     def set_record_mode(self, isRecord, start, end):
         """
         Define record mode or live stream.
-            start and begin will not be modified if isRecord is False
+            start and end will not be modified if isRecord is False
         Args:
             isRecord (bool)
             start (string): Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
@@ -83,14 +83,18 @@ class BGPFilter:
         """
         self.__isRecord = isRecord
         if isRecord:
-            if not (start != end != ""):
-                # Check using a regex ?
-                raise Exception(
-                    "--until_time and --from_time parameters are required when using record mode"
-                )
-            else:
-                self.__start_time = start
-                self.__end_time = end
+            if start is None or end is None:
+                raise ValueError("Record mode requires the from_time and until_time arguments")
+            try:
+                st = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+                en = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                raise ValueError("Invalid record mode date format. Must be %Y-%m-%d %H:%M:%S")
+            if st > en:
+                raise ValueError("Invalid record mode interval. Beginning must ")
+
+            self.__start_time = start
+            self.__end_time = end
 
     @json_out.setter
     def json_out(self, json_out):
@@ -99,8 +103,13 @@ class BGPFilter:
             Default : sys.stdout
         Parameters:
             json_output_file (File): Where to output json
+        Raises:
+            Exception: If unable to use
         """
-        self.__json_out = json_out
+        if hasattr(json_out, "write"):
+            self.__json_out = json_out
+        else:
+            raise FileNotFoundError(f"Is {json_out} a file ?")
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -131,7 +140,7 @@ class BGPFilter:
             if cidr_list is None or len(cidr_list) == 0:
                 raise Exception("Please specify one or more prefixes when filtering by prefix")
             if match_type not in ["exact", "less", "more", "any"]:
-                raise Exception(
+                raise ValueError(
                     "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
                 )
             for c in cidr_list:
@@ -163,7 +172,7 @@ class BGPFilter:
             asn_list (list): List of 5 digit AS numbers
 
         Raises:
-            Exception: If a list item is'n't a 5 digit number
+            Exception: If an item is not a 5 digit number
         """
         if asn_list is not None and len(asn_list) >= 1:
             for a in asn_list:
@@ -229,9 +238,8 @@ class BGPFilter:
         self.__json_out.write(json.dumps(res) + ",")
 
     def __print_queue(self):
-        while True:
-            element = self.__queue.get()
-            self.__jprint(element)
+        while self.__isStarted or self.__queue.qsize():
+            self.__jprint(self.__queue.get())
             self.__queue.task_done()
 
     ####################
@@ -269,23 +277,30 @@ class BGPFilter:
         print("Starting stream")
 
         threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
+
         for elem in self._stream:
             self.__queue.put(elem)
-            print(self.__queue.qsize())
 
     def stop(self):
         """
         Stop BGPStream
             Close JSON output file
         """
-        self.__isStarted = False
-        print("Finishing queue ...")
-        self.__queue.join()
-        if self.__json_out != sys.stdout:
-            self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
-            if self.__json_out.read() == ",":
-                self.__json_out.seek(self.__json_out.tell() - 1, os.SEEK_SET)
-                self.__json_out.truncate()
+        if self.__isStarted:
+            self.__isStarted = False
+            self.__queue.join()
 
-        self.__json_out.write("]}")
-        print("Stream ended")
+            print(self.__queue.qsize())
+            print("Finishing queue ...")
+            if self.__json_out != sys.stdout:
+                with open(self.__json_out.name, "a+") as f:
+                    f.seek(f.tell() - 1, os.SEEK_SET)
+                    f.truncate()
+                    f.write("]}")
+                    f.seek(0, os.SEEK_SET)
+                    js = json.load(f)
+                    f.seek(0, os.SEEK_SET)
+                    f.truncate()
+                    f.write(json.dumps(js, sort_keys=True, indent=4))
+            print("Stream ended")
+            exit(0)

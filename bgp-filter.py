@@ -9,15 +9,6 @@ from yaml import parse
 import bin.BGPFilter
 
 
-def valid_date(s):
-    """Not used yet"""
-    try:
-        return datetime.strptime(s, "%Y-%m-%d")
-    except ValueError:
-        msg = "not a valid date: {!r}".format(s)
-        raise argparse.ArgumentTypeError(msg)
-
-
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Tool for BGP filtering")
@@ -84,19 +75,21 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    print(args)
+    if args.record and (args.from_time is None or args.until_time is None):
+        parser.error("--record requires --from_time and --until_time.")
+
+    if args.cidr_filter and (args.match is None or args.until_time is None):
+        parser.error("--cidr_filter requires --match and --cidr_list.")
 
     filter = bin.BGPFilter.BGPFilter()
     filter.json_out = args.json_output_file
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
     filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
-    # filter.cidr_filter = (args.match, args.cidr_list)
     filter.set_record_mode(args.record, args.from_time, args.until_time)
 
     def stop(x, y):
         filter.stop()
-        sys.exit(0)
 
     signal.signal(signal.SIGINT, stop)
     filter.start()

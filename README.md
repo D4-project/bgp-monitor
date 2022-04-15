@@ -53,30 +53,36 @@ optional arguments:
 ## Exemple of Use
 
 Filter that exact match 84.205.67.0/24 or 41.244.223.0/24 as source AS
+
 ~~~shell
 python3 bgp-filter.py -pf --cidr_list 84.205.67.0/24 41.244.223.0/24 --match exact -jf res.json
 ~~~
 
 Retrieve records instead of live stream
+
 ~~~shell
 python3 bgp-filter.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
 ~~~
 
 Output result to result.json
+
 ~~~shell
 python3 bgp-filter.py -jf result.json`
 ~~~
 
 If you wan't a human readable result, don't forget to reformat your file :
+
 ~~~shell
 cat result.json | python3 -mjson.tool > clean_result.json
 ~~~
 
-## Requirements
-
-- [MaxMindDB Library](https://github.com/maxmind/MaxMind-DB-Reader-python)
-
 ## Installation
+
+1. [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream
+
+~~~shell
+pip3 install -r requirements.txt
+~~~
 
 ## Output
 
@@ -97,17 +103,20 @@ cat result.json | python3 -mjson.tool > clean_result.json
 ## Example of data output
 
 ~~~~json
-{
-  "type": "A",
-  "time": 1438415400.0,
-  "peer": "202.79.197.159",
-  "peer_asn": 24482,
-  "collector": "route-views.sg",
-  "prefix": "216.205.248.0/22",
-  "country_code": "US",
-  "as-path": "24482 6453 3356 20374 20374 20374 20374 20374",
-  "next-hop": "202.79.197.159"
-}
+{"data":[
+  {
+    "type": "A",
+    "time": 1438415400.0,
+    "peer": "202.79.197.159",
+    "peer_asn": 24482,
+    "collector": "route-views.sg",
+    "prefix": "216.205.248.0/22",
+    "country_code": "US",
+    "as-path": "24482 6453 3356 20374 20374 20374 20374 20374",
+    "next-hop": "202.79.197.159"
+  },
+  ...
+]
 ~~~~
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
@@ -116,5 +125,5 @@ See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html
 
 - Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
 - Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)
-- [BGPStream Filtering] (<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
-- [BGPStream python library] (https://bgpstream.caida.org/docs/api/pybgpstream)
+- [BGPStream Filtering](<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
+- [BGPStream python library](<https://bgpstream.caida.org/docs/api/pybgpstream>)
