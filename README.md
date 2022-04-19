@@ -1,36 +1,45 @@
 # BGP-filter
 
-BGP filter based on prefixes/network with country lookup
-
 ## Usage
 
 ~~~~shell
-usage: bgp-filter.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]] [-af ASN_FILTER [ASN_FILTER ...]] [-pf] [-cl CIDR_LIST [CIDR_LIST ...]]
-                     [--match {exact,less,more,any}] [-r] [--until_time UNTIL_TIME] [--from_time FROM_TIME]
+usage: bgp-filter.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]]
+                     [-af ASN_FILTER [ASN_FILTER ...]] [-pf] [-cl CIDR_LIST [CIDR_LIST ...]] [--match {exact,less,more,any}] [-p {ris,routeviews}]
+                     [-c COLLECTORS [COLLECTORS ...]] [-r] [--until_time UNTIL_TIME] [--from_time FROM_TIME]
 
 Tool for BGP filtering
 
 optional arguments:
   -h, --help            show this help message and exit
   -v, --version         show program\'s version number and exit
+
   --country_file [COUNTRY_FILE]
                         MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used
   -jf [JSON_OUTPUT_FILE], --json_output_file [JSON_OUTPUT_FILE]
                         File in which to display JSON output. If not set, default sys.stdout will be used
+
   -cf COUNTRY_FILTER [COUNTRY_FILTER ...], --country_filter COUNTRY_FILTER [COUNTRY_FILTER ...]
                         Filter using specified country codes.
   -af ASN_FILTER [ASN_FILTER ...], --asn_filter ASN_FILTER [ASN_FILTER ...]
                         Filter using specified AS number list, skip a record if its as-path doesn\'t contain one of specified AS numbers
+
   -pf, --cidr_filter    Filter using specified cidr list. Keep records that match to one of specified cidr
   -cl CIDR_LIST [CIDR_LIST ...], --cidr_list CIDR_LIST [CIDR_LIST ...]
                         List of cidr. Format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21
   --match {exact,less,more,any}
                         Type of match -> exact: Exact match | less: Exact match or less specific | more: Exact match or more specific
+
+  -p {ris,routeviews}, --project {ris,routeviews}
+                        Project name
+  -c COLLECTORS [COLLECTORS ...], --collectors COLLECTORS [COLLECTORS ...]
+                        Collectors. For complete list of collectors, see https://bgpstream.caida.org/data
+
   -r, --record          Retrieve records in the interval --until_time and --from-time arguments (which are required)
   --until_time UNTIL_TIME
                         Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
   --from_time FROM_TIME
                         Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
+
 ~~~~
 
 ## TODO
@@ -45,7 +54,7 @@ optional arguments:
 - [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
 - [X] Auto reformat using [pre-commit](https://pre-commit.com/)
 - [X] CIDR block, ASN, country, etc... filtering options
-- [ ] collector/project options ?
+- [X] collector/project options ?
 - [X] Output more data results
 - [X] Correct interrupt of the program (CTRL + C -> clean json ending)
 - [X] Generate requirements.txt
@@ -127,3 +136,4 @@ See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html
 - Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)
 - [BGPStream Filtering](<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
 - [BGPStream python library](<https://bgpstream.caida.org/docs/api/pybgpstream>)
+- [Data sources](<https://bgpstream.caida.org/data>)

@@ -1,3 +1,4 @@
+import ipaddress
 import os
 import re
 import sys
@@ -11,6 +12,78 @@ from datetime import datetime
 from queue import Queue
 from pytz import country_names
 
+collectors_list = {
+    "routeviews": [
+        "route-views.amsix",
+        "route-views.bdix",
+        "route-views.bknix",
+        "route-views.chicago",
+        "route-views.chile",
+        "route-views.eqix",
+        "route-views.flix",
+        "route-views.fortaleza",
+        "route-views.gixa",
+        "route-views.gorex",
+        "route-views.isc",
+        "route-views.jinx",
+        "route-views.kixp",
+        "route-views.linx",
+        "route-views.mwix",
+        "route-views.napafrica",
+        "route-views.nwax",
+        "route-views.ny",
+        "route-views.perth",
+        "route-views.peru",
+        "route-views.phoix",
+        "route-views.rio",
+        "route-views.saopaulo",
+        "route-views.sfmix",
+        "route-views.sg",
+        "route-views.siex",
+        "route-views.soxrs",
+        "route-views.sydney",
+        "route-views.telxatl",
+        "route-views.uaeix",
+        "route-views.wide",
+        "route-views2",
+        "route-views2.saopaulo",
+        "route-views3",
+        "route-views4",
+        "route-views5",
+        "route-views6",
+    ],
+    "ris": [
+        "rrc00",
+        "rrc01",
+        "rrc02",
+        "rrc03",
+        "rrc04",
+        "rrc05",
+        "rrc06",
+        "rrc07",
+        "rrc08",
+        "rrc09",
+        "rrc10",
+        "rrc11",
+        "rrc12",
+        "rrc13",
+        "rrc14",
+        "rrc15",
+        "rrc16",
+        "rrc18",
+        "rrc19",
+        "rrc20",
+        "rrc21",
+        "rrc22",
+        "rrc23",
+        "rrc24",
+        "rrc25",
+        "rrc26",
+    ],
+}
+project_types = {"ris": "ris-live", "routeviews": "routeviews-streams"}
+# projects_list = ['ris-live','routeviews', 'routeviews-stream', 'ris']
+
 
 class BGPFilter:
     """BGP stream filter"""
@@ -22,12 +95,13 @@ class BGPFilter:
         self.__start_time = ""
         self.__end_time = ""
         self.__f_country_path = "mmdb_files/latest.mmdb"
-        self.__collectors = None
         self.__countries_filter = None
         self.__asn_filter = None
         self.__cidr_filter = None
         self.__cidr_match_type_filter = None
         self.__queue = Queue()
+        self.__project = list(project_types.keys())[0]
+        self.__collectors = None
 
     ###############
     #   GETTERS   #
@@ -64,6 +138,14 @@ class BGPFilter:
     @property
     def asn_filter(self):
         return self.__asn_filter
+
+    @property
+    def collectors(self):
+        return self.__collectors
+
+    @property
+    def project(self):
+        return self.__project
 
     ###############
     #   SETTERS   #
@@ -144,8 +226,9 @@ class BGPFilter:
                     "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
                 )
             for c in cidr_list:
-                if not re.match(r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", c):
-                    raise Exception(f"Invalid CIDR format : {c}")
+                ipaddress.ip_network(c)
+                # if not re.match(r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", c):
+                #    raise Exception(f"Invalid CIDR format : {c}")
             self.__cidr_match_type_filter = "prefix-" + match_type
             self.__cidr_filter = cidr_list
 
@@ -182,8 +265,21 @@ class BGPFilter:
         else:
             self.__asn_filter = ""
 
-    def __setCollectors(self, collectors):
-        pass
+    @collectors.setter
+    def collectors(self, collectors):
+        if collectors is not None:
+            for c in collectors:
+                if c not in collectors_list[self.__project]:
+                    raise ValueError("Invalid collector name.")
+            self.__collectors = collectors
+
+    @project.setter
+    def project(self, project):
+        if self.__collectors != project and project in project_types.keys():
+            self.__project = project
+            self.__collectors = None
+        else:
+            raise ValueError(f"Invalid project name. Valid projects list : {project_types.keys()}")
 
     ###############
     #   PRINTERS  #
@@ -260,16 +356,18 @@ class BGPFilter:
 
         if self.__isRecord:
             self._stream = pybgpstream.BGPStream(
-                collectors=["route-views.sg", "route-views.eqix"],
+                project=self.__project,
+                collectors=self.__collectors,
                 from_time=self.start_time,
                 until_time=self.end_time,
                 filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
+            # ["route-views.sg", "route-views.eqix"]
         else:
-            print("Loading live stream ...")
+            print(f"Loading {project_types[self.__project]} live stream ...")
             self._stream = pybgpstream.BGPStream(
-                project="ris-live",
-                collectors=["rrc00"],
+                project=project_types[self.__project],
+                collectors=self.__collectors,
                 filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
         if self.__cidr_match_type_filter is not None:

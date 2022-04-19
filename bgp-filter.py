@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import datetime
+from secrets import choice
 import signal
 import sys
 import argparse
@@ -32,7 +33,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "-cf", "--country_filter", nargs="+", help="Filter using specified country codes."
     )
-
     parser.add_argument(
         "-af",
         "--asn_filter",
@@ -59,6 +59,16 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "-p", "--project", default="ris", choices=["ris", "routeviews"], help="Project name"
+    )
+    parser.add_argument(
+        "-c",
+        "--collectors",
+        nargs="+",
+        help="Collectors. For complete list of collectors, see https://bgpstream.caida.org/data",
+    )
+
+    parser.add_argument(
         "-r",
         "--record",
         action="store_true",
@@ -78,7 +88,7 @@ if __name__ == "__main__":
     if args.record and (args.from_time is None or args.until_time is None):
         parser.error("--record requires --from_time and --until_time.")
 
-    if args.cidr_filter and (args.match is None or args.until_time is None):
+    if args.cidr_filter and (args.match is None or args.match is None):
         parser.error("--cidr_filter requires --match and --cidr_list.")
 
     filter = bin.BGPFilter.BGPFilter()
@@ -86,6 +96,9 @@ if __name__ == "__main__":
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
     filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
+
+    filter.project = args.project
+    filter.collectors = args.collectors
     filter.set_record_mode(args.record, args.from_time, args.until_time)
 
     def stop(x, y):
