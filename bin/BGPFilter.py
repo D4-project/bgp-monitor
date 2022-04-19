@@ -81,7 +81,7 @@ collectors_list = {
         "rrc26",
     ],
 }
-project_types = {"ris": "ris-live", "routeviews": "routeviews-streams"}
+project_types = {"ris": "ris-live", "routeviews": "routeviews-stream"}
 # projects_list = ['ris-live','routeviews', 'routeviews-stream', 'ris']
 
 
