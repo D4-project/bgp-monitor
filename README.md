@@ -73,6 +73,12 @@ Retrieve records instead of live stream
 python3 bgp-filter.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
 ~~~
 
+Specify a project / list of collectors :
+
+~~~shell
+python3 bgp-filter.py -p routeviews --collectors route-views.bdix --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
+~~~~
+
 Output result to result.json
 
 ~~~shell
@@ -89,6 +95,7 @@ cat result.json | python3 -mjson.tool > clean_result.json
 
 1. [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream
 
+2. Install requirements
 ~~~shell
 pip3 install -r requirements.txt
 ~~~
