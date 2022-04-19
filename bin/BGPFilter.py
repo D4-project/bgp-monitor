@@ -1,9 +1,11 @@
 import ipaddress
+from multiprocessing.connection import wait
 import os
 import re
 import sys
 import json
 import threading
+from time import sleep
 import maxminddb
 import pycountry
 import pybgpstream
@@ -82,7 +84,6 @@ collectors_list = {
     ],
 }
 project_types = {"ris": "ris-live", "routeviews": "routeviews-stream"}
-# projects_list = ['ris-live','routeviews', 'routeviews-stream', 'ris']
 
 
 class BGPFilter:
@@ -161,7 +162,9 @@ class BGPFilter:
             end (string): Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
 
         Raises:
-            Exception: If start == end or not defined
+            ValueError: If start > end
+                        If start or end not defined
+                        If invalid date format
         """
         self.__isRecord = isRecord
         if isRecord:
@@ -240,6 +243,9 @@ class BGPFilter:
 
         Parameters:
             country_list (list): List of country codes
+
+        Raises:
+            LookupError: If an element in country_list is not valid.
         """
         if country_list is not None:
             for c in country_list:
@@ -331,7 +337,7 @@ class BGPFilter:
             res["old-state"] = e._maybe_field("old-state")
             res["new-state"] = e._maybe_field("new-state")
 
-        self.__json_out.write(json.dumps(res) + ",")
+        self.__json_out.write("\n" + json.dumps(res, sort_keys=True, indent=4) + ",")
 
     def __print_queue(self):
         while self.__isStarted or self.__queue.qsize():
@@ -362,7 +368,7 @@ class BGPFilter:
                 until_time=self.end_time,
                 filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
-            # ["route-views.sg", "route-views.eqix"]
+
         else:
             print(f"Loading {project_types[self.__project]} live stream ...")
             self._stream = pybgpstream.BGPStream(
@@ -370,6 +376,7 @@ class BGPFilter:
                 collectors=self.__collectors,
                 filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
             )
+
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
         print("Starting stream")
@@ -387,18 +394,14 @@ class BGPFilter:
         if self.__isStarted:
             self.__isStarted = False
             self.__queue.join()
+            self.__json_out.close()
 
-            print(self.__queue.qsize())
             print("Finishing queue ...")
+
             if self.__json_out != sys.stdout:
                 with open(self.__json_out.name, "a+") as f:
                     f.seek(f.tell() - 1, os.SEEK_SET)
                     f.truncate()
                     f.write("]}")
-                    f.seek(0, os.SEEK_SET)
-                    js = json.load(f)
-                    f.seek(0, os.SEEK_SET)
-                    f.truncate()
-                    f.write(json.dumps(js, sort_keys=True, indent=4))
             print("Stream ended")
             exit(0)

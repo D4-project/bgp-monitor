@@ -96,6 +96,7 @@ cat result.json | python3 -mjson.tool > clean_result.json
 1. [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream
 
 2. Install requirements
+
 ~~~shell
 pip3 install -r requirements.txt
 ~~~
