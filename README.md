@@ -122,12 +122,11 @@ pip3 install -r requirements.txt
 ## New ail bgp feeder output (todo)
 
 ~~~~json
-{
+  {
   "data":"",
   "default-encoding": "UTF-8",
   "meta":
   {
-    "id":"",
     "bgp:type": "A",
     "bgp:time": 1438415400.0,
     "bgp:peer": "202.79.197.159",
@@ -139,7 +138,7 @@ pip3 install -r requirements.txt
     "bgp:next-hop": "202.79.197.159"
   },
   "source": "ail_feeder_bgp",
-  "source-uuid": ""
+  "source-uuid": "3e69623a-e90d-4323-a301-a3061a9970c6"
 }
 ~~~~
 

@@ -392,10 +392,16 @@ class BGPFilter:
             Close JSON output file
         """
         if self.__isStarted:
-            print("Finishing queue ...")
             self.__isStarted = False
             self.__queue.join()
             self.__json_out.close()
 
+            print("Finishing queue ...")
+
+            if self.__json_out != sys.stdout:
+                with open(self.__json_out.name, "a+") as f:
+                    f.seek(f.tell() - 1, os.SEEK_SET)
+                    f.truncate()
+                    f.write("]}")
             print("Stream ended")
             exit(0)
