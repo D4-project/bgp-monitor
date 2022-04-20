@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
-import datetime
-from secrets import choice
 import signal
 import sys
 import argparse
+import configparser
 
 from yaml import parse
+from secrets import choice
 import bin.BGPFilter
 
 
 if __name__ == "__main__":
 
+    # args
     parser = argparse.ArgumentParser(description="Tool for BGP filtering")
     parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0")
 
@@ -100,6 +101,14 @@ if __name__ == "__main__":
     filter.project = args.project
     filter.collectors = args.collectors
     filter.set_record_mode(args.record, args.from_time, args.until_time)
+
+    # config redis + ail connection
+    config = configparser.ConfigParser()
+    config.read("../etc/ail-feeder-bgp.cfg")
+
+    # define method for ail url/api key
+
+    # define method for redis parameter / redis instance ?
 
     def stop(x, y):
         filter.stop()

@@ -4,6 +4,8 @@ import os
 import re
 import sys
 import json
+from urllib import request
+import pyail
 import threading
 from time import sleep
 import maxminddb
@@ -308,7 +310,7 @@ class BGPFilter:
     def __check_filters(self, country_code):
         return not (self.__countries_filter is not None and country_code not in self.__countries_filter)
 
-    def __jprint(self, e):
+    def __bgpelem_to_json(self, e):
         """Print a BGPElem to json output file
 
         Parameters:
@@ -337,12 +339,37 @@ class BGPFilter:
             res["old-state"] = e._maybe_field("old-state")
             res["new-state"] = e._maybe_field("new-state")
 
-        self.__json_out.write("\n" + json.dumps(res, sort_keys=True, indent=4) + ",")
+        return json.dumps(res, sort_keys=True, indent=4)
 
     def __print_queue(self):
         while self.__isStarted or self.__queue.qsize():
-            self.__jprint(self.__queue.get())
+            # self.__jprint(self.__queue.get())
             self.__queue.task_done()
+
+    def __redis_save(self):
+        """
+        Save a bgp elem to redis
+        """
+        pass
+
+    def __ail_publish(self, url, apikey, data=None):
+        """Publish a bgp record as json to ail
+
+        Args:
+            url (string): Url (ip:port/path to import)
+            apikey (string)
+            data (_type_, optional): Our bgp record as json. Defaults to None.
+
+        Returns:
+            HTTP Response code
+        """
+        response = request.post(
+            url,
+            headers={"Content-Type": "application/json", "Authorization": apikey},
+            data=data,
+            verify=False,
+        )
+        return response
 
     ####################
     # PUBLIC FUNCTIONS #
@@ -355,10 +382,10 @@ class BGPFilter:
         Print each record as JSON format
         """
         self.__isStarted = True
-        self.__json_out.write('{"data":[')
 
         self.__f_country = maxminddb.open_database(self.__f_country_path)
         print(f"Loaded Geo Open database : {self.__f_country_path}")
+        print(f"Loading {project_types[self.__project]} live stream ...")
 
         self._stream = pybgpstream.BGPStream(
             project=(self.__project if self.__isRecord else project_types[self.__project]),
@@ -369,14 +396,12 @@ class BGPFilter:
             filter="elemtype announcements withdrawals" + self.__asn_filter,
         )
 
-        print(f"Loading {project_types[self.__project]} live stream ...")
-
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
-        print("Starting stream")
 
         threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
 
+        print("Starting")
         for elem in self._stream:
             self.__queue.put(elem)
 
