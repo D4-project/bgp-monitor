@@ -1,4 +1,4 @@
-# BGP-filter
+# Ail BGP feeder
 
 ## Usage
 
@@ -41,23 +41,6 @@ optional arguments:
                         Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
 
 ~~~~
-
-## TODO
-
-- [X] Initial script based on stream retrieve or records
-- [X] Country lookup using [geo open file](https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/)
-- [X] Save json output file option
-- [X] Add .gitignore
-- [X] Use argparse
-- [X] Create lib to centralize filtering
-- [ ] Add test cases
-- [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
-- [X] Auto reformat using [pre-commit](https://pre-commit.com/)
-- [X] CIDR block, ASN, country, etc... filtering options
-- [X] collector/project options ?
-- [X] Output more data results
-- [X] Correct interrupt of the program (CTRL + C -> clean json ending)
-- [X] Generate requirements.txt
 
 ## Exemple of Use
 
@@ -134,6 +117,30 @@ pip3 install -r requirements.txt
   },
   ...
 ]
+~~~~
+
+## New ail bgp feeder output (todo)
+
+~~~~json
+{
+  "data":"",
+  "default-encoding": "UTF-8",
+  "meta":
+  {
+    "id":"",
+    "bgp:type": "A",
+    "bgp:time": 1438415400.0,
+    "bgp:peer": "202.79.197.159",
+    "bgp:peer_asn": 24482,
+    "bgp:collector": "route-views.sg",
+    "bgp:prefix": "216.205.248.0/22",
+    "bgp:country_code": "US",
+    "bgp:as-path": "24482 6453 3356 20374 20374 20374 20374 20374",
+    "bgp:next-hop": "202.79.197.159"
+  },
+  "source": "ail_feeder_bgp",
+  "source-uuid": ""
+}
 ~~~~
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
