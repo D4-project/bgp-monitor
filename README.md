@@ -42,23 +42,6 @@ optional arguments:
 
 ~~~~
 
-## TODO
-
-- [X] Initial script based on stream retrieve or records
-- [X] Country lookup using [geo open file](https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/)
-- [X] Save json output file option
-- [X] Add .gitignore
-- [X] Use argparse
-- [X] Create lib to centralize filtering
-- [ ] Add test cases
-- [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
-- [X] Auto reformat using [pre-commit](https://pre-commit.com/)
-- [X] CIDR block, ASN, country, etc... filtering options
-- [X] collector/project options ?
-- [X] Output more data results
-- [X] Correct interrupt of the program (CTRL + C -> clean json ending)
-- [X] Generate requirements.txt
-
 ## Exemple of Use
 
 Filter that exact match 84.205.67.0/24 or 41.244.223.0/24 as source AS
@@ -145,3 +128,21 @@ See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html
 - [BGPStream Filtering](<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
 - [BGPStream python library](<https://bgpstream.caida.org/docs/api/pybgpstream>)
 - [Data sources](<https://bgpstream.caida.org/data>)
+
+
+## TODO
+
+- [X] Initial script based on stream retrieve or records
+- [X] Country lookup using [geo open file](https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/)
+- [X] Save json output file option
+- [X] Add .gitignore
+- [X] Use argparse
+- [X] Create lib to centralize filtering
+- [ ] Add test cases
+- [X] Reformat code using [black](https://black.readthedocs.io/en/stable/getting_started.html)
+- [X] Auto reformat using [pre-commit](https://pre-commit.com/)
+- [X] CIDR block, ASN, country, etc... filtering options
+- [X] collector/project options ?
+- [X] Output more data results
+- [X] Correct interrupt of the program (CTRL + C -> clean json ending)
+- [X] Generate requirements.txt

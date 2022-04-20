@@ -360,22 +360,16 @@ class BGPFilter:
         self.__f_country = maxminddb.open_database(self.__f_country_path)
         print(f"Loaded Geo Open database : {self.__f_country_path}")
 
-        if self.__isRecord:
-            self._stream = pybgpstream.BGPStream(
-                project=self.__project,
-                collectors=self.__collectors,
-                from_time=self.start_time,
-                until_time=self.end_time,
-                filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
-            )
+        self._stream = pybgpstream.BGPStream(
+            project=(self.__project if self.__isRecord else project_types[self.__project]),
+            collectors=self.__collectors,
+            from_time=(self.start_time if self.__isRecord else None),
+            until_time=(self.end_time if self.__isRecord else None),
+            record_type="updates",
+            filter="elemtype announcements withdrawals" + self.__asn_filter,
+        )
 
-        else:
-            print(f"Loading {project_types[self.__project]} live stream ...")
-            self._stream = pybgpstream.BGPStream(
-                project=project_types[self.__project],
-                collectors=self.__collectors,
-                filter="type updates and elemtype announcements withdrawals" + self.__asn_filter,
-            )
+        print(f"Loading {project_types[self.__project]} live stream ...")
 
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
