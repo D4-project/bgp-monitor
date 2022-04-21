@@ -338,9 +338,6 @@ class BGPFilter:
             r = self.__f_country.get(p.split("/", 1)[0])
             return r["country"]["iso_code"] if r is not None else None
 
-    def __check_filters(self, country_code):
-        return
-
     def __bgp_json(self, e):
         """Return a BGPElem as json
 
@@ -371,20 +368,19 @@ class BGPFilter:
 
         return json.dumps(data, sort_keys=True, indent=4)
 
-    def __redis_save(self):
-        """
-        Save a bgp elem to redis
-        """
-        pass
+    def __iteration(self, e):
+        # redis save
+        key = str(e)
+        if self.__redis.exists(key):
+            print("record already exist : " + key)
+        else:
+            self.__redis.set(key, key)
+            self.__ail.feed_json_item(str(e), self.__bgp_json(e), "ail_feeder_bgp", self.__source_uuid)
 
     def __print_queue(self):
         """Iterate over queue to process each bgp element"""
         while self.__isStarted or self.__queue.qsize():
-            e = self.__queue.get()
-            self.__ail.feed_json_item(
-                str(e.time) + str(e.peer_asn), self.__bgp_json(e), "ail_feeder_bgp", self.__source_uuid
-            )
-            print(self.__queue.qsize())
+            self.__iteration(self.__queue.get())
             self.__queue.task_done()
 
     ####################
@@ -415,9 +411,8 @@ class BGPFilter:
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
 
-        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
-
         print("Starting")
+        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
         for elem in self._stream:
             self.__queue.put(elem)
 
@@ -427,8 +422,8 @@ class BGPFilter:
             Close JSON output file
         """
         if self.__isStarted:
-            print("Finishing queue ...")
             self.__isStarted = False
+            print("Finishing queue ...")
             self.__queue.join()
             print("Stream ended")
             exit(0)
