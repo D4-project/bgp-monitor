@@ -356,7 +356,7 @@ class BGPFilter:
             "bgp:time": e.time,
             "bgp:peer": e.peer_address,
             "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e.collector if e.collector is not None else "",
+            "bgp:collector": e._maybe_field("collector"),
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
