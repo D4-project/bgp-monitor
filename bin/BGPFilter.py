@@ -93,12 +93,11 @@ class BGPFilter:
     """BGP stream filter"""
 
     def __init__(self):
-        self.__json_out = sys.stdout
         self.__isStarted = False
         self.__isRecord = False
         self.__start_time = ""
         self.__end_time = ""
-        self.__f_country_path = "mmdb_files/latest.mmdb"
+        self.__f_country_path = "../mmdb_files/latest.mmdb"
         self.__countries_filter = None
         self.__asn_filter = None
         self.__cidr_filter = None
@@ -125,10 +124,6 @@ class BGPFilter:
     @property
     def isRecord(self):
         return self.__isRecord
-
-    @property
-    def json_out(self):
-        return self.__json_out
 
     @property
     def country_file(self):
@@ -194,21 +189,6 @@ class BGPFilter:
 
             self.__start_time = start
             self.__end_time = end
-
-    @json_out.setter
-    def json_out(self, json_out):
-        """
-        Setter for JSON output
-            Default : sys.stdout
-        Parameters:
-            json_output_file (File): Where to output json
-        Raises:
-            Exception: If unable to use
-        """
-        if hasattr(json_out, "write"):
-            self.__json_out = json_out
-        else:
-            raise FileNotFoundError(f"Is {json_out} a file ?")
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -359,7 +339,7 @@ class BGPFilter:
             return r["country"]["iso_code"] if r is not None else None
 
     def __check_filters(self, country_code):
-        return not (self.__countries_filter is not None and country_code not in self.__countries_filter)
+        return
 
     def __bgp_json(self, e):
         """Return a BGPElem as json
@@ -367,30 +347,29 @@ class BGPFilter:
         Parameters:
             e (BGPElem)
         """
-
         country_code = self.__country_by_prefix(e._maybe_field("prefix"))
-        if not self.__check_filters(country_code):
+        if self.__countries_filter is not None and country_code not in self.__countries_filter:
             return
 
-        res = {
-            "type": e.type,
-            "time": e.time,
-            "peer": e.peer_address,
-            "peer_asn": e.peer_asn,
-            "collector": e.collector,
+        data = {
+            "bgp:type": e.type,
+            "bgp:time": e.time,
+            "bgp:peer": e.peer_address,
+            "bgp:peer_asn": e.peer_asn,
+            "bgp:collector": e.collector if e.collector is not None else "",
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
-            res["prefix"] = e._maybe_field("prefix")
-            res["country_code"] = country_code
+            data["bgp:prefix"] = e._maybe_field("prefix")
+            data["bgp:country_code"] = country_code
         if e.type in ["A", "R"]:  # updateribs
-            res["as-path"] = e._maybe_field("as-path")
-            res["next-hop"] = e._maybe_field("next-hop")
+            data["bgp:as-path"] = e._maybe_field("as-path")
+            data["bgp:next-hop"] = e._maybe_field("next-hop")
         elif e.type == "S":  # peer state
-            res["old-state"] = e._maybe_field("old-state")
-            res["new-state"] = e._maybe_field("new-state")
+            data["bgp:old-state"] = e._maybe_field("old-state")
+            data["bgp:new-state"] = e._maybe_field("new-state")
 
-        return json.dumps(res, sort_keys=True, indent=4)
+        return json.dumps(data, sort_keys=True, indent=4)
 
     def __redis_save(self):
         """
@@ -398,25 +377,14 @@ class BGPFilter:
         """
         pass
 
-    def __ail_publish(self, data=None):
-        """Publish a bgp record as json to ail
-
-        Args:
-            data (_type_, optional): Our bgp record as json. Defaults to None.
-
-        Returns:
-            HTTP Response code
-        """
-        data = ""
-        metadata = {}
-        source = "ail_feeder_bgp"
-
-        self.__ail.feed_json_item(data, metadata, source, self.__source_uuid)
-
     def __print_queue(self):
         """Iterate over queue to process each bgp element"""
         while self.__isStarted or self.__queue.qsize():
-            # self.__jprint(self.__queue.get())
+            e = self.__queue.get()
+            self.__ail.feed_json_item(
+                str(e.time) + str(e.peer_asn), self.__bgp_json(e), "ail_feeder_bgp", self.__source_uuid
+            )
+            print(self.__queue.qsize())
             self.__queue.task_done()
 
     ####################
@@ -462,7 +430,5 @@ class BGPFilter:
             print("Finishing queue ...")
             self.__isStarted = False
             self.__queue.join()
-            self.__json_out.close()
-
             print("Stream ended")
             exit(0)

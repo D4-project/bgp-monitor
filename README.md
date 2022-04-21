@@ -3,25 +3,23 @@
 ## Usage
 
 ~~~~shell
-usage: bgp-filter.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-jf [JSON_OUTPUT_FILE]] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]]
-                     [-af ASN_FILTER [ASN_FILTER ...]] [-pf] [-cl CIDR_LIST [CIDR_LIST ...]] [--match {exact,less,more,any}] [-p {ris,routeviews}]
-                     [-c COLLECTORS [COLLECTORS ...]] [-r] [--until_time UNTIL_TIME] [--from_time FROM_TIME]
+usage: feeder.py [-h] [-v] [--country_file [COUNTRY_FILE]] [-cf COUNTRY_FILTER [COUNTRY_FILTER ...]] [-af ASN_FILTER [ASN_FILTER ...]] [-pf] [-cl CIDR_LIST [CIDR_LIST ...]] [--match {exact,less,more,any}]
+                 [-p {ris,routeviews}] [-c COLLECTORS [COLLECTORS ...]] [-r] [--until_time UNTIL_TIME] [--from_time FROM_TIME]
 
 Tool for BGP filtering
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program\'s version number and exit
+  -v, --version         show program s version number and exit
 
   --country_file [COUNTRY_FILE]
                         MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used
-  -jf [JSON_OUTPUT_FILE], --json_output_file [JSON_OUTPUT_FILE]
-                        File in which to display JSON output. If not set, default sys.stdout will be used
 
   -cf COUNTRY_FILTER [COUNTRY_FILTER ...], --country_filter COUNTRY_FILTER [COUNTRY_FILTER ...]
                         Filter using specified country codes.
+
   -af ASN_FILTER [ASN_FILTER ...], --asn_filter ASN_FILTER [ASN_FILTER ...]
-                        Filter using specified AS number list, skip a record if its as-path doesn\'t contain one of specified AS numbers
+                        Filter using specified AS number list, skip a record if its as-path doesn t contain one of specified AS numbers
 
   -pf, --cidr_filter    Filter using specified cidr list. Keep records that match to one of specified cidr
   -cl CIDR_LIST [CIDR_LIST ...], --cidr_list CIDR_LIST [CIDR_LIST ...]
@@ -101,23 +99,6 @@ pip3 install -r requirements.txt
 - `as-path`: String list separated by spaces of AS numbers, ordered by the near peer ASN to the source ASN. Therefore, Source ASN is at the end of the string. [A type]
 
 ## Example of data output
-
-~~~~json
-{"data":[
-  {
-    "type": "A",
-    "time": 1438415400.0,
-    "peer": "202.79.197.159",
-    "peer_asn": 24482,
-    "collector": "route-views.sg",
-    "prefix": "216.205.248.0/22",
-    "country_code": "US",
-    "as-path": "24482 6453 3356 20374 20374 20374 20374 20374",
-    "next-hop": "202.79.197.159"
-  },
-  ...
-]
-~~~~
 
 ## New ail bgp feeder output (todo)
 

@@ -2,13 +2,12 @@
 
 import os
 import signal
-import sys
 import argparse
 import configparser
 import redis
 from yaml import parse
 from secrets import choice
-import bin.BGPFilter
+import BGPFilter
 
 configPath = "../etc/ail-feeder-bgp.cfg"
 
@@ -21,7 +20,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--country_file",
         nargs="?",
-        default="mmdb_files/latest.mmdb",
+        default="../mmdb_files/latest.mmdb",
         help="MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used",
     )
 
@@ -86,8 +85,7 @@ if __name__ == "__main__":
     if args.cidr_filter and (args.match is None or args.match is None):
         parser.error("--cidr_filter requires --match and --cidr_list.")
 
-    filter = bin.BGPFilter.BGPFilter()
-    filter.json_out = args.json_output_file
+    filter = BGPFilter.BGPFilter()
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
     filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
