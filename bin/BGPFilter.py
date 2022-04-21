@@ -13,7 +13,6 @@ import pybgpstream
 
 from pyail import PyAIL
 from queue import Queue
-from urllib import request
 from datetime import datetime
 from pytz import country_names
 
@@ -108,6 +107,7 @@ class BGPFilter:
         self.__redis = None
         self.__ail = None
         self.__source_uuid = None
+        self.__cache_expire = 86400
 
     ###############
     #   GETTERS   #
@@ -156,6 +156,10 @@ class BGPFilter:
     @property
     def ail(self):
         return self.__ail
+
+    @property
+    def cache_expire(self):
+        return self.__cache_expire
 
     ###############
     #   SETTERS   #
@@ -320,6 +324,11 @@ class BGPFilter:
         except Exception as e:
             raise Exception(e)
 
+    @cache_expire.setter
+    def cache_expire(self, val):
+        if val >= 0:
+            self.__cache_expire = val
+
     ###############
     #   PRINTERS  #
     ###############
@@ -371,10 +380,11 @@ class BGPFilter:
     def __iteration(self, e):
         # redis save
         key = str(e)
-        if self.__redis.exists(key):
+        if self.__redis.exists(f"event:{key}"):
             print("record already exist : " + key)
         else:
-            self.__redis.set(key, key)
+            self.__redis.set(f"event{key}", key)
+            self.__redis.expire(f"event:{key}", self.__cache_expire)
             self.__ail.feed_json_item(str(e), self.__bgp_json(e), "ail_feeder_bgp", self.__source_uuid)
 
     def __print_queue(self):
