@@ -4,16 +4,17 @@ import os
 import re
 import sys
 import json
-from urllib import request
-import pyail
 import threading
 from time import sleep
+from uuid import UUID
 import maxminddb
 import pycountry
 import pybgpstream
 
-from datetime import datetime
+from pyail import PyAIL
 from queue import Queue
+from urllib import request
+from datetime import datetime
 from pytz import country_names
 
 collectors_list = {
@@ -105,6 +106,9 @@ class BGPFilter:
         self.__queue = Queue()
         self.__project = list(project_types.keys())[0]
         self.__collectors = None
+        self.__redis = None
+        self.__ail = None
+        self.__source_uuid = None
 
     ###############
     #   GETTERS   #
@@ -149,6 +153,14 @@ class BGPFilter:
     @property
     def project(self):
         return self.__project
+
+    @property
+    def redis_db(self):
+        return self.__redis
+
+    @property
+    def ail(self):
+        return self.__ail
 
     ###############
     #   SETTERS   #
@@ -283,11 +295,50 @@ class BGPFilter:
 
     @project.setter
     def project(self, project):
+        """
+        Args:
+            project (string): ris or routesviews
+        """
         if self.__collectors != project and project in project_types.keys():
             self.__project = project
             self.__collectors = None
         else:
             raise ValueError(f"Invalid project name. Valid projects list : {project_types.keys()}")
+
+    @redis_db.setter
+    def redis_db(self, r):
+        r.ping()
+        self.__redis = r
+
+    @ail.setter
+    def ail(self, values):
+        """Define args for connection to ail instance
+
+        Args:
+            Ail: (url, api_key, source_uuid)
+            url (string): Url (ip:port/path to import)
+            apikey (string)
+            source_uuid (string)
+
+        Raises:
+            ValueError: if args not defined
+            ValueError: if source uuid doesn't respect uuid v4 format
+        """
+        try:
+            url, api_key, source_uuid = values
+        except ValueError:
+            raise ValueError("Ail url, api key, and source_uuid are required for connection")
+
+        try:
+            UUID(source_uuid, version=4)
+            self.__source_uuid = source_uuid
+        except ValueError:
+            raise ValueError("Invalid source uuid v4 format.")
+
+        try:
+            self.__ail = PyAIL(url, api_key, ssl=False)
+        except Exception as e:
+            raise Exception(e)
 
     ###############
     #   PRINTERS  #
@@ -310,8 +361,8 @@ class BGPFilter:
     def __check_filters(self, country_code):
         return not (self.__countries_filter is not None and country_code not in self.__countries_filter)
 
-    def __bgpelem_to_json(self, e):
-        """Print a BGPElem to json output file
+    def __bgp_json(self, e):
+        """Return a BGPElem as json
 
         Parameters:
             e (BGPElem)
@@ -341,35 +392,32 @@ class BGPFilter:
 
         return json.dumps(res, sort_keys=True, indent=4)
 
-    def __print_queue(self):
-        while self.__isStarted or self.__queue.qsize():
-            # self.__jprint(self.__queue.get())
-            self.__queue.task_done()
-
     def __redis_save(self):
         """
         Save a bgp elem to redis
         """
         pass
 
-    def __ail_publish(self, url, apikey, data=None):
+    def __ail_publish(self, data=None):
         """Publish a bgp record as json to ail
 
         Args:
-            url (string): Url (ip:port/path to import)
-            apikey (string)
             data (_type_, optional): Our bgp record as json. Defaults to None.
 
         Returns:
             HTTP Response code
         """
-        response = request.post(
-            url,
-            headers={"Content-Type": "application/json", "Authorization": apikey},
-            data=data,
-            verify=False,
-        )
-        return response
+        data = ""
+        metadata = {}
+        source = "ail_feeder_bgp"
+
+        self.__ail.feed_json_item(data, metadata, source, self.__source_uuid)
+
+    def __print_queue(self):
+        """Iterate over queue to process each bgp element"""
+        while self.__isStarted or self.__queue.qsize():
+            # self.__jprint(self.__queue.get())
+            self.__queue.task_done()
 
     ####################
     # PUBLIC FUNCTIONS #

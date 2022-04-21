@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
+import os
 import signal
 import sys
 import argparse
 import configparser
-
+import redis
 from yaml import parse
 from secrets import choice
 import bin.BGPFilter
 
+configPath = "../etc/ail-feeder-bgp.cfg"
 
 if __name__ == "__main__":
 
@@ -21,14 +23,6 @@ if __name__ == "__main__":
         nargs="?",
         default="mmdb_files/latest.mmdb",
         help="MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used",
-    )
-    parser.add_argument(
-        "-jf",
-        "--json_output_file",
-        nargs="?",
-        default=sys.stdout,
-        type=argparse.FileType("w+"),
-        help="File in which to display JSON output. If not set, default sys.stdout will be used",
     )
 
     parser.add_argument(
@@ -102,13 +96,29 @@ if __name__ == "__main__":
     filter.collectors = args.collectors
     filter.set_record_mode(args.record, args.from_time, args.until_time)
 
-    # config redis + ail connection
-    config = configparser.ConfigParser()
-    config.read("../etc/ail-feeder-bgp.cfg")
+    # config
+    if os.path.isfile(configPath):
+        config = configparser.ConfigParser()
+        config.read(configPath)
+    else:
+        raise FileNotFoundError("[-] No conf file found")
 
-    # define method for ail url/api key
+    # redis
+    host, port, db = (
+        (config["redis"]["host"], config["redis"]["port"], config["redis"]["db"])
+        if "redis" in config
+        else ("localhost", 6379, 0)
+    )
+    filter.redis_db = redis.Redis(host=host, port=port, db=db)
 
-    # define method for redis parameter / redis instance ?
+    if "cache" in config:
+        filter.cache_expire = config["cache"]["expire"]
+    elif not args.nocache:
+        filter.cache_expire = 86400
+
+    # ail
+    if "ail" in config:
+        filter.ail = (config["ail"]["url"], config["ail"]["apikey"], config["general"]["uuid"])
 
     def stop(x, y):
         filter.stop()

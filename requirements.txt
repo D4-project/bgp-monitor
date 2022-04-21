@@ -4,3 +4,4 @@ pybgpstream
 pytz
 pyyaml
 pyail
+redis
