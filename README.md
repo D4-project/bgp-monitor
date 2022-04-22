@@ -38,6 +38,7 @@ optional arguments:
   --from_time FROM_TIME
                         Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
 
+  --nocache             Disable caching
 ~~~~
 
 ## Exemple of Use

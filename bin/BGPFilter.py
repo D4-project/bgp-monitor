@@ -381,10 +381,10 @@ class BGPFilter:
     def __iteration(self, e):
         # redis save
         key = str(e)
-        print(key)
         r = self.__bgp_conv(e)
+
         if r is None : return
-        print(r)
+        print(self.__queue.qsize())
         if self.nocaching :
             self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
         else:
