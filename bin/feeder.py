@@ -14,15 +14,8 @@ configPath = "../etc/ail-feeder-bgp.cfg"
 if __name__ == "__main__":
 
     # args
-    parser = argparse.ArgumentParser(description="Tool for BGP filtering")
+    parser = argparse.ArgumentParser(description="Tool for BGP filtering and feeding")
     parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0")
-
-    parser.add_argument(
-        "--country_file",
-        nargs="?",
-        default="../mmdb_files/latest.mmdb",
-        help="MMDB Geo Open File which specify IP address geolocation per country. If not set, default file will be used",
-    )
 
     parser.add_argument(
         "-cf", "--country_filter", nargs="+", help="Filter using specified country codes."
@@ -121,6 +114,9 @@ if __name__ == "__main__":
     # ail
     if "ail" in config:
         filter.ail = (config["ail"]["url"], config["ail"]["apikey"], config["general"]["uuid"])
+
+    if 'geoopen' in config:
+        filter.country_file = config['geoopen']['path']
 
     def stop(x, y):
         filter.stop()
