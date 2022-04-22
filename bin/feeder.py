@@ -77,6 +77,8 @@ if __name__ == "__main__":
         "--from_time",
         help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
     )
+    
+    parser.add_argument('--nocache', action='store_true', help='Disable caching')
 
     args = parser.parse_args()
     if args.record and (args.from_time is None or args.until_time is None):
@@ -101,16 +103,18 @@ if __name__ == "__main__":
     else:
         raise FileNotFoundError("[-] No conf file found")
 
-    # redis
-    host, port, db = (
-        (config["redis"]["host"], config["redis"]["port"], config["redis"]["db"])
-        if "redis" in config
-        else ("localhost", 6379, 0)
-    )
-    filter.redis_db = redis.Redis(host=host, port=port, db=db)
+    filter.nocache = args.nocache
+    if not filter.nocache:
+        # redis
+        host, port, db = (
+            (config["redis"]["host"], config["redis"]["port"], config["redis"]["db"])
+            if "redis" in config
+            else ("localhost", 6379, 0)
+        )
+        filter.redis_db = redis.Redis(host=host, port=port, db=db)
 
     if "cache" in config:
-        filter.cache_expire = config["cache"]["expire"]
+        filter.cache_expire = int(config["cache"]["expire"])
     elif not args.nocache:
         filter.cache_expire = 86400
 

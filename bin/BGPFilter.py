@@ -108,6 +108,7 @@ class BGPFilter:
         self.__ail = None
         self.__source_uuid = None
         self.__cache_expire = 86400
+        self.nocaching = False
 
     ###############
     #   GETTERS   #
@@ -347,7 +348,7 @@ class BGPFilter:
             r = self.__f_country.get(p.split("/", 1)[0])
             return r["country"]["iso_code"] if r is not None else None
 
-    def __bgp_json(self, e):
+    def __bgp_conv(self, e):
         """Return a BGPElem as json
 
         Parameters:
@@ -355,7 +356,7 @@ class BGPFilter:
         """
         country_code = self.__country_by_prefix(e._maybe_field("prefix"))
         if self.__countries_filter is not None and country_code not in self.__countries_filter:
-            return
+            return None
 
         data = {
             "bgp:type": e.type,
@@ -375,17 +376,24 @@ class BGPFilter:
             data["bgp:old-state"] = e._maybe_field("old-state")
             data["bgp:new-state"] = e._maybe_field("new-state")
 
-        return json.dumps(data, sort_keys=True, indent=4)
+        return data
 
     def __iteration(self, e):
         # redis save
         key = str(e)
-        if self.__redis.exists(f"event:{key}"):
-            print("record already exist : " + key)
+        print(key)
+        r = self.__bgp_conv(e)
+        if r is None : return
+        print(r)
+        if self.nocaching :
+            self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
         else:
-            self.__redis.set(f"event{key}", key)
-            self.__redis.expire(f"event:{key}", self.__cache_expire)
-            self.__ail.feed_json_item(str(e), self.__bgp_json(e), "ail_feeder_bgp", self.__source_uuid)
+            if self.__redis.exists(f"event:{key}"):
+                print("record already exist : " + key)
+            else:
+                self.__redis.set(f"event{key}", key)
+                self.__redis.expire(f"event:{key}", self.__cache_expire)
+                self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
 
     def __print_queue(self):
         """Iterate over queue to process each bgp element"""
@@ -406,11 +414,12 @@ class BGPFilter:
         self.__isStarted = True
 
         self.__f_country = maxminddb.open_database(self.__f_country_path)
+        project = (self.__project if self.__isRecord else project_types[self.__project])
         print(f"Loaded Geo Open database : {self.__f_country_path}")
-        print(f"Loading {project_types[self.__project]} live stream ...")
+        print(f"Loading {project} stream ...")
 
         self._stream = pybgpstream.BGPStream(
-            project=(self.__project if self.__isRecord else project_types[self.__project]),
+            project=project,
             collectors=self.__collectors,
             from_time=(self.start_time if self.__isRecord else None),
             until_time=(self.end_time if self.__isRecord else None),
