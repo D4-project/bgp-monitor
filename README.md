@@ -75,8 +75,8 @@ Define confi file based on ail-feeder-bgp.cfg.sample
 
 ## Output
 
-- `data`: encoded base 64 string of bgp element
-- `default-encoding`: "UTF-8"
+- `data`: base64 encoded value of the gziped data
+- `data-sha256`: SHA256 value of the uncompress data
 - `meta`:
   - `type`
     - R: RIB table entry
@@ -91,30 +91,32 @@ Define confi file based on ail-feeder-bgp.cfg.sample
   - `country_code`: The country of the source ASN that this element was generated from. [A and W types]
   - `next-hop`: The next-hop IP address [A type]
   - `as-path`: String list separated by spaces of AS numbers, ordered by the near peer ASN to the source ASN. Therefore, Source ASN is at the end of the string. [A type]
-- `source`: ail_feeder_bgp
-- `source-uuid`: uuid v4
+- `source`: name of the ail feeder module
+- `source-uuid`: UUID of the feeder
+- `default-encoding`: "UTF-8"
 
 ## Example of ail output
 
 ~~~~json
-  {
-  "data":"",
-  "default-encoding": "UTF-8",
-  "meta":
-  {
-    "bgp:type": "A",
-    "bgp:time": 1438415400.0,
-    "bgp:peer": "202.79.197.159",
-    "bgp:peer_asn": 24482,
-    "bgp:collector": "route-views.sg",
-    "bgp:prefix": "216.205.248.0/22",
-    "bgp:country_code": "US",
-    "bgp:as-path": "24482 6453 3356 20374 20374 20374 20374 20374",
-    "bgp:next-hop": "202.79.197.159"
-  },
-  "source": "ail_feeder_bgp",
-  "source-uuid": "3e69623a-e90d-4323-a301-a3061a9970c6"
+{
+    "data": "H4sIAEmmYmIC/03LQQ6CYAxE4RNZOwPtL915Ae9gAiQkRoioqzm87vQtvt17beP1OeksZHh2ZHbG8G96LPvhtrwnXdb7P0lkE91RbT5VXzVzbAWh0cgwDGF+ZC9apAEG6fd/AHzF6ohyAAAA",
+    "data-sha256": "accdfaff0df1d797c4c82346bf5c352c15bc729ef6f0227ae65d13f69236b08c",
+    "meta": {
+        "bgp:type": "A",
+        "bgp:time": 1650632262.23,
+        "bgp:peer": "202.69.160.152",
+        "bgp:peer_asn": 17639,
+        "bgp:collector": "None",
+        "bgp:prefix": "172.225.195.0/24",
+        "bgp:country_code": "US",
+        "bgp:as-path": "",
+        "bgp:next-hop": "2.56.11.1"
+    },
+    "source": "ail_feeder_bgp",
+    "source_uuid": "c48f8f2e-85b0-406e-9841-9155b2e39779",
+    "default_encoding": "UTF-8"
 }
+
 ~~~~
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
