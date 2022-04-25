@@ -14,7 +14,6 @@ import pybgpstream
 from pyail import PyAIL
 from queue import Queue
 from datetime import datetime
-from pytz import country_names
 
 collectors_list = {
     "routeviews": [
@@ -106,6 +105,7 @@ class BGPFilter:
         self.__collectors = None
         self.__redis = None
         self.__ail = None
+        self.__no_ail = False
         self.__source_uuid = None
         self.__cache_expire = 86400
         self.nocaching = False
@@ -147,6 +147,10 @@ class BGPFilter:
         return self.__collectors
 
     @property
+    def json_out(self):
+        return self.__json_out
+
+    @property
     def project(self):
         return self.__project
 
@@ -157,6 +161,10 @@ class BGPFilter:
     @property
     def ail(self):
         return self.__ail
+
+    @property
+    def no_ail(self):
+        return self.__no_ail
 
     @property
     def cache_expire(self):
@@ -215,9 +223,9 @@ class BGPFilter:
         Parameters:
             match_type: Type of match
                 exact: Exact match
-                less: Exact match or less specific
-                more: Exact match or more specific
-                any
+                less: Exact match or less specific (contained by)
+                more: Exact match or more specific (contains)
+                any: less and more
             CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
         """
         if isCIDR:
@@ -257,18 +265,23 @@ class BGPFilter:
             Skip a record if its as-path doesn't contain one of specified AS numbers
 
         Args:
-            asn_list (list): List of 5 digit AS numbers
-
-        Raises:
-            Exception: If an item is not a 5 digit number
+            asn_list (list): List of AS numbers
         """
+        self.__asn_filter = ""
+        f_list = []
+        not_f_list = []
         if asn_list is not None and len(asn_list) >= 1:
-            for a in asn_list:
-                if not re.match("^[0-9]{5}$", a):
-                    raise Exception(f"Invalid AS number format : {a}. Must be a 5 digit number.")
-            self.__asn_filter = " and path (" + "|".join(asn_list) + ")"
-        else:
-            self.__asn_filter = ""
+            for i in asn_list:
+                if re.match('-[0-9]+', i):
+                    not_f_list.append(i.replace('#',''))
+                else:
+                    f_list.append(i)
+
+            if len(f_list) >= 1:
+                self.__asn_filter += " and path (" + "|".join(f_list) + ")"
+            if len(not_f_list) >= 1:
+                self.__asn_filter = " and path ^((?!" + "|".join(not_f_list) + ").)*$"
+
 
     @collectors.setter
     def collectors(self, collectors):
@@ -324,11 +337,30 @@ class BGPFilter:
             self.__ail = PyAIL(url, api_key, ssl=False)
         except Exception as e:
             raise Exception(e)
+        
+    @no_ail.setter
+    def no_ail(self, val):
+        self.__no_ail = val
 
     @cache_expire.setter
     def cache_expire(self, val):
         if val >= 0:
             self.__cache_expire = val
+
+    @json_out.setter
+    def json_out(self, json_out):
+        """
+        Setter for JSON output
+            Default : sys.stdout
+        Parameters:
+            json_output_file (File): Where to output json
+        Raises:
+            Exception: If unable to use
+        """
+        if hasattr(json_out, "write"):
+            self.__json_out = json_out
+        else:
+            raise FileNotFoundError(f"Is {json_out} a file ?")
 
     ###############
     #   PRINTERS  #
@@ -385,15 +417,35 @@ class BGPFilter:
 
         if r is None : return
         print(self.__queue.qsize())
-        if self.nocaching :
-            self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-        else:
-            if self.__redis.exists(f"event:{key}"):
-                print("record already exist : " + key)
+
+        """
+        if no publish ail:
+            print to sysout
+        else if caching:
+            send to ail
+        else
+            no send
+ 
+        if json out != sysout
+            print to out
+        """
+
+        if self.__no_ail:
+            print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
+        else: 
+            if not self.nocaching: # Check if record already exist
+                if self.__redis.exists(f"event:{key}"):
+                        print("record already exist : " + key)
+                else:
+                    self.__redis.set(f"event:{key}", key)
+                    self.__redis.expire(f"event:{key}", self.__cache_expire)
+                    self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
             else:
-                self.__redis.set(f"event{key}", key)
-                self.__redis.expire(f"event:{key}", self.__cache_expire)
                 self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
+
+        if self.__json_out != sys.stdout:
+            self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
+
 
     def __print_queue(self):
         """Iterate over queue to process each bgp element"""

@@ -4,6 +4,7 @@ import os
 import signal
 import argparse
 import configparser
+import sys
 import redis
 from yaml import parse
 from secrets import choice
@@ -70,8 +71,24 @@ if __name__ == "__main__":
         "--from_time",
         help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
     )
-    
+
+
+    parser.add_argument(
+        "--noail",
+        action="store_true",
+        help="Disable ail publish",
+    )
+        
     parser.add_argument('--nocache', action='store_true', help='Disable caching')
+
+    parser.add_argument(
+        "--json_output",
+        nargs="?",
+        default=sys.stdout,
+        type=argparse.FileType("w+"),
+        help="File in which to display JSON output. If not set, default sys.stdout will be used",
+    )
+
 
     args = parser.parse_args()
     if args.record and (args.from_time is None or args.until_time is None):
@@ -89,6 +106,8 @@ if __name__ == "__main__":
     filter.collectors = args.collectors
     filter.set_record_mode(args.record, args.from_time, args.until_time)
 
+    filter.json_out = args.json_output
+    
     # config
     if os.path.isfile(configPath):
         config = configparser.ConfigParser()
@@ -112,7 +131,8 @@ if __name__ == "__main__":
         filter.cache_expire = 86400
 
     # ail
-    if "ail" in config:
+    filter.no_ail = args.noail
+    if not filter.no_ail and "ail" in config:
         filter.ail = (config["ail"]["url"], config["ail"]["apikey"], config["general"]["uuid"])
 
     if 'geoopen' in config:

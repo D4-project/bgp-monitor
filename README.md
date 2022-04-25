@@ -43,22 +43,28 @@ optional arguments:
 
 ## Exemple of Use
 
+Test the stream connection
+
+~~~shell
+python3 feeder.py --noail
+~~~
+
 Filter that exact match 84.205.67.0/24 or 41.244.223.0/24 as source AS
 
 ~~~shell
-python3 bgp-filter.py -pf --cidr_list 84.205.67.0/24 41.244.223.0/24 --match exact
+ppython3 feeder.py -pf --cidr_list 84.205.67.0/24 41.244.223.0/24 --match exact
 ~~~
 
 Retrieve records instead of live stream
 
 ~~~shell
-python3 bgp-filter.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
+python3 feeder.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
 ~~~
 
 Specify a project / list of collectors :
 
 ~~~shell
-python3 bgp-filter.py -p routeviews --collectors route-views.bdix --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
+python3 feeder.py -p routeviews --collectors route-views.bdix --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
 ~~~
 
 ## Installation
