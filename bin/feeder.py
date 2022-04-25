@@ -84,7 +84,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--json_output",
         nargs="?",
-        default=sys.stdout,
+        default=sys.stdin,
         type=argparse.FileType("w+"),
         help="File in which to display JSON output. If not set, default sys.stdout will be used",
     )

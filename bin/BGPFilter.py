@@ -353,7 +353,7 @@ class BGPFilter:
         Setter for JSON output
             Default : sys.stdout
         Parameters:
-            json_output_file (File): Where to output json
+            json_out (File): Where to output json
         Raises:
             Exception: If unable to use
         """
@@ -416,7 +416,7 @@ class BGPFilter:
         r = self.__bgp_conv(e)
 
         if r is None : return
-        print("Queue size : " + self.__queue.qsize(), file=sys.stderr)
+        print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
 
         if self.__no_ail:
             print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
@@ -431,7 +431,7 @@ class BGPFilter:
             else:
                 self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
 
-        if self.__json_out != sys.stdout:
+        if self.__json_out != sys.stdin:
             self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
 
 
