@@ -84,10 +84,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--json_output",
         nargs="?",
-        default=sys.stdin,
+        default=sys.stdout,
         type=argparse.FileType("w+"),
         help="File in which to display JSON output. If not set, default sys.stdout will be used",
     )
+    
+    parser.add_argument('--csv_input',
+                        nargs='?',
+                        type=argparse.FileType('r'),
+                        help="Retrieve metadata information from a csv file")
 
 
     args = parser.parse_args()

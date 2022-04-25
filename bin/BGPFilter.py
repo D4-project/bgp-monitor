@@ -273,7 +273,7 @@ class BGPFilter:
         if asn_list is not None and len(asn_list) >= 1:
             for i in asn_list:
                 if re.match('-[0-9]+', i):
-                    not_f_list.append(i.replace('#',''))
+                    not_f_list.append(i.replace('-',''))
                 else:
                     f_list.append(i)
 
@@ -431,7 +431,7 @@ class BGPFilter:
             else:
                 self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
 
-        if self.__json_out != sys.stdin:
+        if self.__json_out != sys.stdout:
             self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
 
 
@@ -465,6 +465,7 @@ class BGPFilter:
             until_time=(self.end_time if self.__isRecord else None),
             record_type="updates",
             filter="elemtype announcements withdrawals" + self.__asn_filter,
+
         )
 
         if self.__cidr_match_type_filter is not None:
@@ -474,6 +475,10 @@ class BGPFilter:
         threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
         for elem in self._stream:
             self.__queue.put(elem)
+
+    def test(self):
+        pass
+
 
     def stop(self):
         """
