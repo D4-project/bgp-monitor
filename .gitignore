@@ -4,4 +4,4 @@ tests
 .pre-commit-config.yaml
 requirements-dev.txt
 pyproject.toml
-etc/ail-feeder-bgp.cfg
+ail-feeder-bgp.cfg

@@ -12,3 +12,6 @@ expire = 86400
 host = 127.0.0.1
 port = 7000
 db = 0
+
+[geoopen]
+path = ../mmdb_files/latest.mmdb
