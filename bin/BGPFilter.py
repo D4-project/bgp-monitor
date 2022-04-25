@@ -416,19 +416,7 @@ class BGPFilter:
         r = self.__bgp_conv(e)
 
         if r is None : return
-        print(self.__queue.qsize())
-
-        """
-        if no publish ail:
-            print to sysout
-        else if caching:
-            send to ail
-        else
-            no send
- 
-        if json out != sysout
-            print to out
-        """
+        print("Queue size : " + self.__queue.qsize(), file=sys.stderr)
 
         if self.__no_ail:
             print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout

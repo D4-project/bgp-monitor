@@ -39,6 +39,9 @@ optional arguments:
                         Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
 
   --nocache             Disable caching
+  --nocache             Disable caching
+  --json_output [JSON_OUTPUT]
+                        File in which to display JSON output. If not set, default sys.stdout will be used
 ~~~~
 
 ## Exemple of Use
