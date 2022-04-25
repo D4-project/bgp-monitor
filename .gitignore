@@ -5,3 +5,4 @@ tests
 requirements-dev.txt
 pyproject.toml
 ail-feeder-bgp.cfg
+tests.py

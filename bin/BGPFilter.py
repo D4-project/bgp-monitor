@@ -109,6 +109,7 @@ class BGPFilter:
         self.__source_uuid = None
         self.__cache_expire = 86400
         self.nocaching = False
+        self.__data_source = {'source_type': 'broker'}
 
     ###############
     #   GETTERS   #
@@ -169,7 +170,7 @@ class BGPFilter:
     @property
     def cache_expire(self):
         return self.__cache_expire
-
+    
     ###############
     #   SETTERS   #
     ###############
@@ -198,10 +199,34 @@ class BGPFilter:
             except ValueError:
                 raise ValueError("Invalid record mode date format. Must be %Y-%m-%d %H:%M:%S")
             if st > en:
-                raise ValueError("Invalid record mode interval. Beginning must ")
+                raise ValueError("Invalid record mode interval. Beginning must precede the end")
 
             self.__start_time = start
             self.__end_time = end
+
+    def data_source(self, record_type, file_format, file_path):
+        """
+        Use single file as data source
+        
+        Args:
+            record_type (str): rib or upd
+            file_format (str): mrt, bmp or ris-live
+            file_path (str): path to archive file
+
+        Raises:
+            FileNotFoundError
+            ValueError
+        """
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError
+        if not record_type in ['rib','upd']:
+            raise ValueError('Input file type must be rib or upd')
+        if record_type == 'rib' and file_format in ['mrt','bmp']:
+            raise ValueError('Accepted input format types for rib : mrt, bmp')
+        elif record_type == 'upd' and file_format not in ['mrt','bmp','ris-live']:
+            raise ValueError('Accepted input format types for upd : mrt, bmp or ris-live')
+
+        self.__data_source = {'source_type': record_type, 'file_format': file_format, 'file_path': file_path}
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -237,8 +262,6 @@ class BGPFilter:
                 )
             for c in cidr_list:
                 ipaddress.ip_network(c)
-                # if not re.match(r"^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))$", c):
-                #    raise Exception(f"Invalid CIDR format : {c}")
             self.__cidr_match_type_filter = "prefix-" + match_type
             self.__cidr_filter = cidr_list
 
@@ -446,18 +469,19 @@ class BGPFilter:
     ####################
 
     def start(self):
-        """Start retrieving stream/records and filtering them
-        Load Geo Open database
-        Start stream with args
-        Print each record as JSON format
+        """
+        Start retrieving stream/records and filtering them
+        - Load Geo Open database
+        - Start stream with args
+        - Print each record as JSON format
         """
         self.__isStarted = True
 
         self.__f_country = maxminddb.open_database(self.__f_country_path)
-        project = (self.__project if self.__isRecord else project_types[self.__project])
-        print(f"Loaded Geo Open database : {self.__f_country_path}")
-        print(f"Loading {project} stream ...")
-
+#        project = (self.__project if self.__isRecord else project_types[self.__project])
+#        print(f"Loaded Geo Open database : {self.__f_country_path}")
+        print(f"Loading stream ...")
+        """
         self._stream = pybgpstream.BGPStream(
             project=project,
             collectors=self.__collectors,
@@ -465,19 +489,23 @@ class BGPFilter:
             until_time=(self.end_time if self.__isRecord else None),
             record_type="updates",
             filter="elemtype announcements withdrawals" + self.__asn_filter,
-
+#            data_interface=self.__data_source['source_type']
         )
+        """
+        stream = pybgpstream.BGPStream()
+        if self.__data_source['source_type'] != 'broker':
+            stream.set_data_interface('singlefile')            
+            stream.set_data_interface_option('singlefile', 'upd-file', '../datasets/updates.20220425.1210')
+            stream.set_data_interface_option('singlefile', 'upd-type', 'mrt')
 
-        if self.__cidr_match_type_filter is not None:
-            self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
+#        if self.__cidr_match_type_filter is not None:
+#            stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
 
         print("Starting")
-        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
-        for elem in self._stream:
-            self.__queue.put(elem)
-
-    def test(self):
-        pass
+#        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
+        for elem in stream:
+            print(elem)
+#            self.__queue.put(elem)
 
 
     def stop(self):

@@ -44,9 +44,29 @@ optional arguments:
                         File in which to display JSON output. If not set, default sys.stdout will be used
 ~~~~
 
+## Installation
+
+1. [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream
+
+2. Install requirements
+
+    ~~~shell
+    pip3 install -r requirements.txt
+    ~~~
+
+3. Define config file based on etc/ail-feeder-bgp.cfg.sample
+
+### Test your installation
+
+Use a single file as source instead of a broker, and disable ail:
+
+~~~shell
+python3 feeder.py --input_data ../datasets/updates.20220425.1215 --input_file_type upd-file --noail
+~~~
+
 ## Exemple of Use
 
-Test the stream connection
+Test the stream connection without ail:
 
 ~~~shell
 python3 feeder.py --noail
@@ -55,7 +75,7 @@ python3 feeder.py --noail
 Filter that exact match 84.205.67.0/24 as source AS
 
 ~~~shell
-python3 feeder.py -pf --cidr_list 84.205.67.0/24--match exact
+python3 feeder.py -pf --cidr_list 84.205.67.0/24 --match exact
 ~~~
 
 Retrieve records instead of live stream
@@ -67,20 +87,19 @@ python3 feeder.py --record --from_time "2022-01-01 10:00:00" --until_time "2022-
 Specify a project / list of collectors :
 
 ~~~shell
-python3 feeder.py -p routeviews --collectors route-views.bdix --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
+python3 feeder.py -p routeviews --collectors route-views.bdix --record --from_time "2022-01-01 10:00:00" --until_time "2022-01-01 10:10:00"
 ~~~
 
-## Installation
-
-1. [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream
-
-2. Install requirements
+Use a single file as source instead of a broker:
 
 ~~~shell
-pip3 install -r requirements.txt
+python3 feeder.py --input_data ../datasets/updates.20220425.1215 --input_file_type upd-file --noail
 ~~~
 
-3. Define config file based on etc/ail-feeder-bgp.cfg.sample
+You can get archive files here :
+
+- [Routeviews DataSets](<http://archive.routeviews.org/>)
+- [RIS RIPE DataSets](<https://data.ris.ripe.net/>)
 
 ## Output
 

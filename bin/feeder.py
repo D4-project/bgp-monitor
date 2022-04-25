@@ -69,14 +69,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--from_time",
-        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
+        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00"
     )
 
 
     parser.add_argument(
         "--noail",
         action="store_true",
-        help="Disable ail publish",
+        help="Disable ail publish"
     )
         
     parser.add_argument('--nocache', action='store_true', help='Disable caching')
@@ -86,21 +86,34 @@ if __name__ == "__main__":
         nargs="?",
         default=sys.stdout,
         type=argparse.FileType("w+"),
-        help="File in which to display JSON output. If not set, default sys.stdout will be used",
+        help="File in which to display JSON output. If not set, default sys.stdout will be used.",
     )
-    
-    parser.add_argument('--csv_input',
-                        nargs='?',
-                        type=argparse.FileType('r'),
-                        help="Retrieve metadata information from a csv file")
+
+
+    parser.add_argument('--input_data',
+                        type=str,
+                        help="Path to a single file instead of broker.")
+
+    parser.add_argument('--input_record_type',
+                        choices=['rib','upd'],
+                        help="Type of records contained in input_data file. Can be ribs (rib) or updates (upd)")
+
+    parser.add_argument('--input_file_format',
+                        choices=['mrt','bmp','ris-live'],
+                        default='mrt',
+                        help="input data type format. ris-live avaible for updates only")
 
 
     args = parser.parse_args()
     if args.record and (args.from_time is None or args.until_time is None):
         parser.error("--record requires --from_time and --until_time.")
 
-    if args.cidr_filter and (args.match is None or args.match is None):
+    if args.cidr_filter and (args.match is None or args.cidr_list is None):
         parser.error("--cidr_filter requires --match and --cidr_list.")
+
+    if args.input_data and (args.input_file_format is None or args.input_record_type is None):
+        parser.error("--input_data requires --input_file_format and --input_record_type.")
+
 
     filter = BGPFilter.BGPFilter()
     filter.countries_filter = args.country_filter
@@ -110,6 +123,9 @@ if __name__ == "__main__":
     filter.project = args.project
     filter.collectors = args.collectors
     filter.set_record_mode(args.record, args.from_time, args.until_time)
+
+    if args.input_data:
+        filter.data_source(args.input_record_type, args.input_file_format, args.input_data)
 
     filter.json_out = args.json_output
     
