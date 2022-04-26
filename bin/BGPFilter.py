@@ -476,36 +476,35 @@ class BGPFilter:
         - Print each record as JSON format
         """
         self.__isStarted = True
-
         self.__f_country = maxminddb.open_database(self.__f_country_path)
-#        project = (self.__project if self.__isRecord else project_types[self.__project])
-#        print(f"Loaded Geo Open database : {self.__f_country_path}")
+        print(f"Loaded Geo Open database : {self.__f_country_path}")
         print(f"Loading stream ...")
-        """
+
         self._stream = pybgpstream.BGPStream(
-            project=project,
-            collectors=self.__collectors,
             from_time=(self.start_time if self.__isRecord else None),
             until_time=(self.end_time if self.__isRecord else None),
+            data_interface=('broker' if self.__data_source['source_type'] == 'broker' else 'singlefile'),
             record_type="updates",
-            filter="elemtype announcements withdrawals" + self.__asn_filter,
-#            data_interface=self.__data_source['source_type']
+            filter="elemtype announcements withdrawals" + self.__asn_filter
         )
-        """
-        stream = pybgpstream.BGPStream()
-        if self.__data_source['source_type'] != 'broker':
-            stream.set_data_interface('singlefile')            
-            stream.set_data_interface_option('singlefile', 'upd-file', '../datasets/updates.20220425.1210')
-            stream.set_data_interface_option('singlefile', 'upd-type', 'mrt')
 
-#        if self.__cidr_match_type_filter is not None:
-#            stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
+        if self.__cidr_match_type_filter is not None:
+            self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
+
+        if self.__data_source['source_type'] != 'broker':            
+            self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-file', self.__data_source['file_path'])
+            self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-type', self.__data_source['file_format'])
+        else:
+            project = (self.__project if self.__isRecord else project_types[self.__project])
+            self._stream._maybe_add_filter('project', project, None)
+            self._stream._maybe_add_filter('collectors', None, self.__collectors)
 
         print("Starting")
-#        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
-        for elem in stream:
-            print(elem)
-#            self.__queue.put(elem)
+        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
+
+        self.__json_out.write('[')
+        for elem in self._stream:
+            self.__queue.put(elem)
 
 
     def stop(self):
@@ -517,5 +516,6 @@ class BGPFilter:
             self.__isStarted = False
             print("Finishing queue ...")
             self.__queue.join()
+            self.__json_out.write(']')
             print("Stream ended")
             exit(0)

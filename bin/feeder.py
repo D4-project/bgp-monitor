@@ -154,7 +154,11 @@ if __name__ == "__main__":
     # ail
     filter.no_ail = args.noail
     if not filter.no_ail and "ail" in config:
-        filter.ail = (config["ail"]["url"], config["ail"]["apikey"], config["general"]["uuid"])
+        try:
+            filter.ail = (config["ail"]["url"], config["ail"]["apikey"], config["general"]["uuid"])
+        except:
+            filter.no_ail = True
+            print("Ail will not be used")
 
     if 'geoopen' in config:
         filter.country_file = config['geoopen']['path']
