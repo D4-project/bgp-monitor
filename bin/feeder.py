@@ -15,18 +15,27 @@ configPath = "../etc/ail-feeder-bgp.cfg"
 if __name__ == "__main__":
 
     # args
-    parser = argparse.ArgumentParser(description="Tool for BGP filtering and feeding")
+    parser = argparse.ArgumentParser(description="Tool for BGP filtering and feeding", allow_abbrev=True)
     parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0")
 
     parser.add_argument(
-        "-cf", "--country_filter", nargs="+", help="Filter using specified country codes."
+        "-cf", "--country_filter", nargs="+", help="Filter using specified country codes.", metavar='<country code>'
     )
     parser.add_argument(
         "-af",
         "--asn_filter",
         nargs="+",
         help="Filter using specified AS number list, skip a record if its as-path doesn't contain one of specified AS numbers",
+        metavar='<AS number>'
     )
+
+    parser.add_argument(
+        '-ip',
+        '--ipversion',
+        choices=['4','6'],
+        help='Filter specific ip address type. ipv4 or ipv6',
+        metavar='<version>'
+        )
 
     parser.add_argument(
         "-pf",
@@ -39,6 +48,7 @@ if __name__ == "__main__":
         "--cidr_list",
         nargs="+",
         help="List of cidr. Format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21",
+        metavar='<prefix>'
     )
     parser.add_argument(
         "--match",
@@ -54,6 +64,7 @@ if __name__ == "__main__":
         "--collectors",
         nargs="+",
         help="Collectors. For complete list of collectors, see https://bgpstream.caida.org/data",
+        metavar='<collector>'
     )
 
     parser.add_argument(
@@ -64,24 +75,28 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--from_time",
+        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
+        metavar='<begin>'
+    )
+
+    parser.add_argument(
         "--until_time",
         help="Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00",
-    )
-    parser.add_argument(
-        "--from_time",
-        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00"
+        metavar='<end>'
     )
 
 
     parser.add_argument(
         "--noail",
         action="store_true",
-        help="Disable ail publish"
+        help="Disable ail publish. Disable caching"
     )
         
     parser.add_argument('--nocache', action='store_true', help='Disable caching')
 
     parser.add_argument(
+        '-jo',
         "--json_output",
         nargs="?",
         default=sys.stdout,
@@ -92,7 +107,9 @@ if __name__ == "__main__":
 
     parser.add_argument('--input_data',
                         type=str,
-                        help="Path to a single file instead of broker.")
+                        help="Path to a single file instead of broker.",
+                        metavar='<path>'
+                        )
 
     parser.add_argument('--input_record_type',
                         choices=['rib','upd'],
@@ -118,6 +135,8 @@ if __name__ == "__main__":
     filter = BGPFilter.BGPFilter()
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
+    filter.ipversion = args.ipversion
+    
     filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
 
     filter.project = args.project

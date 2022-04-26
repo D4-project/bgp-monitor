@@ -98,6 +98,7 @@ class BGPFilter:
         self.__f_country_path = "../mmdb_files/latest.mmdb"
         self.__countries_filter = None
         self.__asn_filter = None
+        self.__ipversion = ''
         self.__cidr_filter = None
         self.__cidr_match_type_filter = None
         self.__queue = Queue()
@@ -170,6 +171,10 @@ class BGPFilter:
     @property
     def cache_expire(self):
         return self.__cache_expire
+    
+    @property
+    def ipversion(self):
+        return self.__ipversion
     
     ###############
     #   SETTERS   #
@@ -370,6 +375,11 @@ class BGPFilter:
         if val >= 0:
             self.__cache_expire = val
 
+    
+    @ipversion.setter
+    def ipversion(self, version):
+        self.__ipversion = ' and ipversion ' + version if version in ['4','6'] else ''
+
     @json_out.setter
     def json_out(self, json_out):
         """
@@ -485,26 +495,30 @@ class BGPFilter:
             until_time=(self.end_time if self.__isRecord else None),
             data_interface=('broker' if self.__data_source['source_type'] == 'broker' else 'singlefile'),
             record_type="updates",
-            filter="elemtype announcements withdrawals" + self.__asn_filter
+            filter="elemtype announcements withdrawals" + self.__asn_filter + self.__ipversion
         )
 
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
 
+
+        print("Starting")
+        self.__json_out.write('[')
+
         if self.__data_source['source_type'] != 'broker':            
             self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-file', self.__data_source['file_path'])
             self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-type', self.__data_source['file_format'])
+            for elem in self._stream:
+                self.__iteration(elem)
+
         else:
             project = (self.__project if self.__isRecord else project_types[self.__project])
             self._stream._maybe_add_filter('project', project, None)
             self._stream._maybe_add_filter('collectors', None, self.__collectors)
-
-        print("Starting")
-        threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
-
-        self.__json_out.write('[')
-        for elem in self._stream:
-            self.__queue.put(elem)
+                
+            threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
+            for elem in self._stream:
+                self.__queue.put(elem)
 
 
     def stop(self):
@@ -517,5 +531,6 @@ class BGPFilter:
             print("Finishing queue ...")
             self.__queue.join()
             self.__json_out.write(']')
+            self.__json_out.close()
             print("Stream ended")
             exit(0)
