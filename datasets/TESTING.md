@@ -1,7 +1,5 @@
 # Testing
 
-<span style="color:red"> Those tests aren't finished yet </span>
-
 Here are commands and expected result files :
 
 1. Default, filter nothing
@@ -22,7 +20,7 @@ Here are commands and expected result files :
     python3 feeder.py --noail --input_data ../datasets/test1 --input_record_type upd -jo ../datasets/results/asn.json -af 268696 3356
     ```
 
-4. Negative AS Number, Restrict the result to elements that AS path do not contains 3356, 17794 or 265636
+4. Negative filtering on AS Number, Restrict the result to elements that AS path do not contains 3356, 17794 or 265636
 
     ```shell
     python3 feeder.py --noail --input_data ../datasets/test1 --input_record_type upd -jo ../datasets/results/asn_neg.json -af _3356 _17794 _265636
