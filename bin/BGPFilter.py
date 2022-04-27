@@ -300,15 +300,16 @@ class BGPFilter:
         not_f_list = []
         if asn_list is not None and len(asn_list) >= 1:
             for i in asn_list:
-                if re.match('-[0-9]+', i):
-                    not_f_list.append(i.replace('-',''))
+                if re.match('_[0-9]+', i):
+                    not_f_list.append(i.replace('_',''))
                 else:
                     f_list.append(i)
 
             if len(f_list) >= 1:
-                self.__asn_filter += " and path (" + "|".join(f_list) + ")"
+                self.__asn_filter += " and path (_" + "_|_".join(f_list) + "_)"
             if len(not_f_list) >= 1:
-                self.__asn_filter = " and path ^((?!" + "|".join(not_f_list) + ").)*$"
+                self.__asn_filter = " and path !(_"+ "_|_".join(not_f_list) + "_)"
+
 
 
     @collectors.setter
@@ -530,7 +531,16 @@ class BGPFilter:
             self.__isStarted = False
             print("Finishing queue ...")
             self.__queue.join()
+    
+            if self.__json_out != sys.stdout:
+                removeLastChar(self.__json_out)
+
             self.__json_out.write(']')
             self.__json_out.close()
             print("Stream ended")
             exit(0)
+
+def removeLastChar(file):
+    file.seek(file.tell() - 1, os.SEEK_SET)
+    file.truncate()
+    
