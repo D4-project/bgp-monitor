@@ -111,6 +111,7 @@ class BGPFilter:
         self.__cache_expire = 86400
         self.nocaching = False
         self.__data_source = {'source_type': 'broker'}
+        self.__expected_result = None
 
     ###############
     #   GETTERS   #
@@ -175,6 +176,10 @@ class BGPFilter:
     @property
     def ipversion(self):
         return self.__ipversion
+    
+    @property
+    def expected_result(self):
+        return self.__expected_result
     
     ###############
     #   SETTERS   #
@@ -310,6 +315,7 @@ class BGPFilter:
             if len(not_f_list) >= 1:
                 self.__asn_filter = " and path !(_"+ "_|_".join(not_f_list) + "_)"
 
+            print(self.__asn_filter)
 
 
     @collectors.setter
@@ -395,6 +401,17 @@ class BGPFilter:
             self.__json_out = json_out
         else:
             raise FileNotFoundError(f"Is {json_out} a file ?")
+
+
+    @expected_result.setter
+    def expected_result(self, expected_result):
+        if expected_result is not None:
+            if hasattr(expected_result, "read"):
+                self.__expected_result = expected_result
+            else:
+                raise FileNotFoundError(f"Is {expected_result} a file ?")
+    
+
 
     ###############
     #   PRINTERS  #
@@ -531,16 +548,31 @@ class BGPFilter:
             self.__isStarted = False
             print("Finishing queue ...")
             self.__queue.join()
-    
-            if self.__json_out != sys.stdout:
-                removeLastChar(self.__json_out)
+            jout = self.__json_out.name
+            closeFile(self.__json_out)
 
-            self.__json_out.write(']')
-            self.__json_out.close()
+            if self.__expected_result != None:
+                f1 = open(jout)
+                if checkFiles(f1, self.__expected_result):
+                    print('The filtered result is as expected')
+                else :
+                    print('The filtered result is not as expected')
+
             print("Stream ended")
             exit(0)
 
-def removeLastChar(file):
-    file.seek(file.tell() - 1, os.SEEK_SET)
-    file.truncate()
+def checkFiles(f1, f2):
+    f1.seek(0, os.SEEK_SET)
+    f2.seek(0, os.SEEK_SET)
+    json1 = json.load(f1)
+    json2 = json.load(f2)
+    return json1 == json2
+
+def closeFile(file):
+    if file != sys.stdout:
+        print(file.tell())
+        file.seek(file.tell() - 1, os.SEEK_SET)
+        file.truncate()
+    file.write(']')
+    file.close()
     

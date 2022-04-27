@@ -120,6 +120,14 @@ if __name__ == "__main__":
                         default='mrt',
                         help="input data type format. ris-live avaible for updates only")
 
+    parser.add_argument('--expected_result',
+                        '-expected',
+                        nargs="?",
+                        type=argparse.FileType("r"),
+                        metavar='<path>',
+                        help="Check that the result is the same as the expected result"
+                        )
+
 
     args = parser.parse_args()
     if args.record and (args.from_time is None or args.until_time is None):
@@ -130,6 +138,9 @@ if __name__ == "__main__":
 
     if args.input_data and (args.input_file_format is None or args.input_record_type is None):
         parser.error("--input_data requires --input_file_format and --input_record_type.")
+    
+    if args.json_output == sys.stdout and args.expected_result != None:
+        parser.error('--expected_result requires --json_output')
 
 
     filter = BGPFilter.BGPFilter()
@@ -147,6 +158,7 @@ if __name__ == "__main__":
         filter.data_source(args.input_record_type, args.input_file_format, args.input_data)
 
     filter.json_out = args.json_output
+    filter.expected_result = args.expected_result
     
     # config
     if os.path.isfile(configPath):
@@ -184,7 +196,7 @@ if __name__ == "__main__":
 
     def stop(x, y):
         filter.stop()
-
     signal.signal(signal.SIGINT, stop)
+
     filter.start()
     filter.stop()
