@@ -55,11 +55,7 @@ optional arguments:
 
 ### Test your installation
 
-Use a single file as source instead of a broker, and disable ail:
-
-~~~shell
-python3 feeder.py --input_data ../datasets/updates.20220425.1215 --input_file_type upd-file --noail
-~~~
+Read [`TESTING.md`](./datasets/TESTING.md) for more informations
 
 ## Exemple of Use
 
