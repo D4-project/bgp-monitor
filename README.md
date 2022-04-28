@@ -3,42 +3,60 @@
 ## Usage
 
 ~~~~shell
-usage: feeder.py [-h] [-v] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]] [-ip <version>] [-pf] [-cl <prefix> [<prefix> ...]] [--match {exact,less,more,any}]
-                 [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r] [--from_time <begin>] [--until_time <end>] [--noail] [--nocache] [-jo [JSON_OUTPUT]] [--input_data <path>]
-                 [--input_record_type {rib,upd}] [--input_file_format {mrt,bmp,ris-live}]
+usage: feeder.py [-h] [-v] [-cf <country code> [<country code> ...]]
+                 [-af <AS number> [<AS number> ...]] [-ip <version>] [-pf]
+                 [-cl <prefix> [<prefix> ...]] [--match {exact,less,more,any}]
+                 [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r]
+                 [--from_time <begin>] [--until_time <end>] [--queue] [--noail]
+                 [--nocache] [-jo [JSON_OUTPUT]] [--input_data <path>]
+                 [--input_record_type {rib,upd}]
+                 [--input_file_format {mrt,bmp,ris-live}] [--expected_result [<path>]]
 
 Tool for BGP filtering and feeding
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program s version number and exit
+  -v, --version         show program's version number and exit
   -cf <country code> [<country code> ...], --country_filter <country code> [<country code> ...]
                         Filter using specified country codes.
   -af <AS number> [<AS number> ...], --asn_filter <AS number> [<AS number> ...]
-                        Filter using specified AS number list, skip a record if its as-path doesn t contain one of specified AS numbers
+                        Filter using specified AS number list, skip a record if its as-
+                        path doesn't contain one of specified AS numbers
   -ip <version>, --ipversion <version>
                         Filter specific ip address type. ipv4 or ipv6
-  -pf, --cidr_filter    Filter using specified cidr list. Keep records that match to one of specified cidr
+  -pf, --cidr_filter    Filter using specified cidr list. Keep records that match to
+                        one of specified cidr
   -cl <prefix> [<prefix> ...], --cidr_list <prefix> [<prefix> ...]
-                        List of cidr. Format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21
+                        List of cidr. Format: ip/subnet | Example:
+                        130.0.192.0/21,130.0.100.0/21
   --match {exact,less,more,any}
-                        Type of match -> exact: Exact match | less: Exact match or less specific | more: Exact match or more specific
+                        Type of match -> exact: Exact match | less: Exact match or less
+                        specific | more: Exact match or more specific
   -p {ris,routeviews}, --project {ris,routeviews}
                         Project name
   -c <collector> [<collector> ...], --collectors <collector> [<collector> ...]
-                        Collectors. For complete list of collectors, see https://bgpstream.caida.org/data
-  -r, --record          Retrieve records in the interval --until_time and --from-time arguments (which are required)
-  --from_time <begin>   Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
-  --until_time <end>    Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
+                        Collectors. For complete list of collectors, see
+                        https://bgpstream.caida.org/data
+  -r, --record          Retrieve records in the interval --until_time and --from-time
+                        arguments (which are required)
+  --from_time <begin>   Beginning of the interval. Timestamp format : YYYY-MM-DD
+                        hh:mm:ss -> Example: 2022-01-01 10:00:00
+  --until_time <end>    Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss
+                        -> Example: 2022-01-01 10:10:00
+  --queue               Enable queue option. Use lot a of memory
   --noail               Disable ail publish. Disable caching
   --nocache             Disable caching
   -jo [JSON_OUTPUT], --json_output [JSON_OUTPUT]
-                        File in which to display JSON output. If not set, default sys.stdout will be used.
+                        File in which to display JSON output. If not set, default
+                        sys.stdout will be used.
   --input_data <path>   Path to a single file instead of broker.
   --input_record_type {rib,upd}
-                        Type of records contained in input_data file. Can be ribs (rib) or updates (upd)
+                        Type of records contained in input_data file. Can be ribs (rib)
+                        or updates (upd)
   --input_file_format {mrt,bmp,ris-live}
                         input data type format. ris-live avaible for updates only
+  --expected_result [<path>], -expected [<path>]
+                        Check that the result is the same as the expected result
 ~~~~
 
 ## Installation

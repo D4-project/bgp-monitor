@@ -6,8 +6,6 @@ import argparse
 import configparser
 import sys
 import redis
-from yaml import parse
-from secrets import choice
 import BGPFilter
 
 configPath = "../etc/ail-feeder-bgp.cfg"
@@ -73,19 +71,20 @@ if __name__ == "__main__":
         action="store_true",
         help="Retrieve records in the interval --until_time and --from-time arguments (which are required)",
     )
-
     parser.add_argument(
         "--from_time",
         help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
         metavar='<begin>'
     )
-
     parser.add_argument(
         "--until_time",
         help="Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00",
         metavar='<end>'
     )
 
+    parser.add_argument('--queue',
+                        action='store_true',
+                        help='Enable queue option. Use lot a of memory')
 
     parser.add_argument(
         "--noail",
@@ -147,6 +146,7 @@ if __name__ == "__main__":
     filter.countries_filter = args.country_filter
     filter.asn_filter = args.asn_filter
     filter.ipversion = args.ipversion
+    filter.queue = args.queue
     
     filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
 
@@ -191,8 +191,10 @@ if __name__ == "__main__":
             filter.no_ail = True
             print("Ail will not be used")
 
+    # GeoOpen DB
     if 'geoopen' in config:
         filter.country_file = config['geoopen']['path']
+
 
     def stop(x, y):
         filter.stop()

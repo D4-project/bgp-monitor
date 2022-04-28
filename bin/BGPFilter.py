@@ -181,6 +181,10 @@ class BGPFilter:
     def expected_result(self):
         return self.__expected_result
     
+    @property
+    def queue(self):
+        return self.__queue
+    
     ###############
     #   SETTERS   #
     ###############
@@ -381,7 +385,13 @@ class BGPFilter:
     def cache_expire(self, val):
         if val >= 0:
             self.__cache_expire = val
-
+    
+    @queue.setter
+    def queue(self, bool):
+        if bool:
+            self.__queue = Queue()
+        else :
+            self.__queue = None
     
     @ipversion.setter
     def ipversion(self, version):
@@ -410,7 +420,6 @@ class BGPFilter:
                 self.__expected_result = expected_result
             else:
                 raise FileNotFoundError(f"Is {expected_result} a file ?")
-    
 
 
     ###############
@@ -467,7 +476,6 @@ class BGPFilter:
         r = self.__bgp_conv(e)
 
         if r is None : return
-        print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
 
         if self.__no_ail:
             print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
@@ -485,6 +493,9 @@ class BGPFilter:
         if self.__json_out != sys.stdout:
             self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
 
+    def send_data(self):
+        
+        pass
 
     def __print_queue(self):
         """Iterate over queue to process each bgp element"""
@@ -526,18 +537,21 @@ class BGPFilter:
         if self.__data_source['source_type'] != 'broker':            
             self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-file', self.__data_source['file_path'])
             self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-type', self.__data_source['file_format'])
-            for elem in self._stream:
-                self.__iteration(elem)
-
         else:
             project = (self.__project if self.__isRecord else project_types[self.__project])
             self._stream._maybe_add_filter('project', project, None)
             self._stream._maybe_add_filter('collectors', None, self.__collectors)
-                
+
+
+        if self.__queue:
             threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
             for elem in self._stream:
                 self.__queue.put(elem)
+                print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
 
+        else :
+            for elem in self._stream:
+                self.__iteration(elem)
 
     def stop(self):
         """
