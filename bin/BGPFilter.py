@@ -1,19 +1,19 @@
 import ipaddress
-from multiprocessing.connection import wait
 import os
 import re
 import sys
 import json
 import threading
-from time import sleep
-from uuid import UUID
 import maxminddb
 import pycountry
 import pybgpstream
 
-from pyail import PyAIL
 from queue import Queue
 from datetime import datetime
+
+from uuid import UUID
+
+import bgpout
 
 collectors_list = {
     "routeviews": [
@@ -104,11 +104,7 @@ class BGPFilter:
         self.__queue = Queue()
         self.__project = list(project_types.keys())[0]
         self.__collectors = None
-        self.__redis = None
-        self.__ail = None
         self.__no_ail = False
-        self.__source_uuid = None
-        self.__cache_expire = 86400
         self.nocaching = False
         self.__data_source = {'source_type': 'broker'}
         self.__expected_result = None
@@ -126,7 +122,7 @@ class BGPFilter:
         return self.__end_time
 
     @property
-    def isRecord(self):
+    def isRecord(self) -> bool:
         return self.__isRecord
 
     @property
@@ -150,36 +146,12 @@ class BGPFilter:
         return self.__collectors
 
     @property
-    def json_out(self):
-        return self.__json_out
-
-    @property
     def project(self):
         return self.__project
 
     @property
-    def redis_db(self):
-        return self.__redis
-
-    @property
-    def ail(self):
-        return self.__ail
-
-    @property
-    def no_ail(self):
-        return self.__no_ail
-
-    @property
-    def cache_expire(self):
-        return self.__cache_expire
-    
-    @property
     def ipversion(self):
         return self.__ipversion
-    
-    @property
-    def expected_result(self):
-        return self.__expected_result
     
     @property
     def queue(self):
@@ -189,7 +161,7 @@ class BGPFilter:
     #   SETTERS   #
     ###############
 
-    def set_record_mode(self, isRecord, start, end):
+    def record_mode(self, isRecord, start, end):
         """
         Define record mode or live stream.
             start and end will not be modified if isRecord is False
@@ -254,7 +226,7 @@ class BGPFilter:
             raise FileNotFoundError
         self.__f_country_path = country_file_path
 
-    def set_cidr_filter(self, isCIDR, match_type, cidr_list):
+    def cidr_filter(self, isCIDR, match_type, cidr_list):
         """
         CIDR filter option
             Keep records that match to one of specified cidr.
@@ -300,6 +272,7 @@ class BGPFilter:
     def asn_filter(self, asn_list):
         """Filter using specified AS number list
             Skip a record if its as-path doesn't contain one of specified AS numbers
+            Use _ for negation
 
         Args:
             asn_list (list): List of AS numbers
@@ -341,50 +314,6 @@ class BGPFilter:
             self.__collectors = None
         else:
             raise ValueError(f"Invalid project name. Valid projects list : {project_types.keys()}")
-
-    @redis_db.setter
-    def redis_db(self, r):
-        r.ping()
-        self.__redis = r
-
-    @ail.setter
-    def ail(self, values):
-        """Define args for connection to ail instance
-
-        Args:
-            Ail: (url, api_key, source_uuid)
-            url (string): Url (ip:port/path to import)
-            apikey (string)
-            source_uuid (string)
-
-        Raises:
-            ValueError: if args not defined
-            ValueError: if source uuid doesn't respect uuid v4 format
-        """
-        try:
-            url, api_key, source_uuid = values
-        except ValueError:
-            raise ValueError("Ail url, api key, and source_uuid are required for connection")
-
-        try:
-            UUID(source_uuid, version=4)
-            self.__source_uuid = source_uuid
-        except ValueError:
-            raise ValueError("Invalid source uuid v4 format.")
-
-        try:
-            self.__ail = PyAIL(url, api_key, ssl=False)
-        except Exception as e:
-            raise Exception(e)
-        
-    @no_ail.setter
-    def no_ail(self, val):
-        self.__no_ail = val
-
-    @cache_expire.setter
-    def cache_expire(self, val):
-        if val >= 0:
-            self.__cache_expire = val
     
     @queue.setter
     def queue(self, bool):
@@ -397,29 +326,6 @@ class BGPFilter:
     def ipversion(self, version):
         self.__ipversion = ' and ipversion ' + version if version in ['4','6'] else ''
 
-    @json_out.setter
-    def json_out(self, json_out):
-        """
-        Setter for JSON output
-            Default : sys.stdout
-        Parameters:
-            json_out (File): Where to output json
-        Raises:
-            Exception: If unable to use
-        """
-        if hasattr(json_out, "write"):
-            self.__json_out = json_out
-        else:
-            raise FileNotFoundError(f"Is {json_out} a file ?")
-
-
-    @expected_result.setter
-    def expected_result(self, expected_result):
-        if expected_result is not None:
-            if hasattr(expected_result, "read"):
-                self.__expected_result = expected_result
-            else:
-                raise FileNotFoundError(f"Is {expected_result} a file ?")
 
 
     ###############
@@ -479,23 +385,21 @@ class BGPFilter:
 
         if self.__no_ail:
             print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
-        else: 
-            if not self.nocaching: # Check if record already exist
-                if self.__redis.exists(f"event:{key}"):
-                        print("record already exist : " + key)
-                else:
-                    self.__redis.set(f"event:{key}", key)
-                    self.__redis.expire(f"event:{key}", self.__cache_expire)
-                    self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-            else:
-                self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
+        else:
 
+            
+#            if not self.nocaching: # Check if record already exist
+#                if self.__redis.exists(f"event:{key}"):
+#                        print("record already exist : " + key)
+#                else:
+#                    self.__redis.set(f"event:{key}", key)
+#                    self.__redis.expire(f"event:{key}", self.__cache_expire)
+#                    self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
+#            else:
+#                self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
+            pass
         if self.__json_out != sys.stdout:
             self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
-
-    def send_data(self):
-        
-        pass
 
     def __print_queue(self):
         """Iterate over queue to process each bgp element"""
@@ -532,9 +436,9 @@ class BGPFilter:
 
 
         print("Starting")
-        self.__json_out.write('[')
+        BGPOut._begin()
 
-        if self.__data_source['source_type'] != 'broker':            
+        if self.__data_source['source_type'] != 'broker':
             self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-file', self.__data_source['file_path'])
             self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-type', self.__data_source['file_format'])
         else:
@@ -562,31 +466,9 @@ class BGPFilter:
             self.__isStarted = False
             print("Finishing queue ...")
             self.__queue.join()
-            jout = self.__json_out.name
-            closeFile(self.__json_out)
-
-            if self.__expected_result != None:
-                f1 = open(jout)
-                if checkFiles(f1, self.__expected_result):
-                    print('The filtered result is as expected')
-                else :
-                    print('The filtered result is not as expected')
+            BGPOut.closeFile(self.__json_out)            
 
             print("Stream ended")
             exit(0)
 
-def checkFiles(f1, f2):
-    f1.seek(0, os.SEEK_SET)
-    f2.seek(0, os.SEEK_SET)
-    json1 = json.load(f1)
-    json2 = json.load(f2)
-    return json1 == json2
-
-def closeFile(file):
-    if file != sys.stdout:
-        print(file.tell())
-        file.seek(file.tell() - 1, os.SEEK_SET)
-        file.truncate()
-    file.write(']')
-    file.close()
     

@@ -7,6 +7,7 @@ import configparser
 import sys
 import redis
 import BGPFilter
+import bgpout
 
 configPath = "../etc/ail-feeder-bgp.cfg"
 
@@ -142,17 +143,25 @@ if __name__ == "__main__":
         parser.error('--expected_result requires --json_output')
 
 
-    filter = BGPFilter.BGPFilter()
-    filter.countries_filter = args.country_filter
-    filter.asn_filter = args.asn_filter
-    filter.ipversion = args.ipversion
-    filter.queue = args.queue
-    
-    filter.set_cidr_filter(args.cidr_filter, args.match, args.cidr_list)
 
-    filter.project = args.project
-    filter.collectors = args.collectors
-    filter.set_record_mode(args.record, args.from_time, args.until_time)
+
+    filter = BGPFilter.BGPFilter()
+
+    filter.project = args.project # ris / routeviews
+    filter.collectors = args.collectors # there's many collectors
+    filter.countries_filter = args.country_filter # Country codes
+    filter.asn_filter = args.asn_filter # asn list
+    filter.ipversion = args.ipversion # 4 / 6
+    filter.queue = args.queue # Boolean
+    
+    filter.cidr_filter(args.cidr_filter, args.match, args.cidr_list) # List of cidr + specficity
+
+    filter.record_mode(args.record, args.from_time, args.until_time) #Timestamp for begin and end
+
+
+    out = bgpout.BGPOut()
+
+## CLEAN =================================v vv v 
 
     if args.input_data:
         filter.data_source(args.input_record_type, args.input_file_format, args.input_data)
