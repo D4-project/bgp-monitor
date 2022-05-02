@@ -1,8 +1,6 @@
 .vscode
 __pycache__
 tests
-.pre-commit-config.yaml
 requirements-dev.txt
-pyproject.toml
 ail-feeder-bgp.cfg
 tests.py
