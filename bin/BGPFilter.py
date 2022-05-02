@@ -557,7 +557,8 @@ class BGPFilter:
         if self.__isStarted:
             self.__isStarted = False
             print("Finishing queue ...")
-            self.__queue.join()
+            if self.__queue is not None:
+                self.__queue.join()
             jout = self.__json_out.name
             closeFile(self.__json_out)
 
@@ -585,5 +586,5 @@ def closeFile(file):
         print(file.tell())
         file.seek(file.tell() - 1, os.SEEK_SET)
         file.truncate()
-    file.write("]")
-    file.close()
+        file.write("]")
+        file.close()
