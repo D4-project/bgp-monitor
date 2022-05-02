@@ -1,11 +1,9 @@
 import ipaddress
-from multiprocessing.connection import wait
 import os
 import re
 import sys
 import json
 import threading
-from time import sleep
 from uuid import UUID
 import maxminddb
 import pycountry
@@ -98,7 +96,7 @@ class BGPFilter:
         self.__f_country_path = "../mmdb_files/latest.mmdb"
         self.__countries_filter = None
         self.__asn_filter = None
-        self.__ipversion = ''
+        self.__ipversion = ""
         self.__cidr_filter = None
         self.__cidr_match_type_filter = None
         self.__queue = Queue()
@@ -110,7 +108,7 @@ class BGPFilter:
         self.__source_uuid = None
         self.__cache_expire = 86400
         self.nocaching = False
-        self.__data_source = {'source_type': 'broker'}
+        self.__data_source = {"source_type": "broker"}
         self.__expected_result = None
 
     ###############
@@ -172,19 +170,19 @@ class BGPFilter:
     @property
     def cache_expire(self):
         return self.__cache_expire
-    
+
     @property
     def ipversion(self):
         return self.__ipversion
-    
+
     @property
     def expected_result(self):
         return self.__expected_result
-    
+
     @property
     def queue(self):
         return self.__queue
-    
+
     ###############
     #   SETTERS   #
     ###############
@@ -221,7 +219,7 @@ class BGPFilter:
     def data_source(self, record_type, file_format, file_path):
         """
         Use single file as data source
-        
+
         Args:
             record_type (str): rib or upd
             file_format (str): mrt, bmp or ris-live
@@ -233,14 +231,14 @@ class BGPFilter:
         """
         if not os.path.isfile(file_path):
             raise FileNotFoundError
-        if not record_type in ['rib','upd']:
-            raise ValueError('Input file type must be rib or upd')
-        if record_type == 'rib' and file_format in ['mrt','bmp']:
-            raise ValueError('Accepted input format types for rib : mrt, bmp')
-        elif record_type == 'upd' and file_format not in ['mrt','bmp','ris-live']:
-            raise ValueError('Accepted input format types for upd : mrt, bmp or ris-live')
+        if record_type not in ["rib", "upd"]:
+            raise ValueError("Input file type must be rib or upd")
+        if record_type == "rib" and file_format in ["mrt", "bmp"]:
+            raise ValueError("Accepted input format types for rib : mrt, bmp")
+        elif record_type == "upd" and file_format not in ["mrt", "bmp", "ris-live"]:
+            raise ValueError("Accepted input format types for upd : mrt, bmp or ris-live")
 
-        self.__data_source = {'source_type': record_type, 'file_format': file_format, 'file_path': file_path}
+        self.__data_source = {"source_type": record_type, "file_format": file_format, "file_path": file_path}
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -271,9 +269,7 @@ class BGPFilter:
             if cidr_list is None or len(cidr_list) == 0:
                 raise Exception("Please specify one or more prefixes when filtering by prefix")
             if match_type not in ["exact", "less", "more", "any"]:
-                raise ValueError(
-                    "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
-                )
+                raise ValueError("Match type must be specified and one of ['exact', 'less', 'more', 'any']")
             for c in cidr_list:
                 ipaddress.ip_network(c)
             self.__cidr_match_type_filter = "prefix-" + match_type
@@ -309,18 +305,17 @@ class BGPFilter:
         not_f_list = []
         if asn_list is not None and len(asn_list) >= 1:
             for i in asn_list:
-                if re.match('_[0-9]+', i):
-                    not_f_list.append(i.replace('_',''))
+                if re.match("_[0-9]+", i):
+                    not_f_list.append(i.replace("_", ""))
                 else:
                     f_list.append(i)
 
             if len(f_list) >= 1:
                 self.__asn_filter += " and path (_" + "_|_".join(f_list) + "_)"
             if len(not_f_list) >= 1:
-                self.__asn_filter = " and path !(_"+ "_|_".join(not_f_list) + "_)"
+                self.__asn_filter = " and path !(_" + "_|_".join(not_f_list) + "_)"
 
             print(self.__asn_filter)
-
 
     @collectors.setter
     def collectors(self, collectors):
@@ -376,7 +371,7 @@ class BGPFilter:
             self.__ail = PyAIL(url, api_key, ssl=False)
         except Exception as e:
             raise Exception(e)
-        
+
     @no_ail.setter
     def no_ail(self, val):
         self.__no_ail = val
@@ -385,17 +380,17 @@ class BGPFilter:
     def cache_expire(self, val):
         if val >= 0:
             self.__cache_expire = val
-    
+
     @queue.setter
     def queue(self, bool):
         if bool:
             self.__queue = Queue()
-        else :
+        else:
             self.__queue = None
-    
+
     @ipversion.setter
     def ipversion(self, version):
-        self.__ipversion = ' and ipversion ' + version if version in ['4','6'] else ''
+        self.__ipversion = " and ipversion " + version if version in ["4", "6"] else ""
 
     @json_out.setter
     def json_out(self, json_out):
@@ -412,7 +407,6 @@ class BGPFilter:
         else:
             raise FileNotFoundError(f"Is {json_out} a file ?")
 
-
     @expected_result.setter
     def expected_result(self, expected_result):
         if expected_result is not None:
@@ -420,7 +414,6 @@ class BGPFilter:
                 self.__expected_result = expected_result
             else:
                 raise FileNotFoundError(f"Is {expected_result} a file ?")
-
 
     ###############
     #   PRINTERS  #
@@ -475,14 +468,15 @@ class BGPFilter:
         key = str(e)
         r = self.__bgp_conv(e)
 
-        if r is None : return
+        if r is None:
+            return
 
         if self.__no_ail:
-            print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
-        else: 
-            if not self.nocaching: # Check if record already exist
+            print("\n" + json.dumps(r, sort_keys=True) + ",")  # print to stdout
+        else:
+            if not self.nocaching:  # Check if record already exist
                 if self.__redis.exists(f"event:{key}"):
-                        print("record already exist : " + key)
+                    print("record already exist : " + key)
                 else:
                     self.__redis.set(f"event:{key}", key)
                     self.__redis.expire(f"event:{key}", self.__cache_expire)
@@ -491,10 +485,10 @@ class BGPFilter:
                 self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
 
         if self.__json_out != sys.stdout:
-            self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
+            self.json_out.write("\n" + json.dumps(r, sort_keys=True, indent=4) + ",")
 
     def send_data(self):
-        
+
         pass
 
     def __print_queue(self):
@@ -517,31 +511,33 @@ class BGPFilter:
         self.__isStarted = True
         self.__f_country = maxminddb.open_database(self.__f_country_path)
         print(f"Loaded Geo Open database : {self.__f_country_path}")
-        print(f"Loading stream ...")
+        print("Loading stream ...")
 
         self._stream = pybgpstream.BGPStream(
             from_time=(self.start_time if self.__isRecord else None),
             until_time=(self.end_time if self.__isRecord else None),
-            data_interface=('broker' if self.__data_source['source_type'] == 'broker' else 'singlefile'),
+            data_interface=("broker" if self.__data_source["source_type"] == "broker" else "singlefile"),
             record_type="updates",
-            filter="elemtype announcements withdrawals" + self.__asn_filter + self.__ipversion
+            filter="elemtype announcements withdrawals" + self.__asn_filter + self.__ipversion,
         )
 
         if self.__cidr_match_type_filter is not None:
             self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
 
-
         print("Starting")
-        self.__json_out.write('[')
+        self.__json_out.write("[")
 
-        if self.__data_source['source_type'] != 'broker':            
-            self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-file', self.__data_source['file_path'])
-            self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-type', self.__data_source['file_format'])
+        if self.__data_source["source_type"] != "broker":
+            self._stream.set_data_interface_option(
+                "singlefile", self.__data_source["source_type"] + "-file", self.__data_source["file_path"]
+            )
+            self._stream.set_data_interface_option(
+                "singlefile", self.__data_source["source_type"] + "-type", self.__data_source["file_format"]
+            )
         else:
-            project = (self.__project if self.__isRecord else project_types[self.__project])
-            self._stream._maybe_add_filter('project', project, None)
-            self._stream._maybe_add_filter('collectors', None, self.__collectors)
-
+            project = self.__project if self.__isRecord else project_types[self.__project]
+            self._stream._maybe_add_filter("project", project, None)
+            self._stream._maybe_add_filter("collectors", None, self.__collectors)
 
         if self.__queue:
             threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
@@ -549,7 +545,7 @@ class BGPFilter:
                 self.__queue.put(elem)
                 print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
 
-        else :
+        else:
             for elem in self._stream:
                 self.__iteration(elem)
 
@@ -565,15 +561,16 @@ class BGPFilter:
             jout = self.__json_out.name
             closeFile(self.__json_out)
 
-            if self.__expected_result != None:
+            if self.__expected_result is not None:
                 f1 = open(jout)
                 if checkFiles(f1, self.__expected_result):
-                    print('The filtered result is as expected')
-                else :
-                    print('The filtered result is not as expected')
+                    print("The filtered result is as expected")
+                else:
+                    print("The filtered result is not as expected")
 
             print("Stream ended")
             exit(0)
+
 
 def checkFiles(f1, f2):
     f1.seek(0, os.SEEK_SET)
@@ -582,11 +579,11 @@ def checkFiles(f1, f2):
     json2 = json.load(f2)
     return json1 == json2
 
+
 def closeFile(file):
     if file != sys.stdout:
         print(file.tell())
         file.seek(file.tell() - 1, os.SEEK_SET)
         file.truncate()
-    file.write(']')
+    file.write("]")
     file.close()
-    
