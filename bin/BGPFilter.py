@@ -238,7 +238,11 @@ class BGPFilter:
         elif record_type == "upd" and file_format not in ["mrt", "bmp", "ris-live"]:
             raise ValueError("Accepted input format types for upd : mrt, bmp or ris-live")
 
-        self.__data_source = {"source_type": record_type, "file_format": file_format, "file_path": file_path}
+        self.__data_source = {
+            "source_type": record_type,
+            "file_format": file_format,
+            "file_path": file_path,
+        }
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -269,7 +273,9 @@ class BGPFilter:
             if cidr_list is None or len(cidr_list) == 0:
                 raise Exception("Please specify one or more prefixes when filtering by prefix")
             if match_type not in ["exact", "less", "more", "any"]:
-                raise ValueError("Match type must be specified and one of ['exact', 'less', 'more', 'any']")
+                raise ValueError(
+                    "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
+                )
             for c in cidr_list:
                 ipaddress.ip_network(c)
             self.__cidr_match_type_filter = "prefix-" + match_type
@@ -529,10 +535,14 @@ class BGPFilter:
 
         if self.__data_source["source_type"] != "broker":
             self._stream.set_data_interface_option(
-                "singlefile", self.__data_source["source_type"] + "-file", self.__data_source["file_path"]
+                "singlefile",
+                self.__data_source["source_type"] + "-file",
+                self.__data_source["file_path"],
             )
             self._stream.set_data_interface_option(
-                "singlefile", self.__data_source["source_type"] + "-type", self.__data_source["file_format"]
+                "singlefile",
+                self.__data_source["source_type"] + "-type",
+                self.__data_source["file_format"],
             )
         else:
             project = self.__project if self.__isRecord else project_types[self.__project]
