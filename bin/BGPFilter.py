@@ -1,19 +1,10 @@
 import ipaddress
 import os
 import re
-import sys
-import json
-import threading
 import maxminddb
 import pycountry
 import pybgpstream
-
-from queue import Queue
 from datetime import datetime
-
-from uuid import UUID
-
-import bgpout
 
 collectors_list = {
     "routeviews": [
@@ -98,16 +89,13 @@ class BGPFilter:
         self.__f_country_path = "../mmdb_files/latest.mmdb"
         self.__countries_filter = None
         self.__asn_filter = None
-        self.__ipversion = ''
+        self.__ipversion = ""
         self.__cidr_filter = None
         self.__cidr_match_type_filter = None
-        self.__queue = Queue()
         self.__project = list(project_types.keys())[0]
         self.__collectors = None
-        self.__no_ail = False
-        self.nocaching = False
-        self.__data_source = {'source_type': 'broker'}
-        self.__expected_result = None
+        self.__data_source = {"source_type": "broker"}
+        self.out = None
 
     ###############
     #   GETTERS   #
@@ -152,11 +140,7 @@ class BGPFilter:
     @property
     def ipversion(self):
         return self.__ipversion
-    
-    @property
-    def queue(self):
-        return self.__queue
-    
+
     ###############
     #   SETTERS   #
     ###############
@@ -178,14 +162,20 @@ class BGPFilter:
         self.__isRecord = isRecord
         if isRecord:
             if start is None or end is None:
-                raise ValueError("Record mode requires the from_time and until_time arguments")
+                raise ValueError(
+                    "Record mode requires the from_time and until_time arguments"
+                )
             try:
                 st = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
                 en = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
             except ValueError:
-                raise ValueError("Invalid record mode date format. Must be %Y-%m-%d %H:%M:%S")
+                raise ValueError(
+                    "Invalid record mode date format. Must be %Y-%m-%d %H:%M:%S"
+                )
             if st > en:
-                raise ValueError("Invalid record mode interval. Beginning must precede the end")
+                raise ValueError(
+                    "Invalid record mode interval. Beginning must precede the end"
+                )
 
             self.__start_time = start
             self.__end_time = end
@@ -193,7 +183,7 @@ class BGPFilter:
     def data_source(self, record_type, file_format, file_path):
         """
         Use single file as data source
-        
+
         Args:
             record_type (str): rib or upd
             file_format (str): mrt, bmp or ris-live
@@ -205,14 +195,24 @@ class BGPFilter:
         """
         if not os.path.isfile(file_path):
             raise FileNotFoundError
-        if not record_type in ['rib','upd']:
-            raise ValueError('Input file type must be rib or upd')
-        if record_type == 'rib' and file_format in ['mrt','bmp']:
-            raise ValueError('Accepted input format types for rib : mrt, bmp')
-        elif record_type == 'upd' and file_format not in ['mrt','bmp','ris-live']:
-            raise ValueError('Accepted input format types for upd : mrt, bmp or ris-live')
+        if record_type not in ["rib", "upd"]:
+            raise ValueError("Input file type must be rib or upd")
+        if record_type == "rib" and file_format in ["mrt", "bmp"]:
+            raise ValueError("Accepted input format types for rib : mrt, bmp")
+        elif record_type == "upd" and file_format not in [
+            "mrt",
+            "bmp",
+            "ris-live",
+        ]:
+            raise ValueError(
+                "Accepted input format types for upd : mrt, bmp or ris-live"
+            )
 
-        self.__data_source = {'source_type': record_type, 'file_format': file_format, 'file_path': file_path}
+        self.__data_source = {
+            "source_type": record_type,
+            "file_format": file_format,
+            "file_path": file_path,
+        }
 
     @country_file.setter
     def country_file(self, country_file_path):
@@ -226,6 +226,7 @@ class BGPFilter:
             raise FileNotFoundError
         self.__f_country_path = country_file_path
 
+    @cidr_filter.setter
     def cidr_filter(self, isCIDR, match_type, cidr_list):
         """
         CIDR filter option
@@ -241,7 +242,9 @@ class BGPFilter:
         """
         if isCIDR:
             if cidr_list is None or len(cidr_list) == 0:
-                raise Exception("Please specify one or more prefixes when filtering by prefix")
+                raise Exception(
+                    "Please specify one or more prefixes when filtering by prefix"
+                )
             if match_type not in ["exact", "less", "more", "any"]:
                 raise ValueError(
                     "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
@@ -282,18 +285,19 @@ class BGPFilter:
         not_f_list = []
         if asn_list is not None and len(asn_list) >= 1:
             for i in asn_list:
-                if re.match('_[0-9]+', i):
-                    not_f_list.append(i.replace('_',''))
+                if re.match("_[0-9]+", i):
+                    not_f_list.append(i.replace("_", ""))
                 else:
                     f_list.append(i)
 
             if len(f_list) >= 1:
                 self.__asn_filter += " and path (_" + "_|_".join(f_list) + "_)"
             if len(not_f_list) >= 1:
-                self.__asn_filter = " and path !(_"+ "_|_".join(not_f_list) + "_)"
+                self.__asn_filter = (
+                    " and path !(_" + "_|_".join(not_f_list) + "_)"
+                )
 
             print(self.__asn_filter)
-
 
     @collectors.setter
     def collectors(self, collectors):
@@ -313,20 +317,15 @@ class BGPFilter:
             self.__project = project
             self.__collectors = None
         else:
-            raise ValueError(f"Invalid project name. Valid projects list : {project_types.keys()}")
-    
-    @queue.setter
-    def queue(self, bool):
-        if bool:
-            self.__queue = Queue()
-        else :
-            self.__queue = None
-    
+            raise ValueError(
+                f"Invalid project name. Valid projects list : {project_types.keys()}"
+            )
+
     @ipversion.setter
     def ipversion(self, version):
-        self.__ipversion = ' and ipversion ' + version if version in ['4','6'] else ''
-
-
+        self.__ipversion = (
+            " and ipversion " + version if version in ["4", "6"] else ""
+        )
 
     ###############
     #   PRINTERS  #
@@ -346,66 +345,18 @@ class BGPFilter:
             r = self.__f_country.get(p.split("/", 1)[0])
             return r["country"]["iso_code"] if r is not None else None
 
-    def __bgp_conv(self, e):
-        """Return a BGPElem as json
-
-        Parameters:
-            e (BGPElem)
+    def __check_country(self, e):
         """
-        country_code = self.__country_by_prefix(e._maybe_field("prefix"))
-        if self.__countries_filter is not None and country_code not in self.__countries_filter:
-            return None
+        Args:
+            e (_type_): _description_
 
-        data = {
-            "bgp:type": e.type,
-            "bgp:time": e.time,
-            "bgp:peer": e.peer_address,
-            "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e._maybe_field("collector"),
-        }
-
-        if e.type in ["A", "R", "W"]:  # updateribs
-            data["bgp:prefix"] = e._maybe_field("prefix")
-            data["bgp:country_code"] = country_code
-        if e.type in ["A", "R"]:  # updateribs
-            data["bgp:as-path"] = e._maybe_field("as-path")
-            data["bgp:next-hop"] = e._maybe_field("next-hop")
-        elif e.type == "S":  # peer state
-            data["bgp:old-state"] = e._maybe_field("old-state")
-            data["bgp:new-state"] = e._maybe_field("new-state")
-
-        return data
-
-    def __iteration(self, e):
-        # redis save
-        key = str(e)
-        r = self.__bgp_conv(e)
-
-        if r is None : return
-
-        if self.__no_ail:
-            print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
-        else:
-
-            
-#            if not self.nocaching: # Check if record already exist
-#                if self.__redis.exists(f"event:{key}"):
-#                        print("record already exist : " + key)
-#                else:
-#                    self.__redis.set(f"event:{key}", key)
-#                    self.__redis.expire(f"event:{key}", self.__cache_expire)
-#                    self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-#            else:
-#                self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-            pass
-        if self.__json_out != sys.stdout:
-            self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
-
-    def __print_queue(self):
-        """Iterate over queue to process each bgp element"""
-        while self.__isStarted or self.__queue.qsize():
-            self.__iteration(self.__queue.get())
-            self.__queue.task_done()
+        Returns:
+            boolean: if e.country code is in self.__countries_filter list
+        """
+        return not (
+            self.__countries_filter is not None
+            and e.country_code not in self.__countries_filter
+        )
 
     ####################
     # PUBLIC FUNCTIONS #
@@ -421,41 +372,57 @@ class BGPFilter:
         self.__isStarted = True
         self.__f_country = maxminddb.open_database(self.__f_country_path)
         print(f"Loaded Geo Open database : {self.__f_country_path}")
-        print(f"Loading stream ...")
+        print("Loading stream ...")
 
         self._stream = pybgpstream.BGPStream(
             from_time=(self.start_time if self.__isRecord else None),
             until_time=(self.end_time if self.__isRecord else None),
-            data_interface=('broker' if self.__data_source['source_type'] == 'broker' else 'singlefile'),
+            data_interface=(
+                "broker"
+                if self.__data_source["source_type"] == "broker"
+                else "singlefile"
+            ),
             record_type="updates",
-            filter="elemtype announcements withdrawals" + self.__asn_filter + self.__ipversion
+            filter="elemtype announcements withdrawals"
+            + self.__asn_filter
+            + self.__ipversion,
         )
 
         if self.__cidr_match_type_filter is not None:
-            self._stream._maybe_add_filter(self.__cidr_match_type_filter, None, self.__cidr_filter)
-
+            self._stream._maybe_add_filter(
+                self.__cidr_match_type_filter, None, self.__cidr_filter
+            )
 
         print("Starting")
-        BGPOut._begin()
 
-        if self.__data_source['source_type'] != 'broker':
-            self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-file', self.__data_source['file_path'])
-            self._stream.set_data_interface_option('singlefile', self.__data_source['source_type']+'-type', self.__data_source['file_format'])
+        if self.__data_source["source_type"] != "broker":
+            self._stream.set_data_interface_option(
+                "singlefile",
+                self.__data_source["source_type"] + "-file",
+                self.__data_source["file_path"],
+            )
+            self._stream.set_data_interface_option(
+                "singlefile",
+                self.__data_source["source_type"] + "-type",
+                self.__data_source["file_format"],
+            )
         else:
-            project = (self.__project if self.__isRecord else project_types[self.__project])
-            self._stream._maybe_add_filter('project', project, None)
-            self._stream._maybe_add_filter('collectors', None, self.__collectors)
+            project = (
+                self.__project
+                if self.__isRecord
+                else project_types[self.__project]
+            )
+            self._stream._maybe_add_filter("project", project, None)
+            self._stream._maybe_add_filter(
+                "collectors", None, self.__collectors
+            )
 
+        self.out.start()
 
-        if self.__queue:
-            threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
-            for elem in self._stream:
-                self.__queue.put(elem)
-                print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
-
-        else :
-            for elem in self._stream:
-                self.__iteration(elem)
+        for e in self._stream:
+            e.country_code = self.__country_by_prefix(e._maybe_field("prefix"))
+            if self.__check_country(e):
+                self.out.input_data(e)
 
     def stop(self):
         """
@@ -464,11 +431,6 @@ class BGPFilter:
         """
         if self.__isStarted:
             self.__isStarted = False
-            print("Finishing queue ...")
-            self.__queue.join()
-            BGPOut.closeFile(self.__json_out)            
-
+            self.out.close()
             print("Stream ended")
             exit(0)
-
-    
