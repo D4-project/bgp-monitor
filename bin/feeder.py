@@ -97,18 +97,16 @@ if __name__ == "__main__":
     parser.add_argument(
         "--queue",
         action="store_true",
-        help="Enable queue option. Use lot a of memory",
+        help="Enable queue option. Use a lot of memory",
     )
 
     parser.add_argument(
         "--noail",
         action="store_true",
-        help="Disable ail publish. Disable caching",
+        help="Disable ail publish.",
     )
 
-    parser.add_argument(
-        "--nocache", action="store_true", help="Disable caching"
-    )
+    parser.add_argument("--noredis", action="store_true", help="Disable redis")
 
     parser.add_argument(
         "-jo",
@@ -180,10 +178,8 @@ if __name__ == "__main__":
     filter.countries_filter = args.country_filter  # Country codes
     filter.asn_filter = args.asn_filter  # asn list
     filter.ipversion = args.ipversion  # 4 / 6
-    filter.queue = args.queue  # Boolean
-    filter.cidr_filter(
-        args.cidr_filter, args.match, args.cidr_list
-    )  # List of cidr + specficity
+    filter.cidr_filter = (args.cidr_filter, args.match, args.cidr_list)
+    # List of cidr + specficity
     filter.record_mode(
         args.record, args.from_time, args.until_time
     )  # Timestamp for begin and end
@@ -199,10 +195,10 @@ if __name__ == "__main__":
     bout = bgpout.BGPOut()
     bout.json_out = args.json_output
     bout.expected_result = args.expected_result
-    bout.nocache = args.nocache
+    bout.queue = args.queue  # Boolean
 
     # redis
-    if not args.nocache:
+    if not args.noredis:
         bout.redis = (
             (
                 config["redis"]["host"],
@@ -214,7 +210,7 @@ if __name__ == "__main__":
         )
 
     # ail
-    if not args.no_ail and "ail" in config:
+    if not args.noail and "ail" in config:
         try:
             bout.ail = (
                 config["ail"]["url"],

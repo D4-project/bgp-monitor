@@ -1,32 +1,56 @@
-import threading
-from uuid import UUID
-import redis
-import json
 import os
 import sys
+import json
+import redis
+import threading
+from uuid import UUID
+from queue import Queue
 from pyail import PyAIL
 
 
 class BGPOut:
-    def __init__(self, redis=None, ail=None) -> None:
+    def __init__(self, redis=None, ail=None, stream_name="bgpmonitor") -> None:
         self.__redis = None
         self.__ail = None
         self.__source_uuid = None
         self.__expected_result = None
-
-        self.redis = redis
-        self.ail = ail
+        self.__queue = Queue()
+        self.isStarted = False
+        self.stream_name = stream_name
 
     #######################
     #   GETTERS/SETTERS   #
     #######################
 
     @property
+    def queue(self):
+        return self.__queue
+
+    @queue.setter
+    def queue(self, isQueue):
+        if isQueue:
+            self.__queue = Queue()
+        else:
+            self.__queue = None
+
+    @property
     def redis(self):
         return self.__redis
 
     @redis.setter
-    def redis(self, host, port, db):
+    def redis(self, values):
+        """
+
+        Args:
+            host: Ip address of redis
+            port: Port number of redis
+            db:
+        """
+        try:
+            host, port, db = values
+        except ValueError:
+            sys.stderr.write("Connection to Redis is not available")
+            return
         self.__redis = redis.Redis(host=host, port=port, db=db)
         self.__redis.ping()
 
@@ -90,12 +114,12 @@ class BGPOut:
         return self.__expected_result
 
     @expected_result.setter
-    def expected_result(self, expected_result):
-        if expected_result is not None:
-            if hasattr(expected_result, "read"):
-                self.__expected_result = expected_result
+    def expected_result(self, exp):
+        if exp is not None:
+            if hasattr(exp, "read"):
+                self.__expected_result = exp
             else:
-                raise FileNotFoundError(f"Is {expected_result} a file ?")
+                raise FileNotFoundError(f"Is {exp} a file ?")
 
     ########
     # MAIN #
@@ -114,6 +138,15 @@ class BGPOut:
     def stop(self):
         if self.isStarted:
             self.isStarted = False
+        closeFile(self.__json_out)
+        if self.__expected_result:
+            print("Testing result: ")
+            with open(self.__json_out.name, "r+") as js:
+                print(
+                    "Result is as expected"
+                    if checkFiles(js, self.__expected_result)
+                    else "Result is not as expected"
+                )
 
     def __bgp_conv(self, e):
         """Return a BGPElem as json
@@ -143,67 +176,52 @@ class BGPOut:
 
     def __iteration(self, e):
         # redis save
+        r = self.__bgp_conv(e)
 
-        if self.__no_ail:
-            pass
-            # print('\n' + json.dumps(r,sort_keys=True)+ ',') # print to stdout
-        else:
-            #            if not self.nocaching: # Check if record already exist
-            #                if self.__redis.exists(f"event:{key}"):
-            #                        print("record already exist : " + key)
-            #                else:
-            #                    self.__redis.set(f"event:{key}", key)
-            #                    self.__redis.expire(f"event:{key}", self.__cache_expire)
+        """Send data to redis"""
+        if self.isHijack(r):
+            if self.ail:
+                self.__ail.feed_json_item(
+                    str(e), r, self.stream_name, self.__source_uuid
+                )
+            else:
+                print(
+                    "\n" + json.dumps(r, sort_keys=True) + ","
+                )  # print to stdout
             #                    self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-            #            else:
-            #                self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-            pass
+
+        if self.redis:
+            self.redis.xadd(self.__stream_name, r)
+
         if self.__json_out != sys.stdout:
-            pass
-            # self.json_out.write('\n' + json.dumps(r,sort_keys=True,indent=4)+ ',')
+            self.json_out.write(
+                "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
+            )
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""
-        while self.__isStarted or self.__queue.qsize():
-            pass
-            # self.__iteration(self.__queue.get())
-            # self.__queue.task_done()
-
-    #            print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
-    #            threading.Thread(target=self.__print_queue, daemon=True, name="BGPFilter output").start()
+        while self.isStarted or self.__queue.qsize():
+            # print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
+            self.__iteration(self.__queue.get())
+            self.__queue.task_done()
 
     def input_data(self, data):
         """receive bgp elem"""
-        if self.redis:
-            self.redis.xadd(data)
-            """Send data to redis"""
-            # redis.xadd(data)
-            # Need to check redis usage again
+        if self.__queue:
+            self.__queue.put(data)
         else:
             self.__iteration(data)
 
-    def check_bgp(self, data):
+    def isHijack(self, data) -> bool:
         # Check if data is suspicious
         # Implement an IA ?
         # Currently searching
-        pass
+        return True
 
     def publish(self, data):
         self.__ail.feed_json_item(
             str(data), data, "ail_feeder_bgp", self.__source_uuid
         )
-
-    """
-    @property
-    def queue(self):
-        return self.__queue
-    @queue.setter
-    def queue(self, bool):
-        if bool:
-            self.__queue = Queue()
-        else :
-            self.__queue = None
-    """
 
 
 def checkFiles(f1, f2):
@@ -216,32 +234,7 @@ def checkFiles(f1, f2):
 
 def closeFile(file):
     if file != sys.stdout:
-        print(file.tell())
         file.seek(file.tell() - 1, os.SEEK_SET)
         file.truncate()
     file.write("]")
     file.close()
-
-    # Algorithm :
-
-
-"""
-def process(data):
-    if queue
-        if queue.add(data)
-    else
-        iterate(data)
-
-
-def threaded:
-    while not end:
-        iterate(data.get())
-
-def iterate(data):
-    if redis:
-        update_redis(data.count) #asn/cidr count eg last seend
-
-    if isSuspicious(data):
-        if ail
-            publish
-"""

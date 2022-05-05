@@ -227,7 +227,7 @@ class BGPFilter:
         self.__f_country_path = country_file_path
 
     @cidr_filter.setter
-    def cidr_filter(self, isCIDR, match_type, cidr_list):
+    def cidr_filter(self, values):
         """
         CIDR filter option
             Keep records that match to one of specified cidr.
@@ -240,6 +240,13 @@ class BGPFilter:
                 any: less and more
             CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
         """
+        try:
+            isCIDR, match_type, cidr_list = values
+        except ValueError:
+            raise ValueError(
+                "match type and prefixes list are required for filtering by prefixes"
+            )
+
         if isCIDR:
             if cidr_list is None or len(cidr_list) == 0:
                 raise Exception(
@@ -429,8 +436,6 @@ class BGPFilter:
         Stop BGPStream
             Close JSON output file
         """
-        if self.__isStarted:
-            self.__isStarted = False
-            self.out.close()
-            print("Stream ended")
-            exit(0)
+        self.out.stop()
+        print("Stream ended")
+        exit(0)
