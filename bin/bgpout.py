@@ -9,7 +9,7 @@ from pyail import PyAIL
 
 
 class BGPOut:
-    def __init__(self, redis=None, ail=None, stream_name="bgpmonitor") -> None:
+    def __init__(self, stream_name='bgpmonitor') -> None:
         self.__redis = None
         self.__ail = None
         self.__source_uuid = None
@@ -138,15 +138,15 @@ class BGPOut:
     def stop(self):
         if self.isStarted:
             self.isStarted = False
-        closeFile(self.__json_out)
-        if self.__expected_result:
-            print("Testing result: ")
-            with open(self.__json_out.name, "r+") as js:
-                print(
-                    "Result is as expected"
-                    if checkFiles(js, self.__expected_result)
-                    else "Result is not as expected"
-                )
+            closeFile(self.__json_out)
+            if self.__expected_result:
+                print("Testing result: ")
+                with open(self.__json_out.name, "r+") as js:
+                    print(
+                        "Result is as expected"
+                        if checkFiles(js, self.__expected_result)
+                        else "Result is not as expected"
+                    )
 
     def __bgp_conv(self, e):
         """Return a BGPElem as json
@@ -159,27 +159,28 @@ class BGPOut:
             "bgp:time": e.time,
             "bgp:peer": e.peer_address,
             "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e._maybe_field("collector"),
+            "bgp:collector": e._maybe_field("collector") or '',
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
-            data["bgp:prefix"] = e._maybe_field("prefix")
+            data["bgp:prefix"] = e._maybe_field("prefix") or ''
             data["bgp:country_code"] = e.country_code
         if e.type in ["A", "R"]:  # updateribs
-            data["bgp:as-path"] = e._maybe_field("as-path")
-            data["bgp:next-hop"] = e._maybe_field("next-hop")
+            data["bgp:as-path"] = e._maybe_field("as-path") or ''
+            data["bgp:as-source"] = data["bgp:as-path"].split()[-1] or ''
+            data["bgp:next-hop"] = e._maybe_field("next-hop") or ''
         elif e.type == "S":  # peer state
-            data["bgp:old-state"] = e._maybe_field("old-state")
-            data["bgp:new-state"] = e._maybe_field("new-state")
+            data["bgp:old-state"] = e._maybe_field("old-state") or ''
+            data["bgp:new-state"] = e._maybe_field("new-state") or ''
 
         return data
 
     def __iteration(self, e):
-        # redis save
+        if e.type not in ['A', 'R']: return
         r = self.__bgp_conv(e)
 
         """Send data to redis"""
-        if self.isHijack(r):
+        if self.isSuspicious(r):
             if self.ail:
                 self.__ail.feed_json_item(
                     str(e), r, self.stream_name, self.__source_uuid
@@ -187,11 +188,11 @@ class BGPOut:
             else:
                 print(
                     "\n" + json.dumps(r, sort_keys=True) + ","
-                )  # print to stdout
-            #                    self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
+                )
+            #self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
 
         if self.redis:
-            self.redis.xadd(self.__stream_name, r)
+            self.redis.xadd(self.stream_name, {'as-source' : r['bgp:as-souce'], 'prefix' : r['bgp:prefix'], 'time': r['bgp:time'], 'collector': r['bgp:collector']}, '*')
 
         if self.__json_out != sys.stdout:
             self.json_out.write(
@@ -212,7 +213,7 @@ class BGPOut:
         else:
             self.__iteration(data)
 
-    def isHijack(self, data) -> bool:
+    def isSuspicious(self, data) -> bool:
         # Check if data is suspicious
         # Implement an IA ?
         # Currently searching
@@ -233,8 +234,9 @@ def checkFiles(f1, f2):
 
 
 def closeFile(file):
-    if file != sys.stdout:
-        file.seek(file.tell() - 1, os.SEEK_SET)
-        file.truncate()
+    if file == sys.stdout:
+        return
+    file.seek(file.tell() - 1, os.SEEK_SET)
+    file.truncate()
     file.write("]")
     file.close()

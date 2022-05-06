@@ -338,6 +338,7 @@ class BGPFilter:
     #   PRINTERS  #
     ###############
 
+
     def __country_by_prefix(self, p):
         """
         Parameters:
@@ -427,7 +428,7 @@ class BGPFilter:
         self.out.start()
 
         for e in self._stream:
-            e.country_code = self.__country_by_prefix(e._maybe_field("prefix"))
+            e.country_code = self.__country_by_prefix(e._maybe_field("prefix")) or ''
             if self.__check_country(e):
                 self.out.input_data(e)
 

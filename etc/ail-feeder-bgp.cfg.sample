@@ -14,4 +14,4 @@ port = 7000
 db = 0
 
 [geoopen]
-path = ../mmdb_files/latest.mmdb
+path = ../mmdb_files/2022-04-24-GeoOpen-Country.mmdb
