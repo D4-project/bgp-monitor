@@ -1,19 +1,16 @@
 import os
 import sys
 import json
-import redis
 import threading
-from uuid import UUID
 from queue import Queue
-from pyail import PyAIL
 
 
 class BGPOut:
-    def __init__(self, stream_name='bgpmonitor') -> None:
-        self.__redis = None
-        self.__ail = None
+    def __init__(self, stream_name="bgpmonitor") -> None:
         self.__source_uuid = None
         self.__expected_result = None
+        self.__json_out = None
+        self.verbose = False
         self.__queue = Queue()
         self.isStarted = False
         self.stream_name = stream_name
@@ -28,67 +25,7 @@ class BGPOut:
 
     @queue.setter
     def queue(self, isQueue):
-        if isQueue:
-            self.__queue = Queue()
-        else:
-            self.__queue = None
-
-    @property
-    def redis(self):
-        return self.__redis
-
-    @redis.setter
-    def redis(self, values):
-        """
-
-        Args:
-            host: Ip address of redis
-            port: Port number of redis
-            db:
-        """
-        try:
-            host, port, db = values
-        except ValueError:
-            sys.stderr.write("Connection to Redis is not available")
-            return
-        self.__redis = redis.Redis(host=host, port=port, db=db)
-        self.__redis.ping()
-
-    @property
-    def ail(self):
-        return self.__ail
-
-    @ail.setter
-    def ail(self, values):
-        """Define args for connection to ail instance
-
-        Args:
-            Ail: (url, api_key, source_uuid)
-            url (string): Url (ip:port/path to import)
-            apikey (string)
-            source_uuid (string)
-
-        Raises:
-            ValueError: if args not defined
-            ValueError: if source uuid doesn't respect uuid v4 format
-        """
-        try:
-            url, api_key, source_uuid = values
-        except ValueError:
-            raise ValueError(
-                "Ail url, api key, and source_uuid are required for connection"
-            )
-
-        try:
-            UUID(source_uuid, version=4)
-            self.__source_uuid = source_uuid
-        except ValueError:
-            raise ValueError("Invalid source uuid v4 format.")
-
-        try:
-            self.__ail = PyAIL(url, api_key, ssl=False)
-        except Exception as e:
-            raise Exception(e)
+        self.__queue = Queue() if isQueue else None
 
     @property
     def json_out(self):
@@ -98,7 +35,6 @@ class BGPOut:
     def json_out(self, json_out):
         """
         Setter for JSON output
-            Default : sys.stdout
         Parameters:
             json_out (File): Where to output json
         Raises:
@@ -106,8 +42,6 @@ class BGPOut:
         """
         if hasattr(json_out, "write"):
             self.__json_out = json_out
-        else:
-            raise FileNotFoundError(f"Is {json_out} a file ?")
 
     @property
     def expected_result(self):
@@ -126,7 +60,9 @@ class BGPOut:
     ########
 
     def start(self):
-        self.__json_out.write("[")
+        """Start daemon for queue and write to json"""
+        if self.__json_out:
+            self.__json_out.write("[")
         self.isStarted = True
         if self.__queue:
             threading.Thread(
@@ -136,6 +72,7 @@ class BGPOut:
             ).start()
 
     def stop(self):
+        """Close file output"""
         if self.isStarted:
             self.isStarted = False
             closeFile(self.__json_out)
@@ -159,42 +96,30 @@ class BGPOut:
             "bgp:time": e.time,
             "bgp:peer": e.peer_address,
             "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e._maybe_field("collector") or '',
+            "bgp:collector": e._maybe_field("collector") or "",
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
-            data["bgp:prefix"] = e._maybe_field("prefix") or ''
+            data["bgp:prefix"] = e._maybe_field("prefix") or ""
             data["bgp:country_code"] = e.country_code
         if e.type in ["A", "R"]:  # updateribs
-            data["bgp:as-path"] = e._maybe_field("as-path") or ''
-            data["bgp:as-source"] = data["bgp:as-path"].split()[-1] or ''
-            data["bgp:next-hop"] = e._maybe_field("next-hop") or ''
+            data["bgp:as-path"] = e._maybe_field("as-path") or ""
+            data["bgp:as-source"] = data["bgp:as-path"].split()[-1] or ""
+            data["bgp:next-hop"] = e._maybe_field("next-hop") or ""
         elif e.type == "S":  # peer state
-            data["bgp:old-state"] = e._maybe_field("old-state") or ''
-            data["bgp:new-state"] = e._maybe_field("new-state") or ''
+            data["bgp:old-state"] = e._maybe_field("old-state") or ""
+            data["bgp:new-state"] = e._maybe_field("new-state") or ""
 
         return data
 
     def __iteration(self, e):
-        if e.type not in ['A', 'R']: return
+        if e.type not in ["A", "R"]:
+            return
         r = self.__bgp_conv(e)
 
-        """Send data to redis"""
-        if self.isSuspicious(r):
-            if self.ail:
-                self.__ail.feed_json_item(
-                    str(e), r, self.stream_name, self.__source_uuid
-                )
-            else:
-                print(
-                    "\n" + json.dumps(r, sort_keys=True) + ","
-                )
-            #self.__ail.feed_json_item(str(e), r, "ail_feeder_bgp", self.__source_uuid)
-
-        if self.redis:
-            self.redis.xadd(self.stream_name, {'as-source' : r['bgp:as-souce'], 'prefix' : r['bgp:prefix'], 'time': r['bgp:time'], 'collector': r['bgp:collector']}, '*')
-
-        if self.__json_out != sys.stdout:
+        if self.verbose:
+            print("\n" + json.dumps(r, sort_keys=True) + ",")
+        if self.__json_out:
             self.json_out.write(
                 "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
             )
@@ -208,21 +133,7 @@ class BGPOut:
 
     def input_data(self, data):
         """receive bgp elem"""
-        if self.__queue:
-            self.__queue.put(data)
-        else:
-            self.__iteration(data)
-
-    def isSuspicious(self, data) -> bool:
-        # Check if data is suspicious
-        # Implement an IA ?
-        # Currently searching
-        return True
-
-    def publish(self, data):
-        self.__ail.feed_json_item(
-            str(data), data, "ail_feeder_bgp", self.__source_uuid
-        )
+        self.__queue.put(data) if self.__queue else self.__iteration(data)
 
 
 def checkFiles(f1, f2):
@@ -234,7 +145,7 @@ def checkFiles(f1, f2):
 
 
 def closeFile(file):
-    if file == sys.stdout:
+    if file == sys.stdout or file is None:
         return
     file.seek(file.tell() - 1, os.SEEK_SET)
     file.truncate()

@@ -3,5 +3,3 @@ pycountry
 pybgpstream
 pytz
 pyyaml
-pyail
-redis

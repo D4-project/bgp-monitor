@@ -82,7 +82,6 @@ class BGPFilter:
     """BGP stream filter"""
 
     def __init__(self):
-        self.__isStarted = False
         self.__isRecord = False
         self.__start_time = ""
         self.__end_time = ""
@@ -90,8 +89,8 @@ class BGPFilter:
         self.__countries_filter = None
         self.__asn_filter = None
         self.__ipversion = ""
-        self.__cidr_filter = None
-        self.__cidr_match_type_filter = None
+        self.__prefix_filter = None
+        self.__prefix_match_type_filter = None
         self.__project = list(project_types.keys())[0]
         self.__collectors = None
         self.__data_source = {"source_type": "broker"}
@@ -122,8 +121,8 @@ class BGPFilter:
         return self.__countries_filter
 
     @property
-    def cidr_filter(self):
-        return self.__cidr_filter
+    def prefix_filter(self):
+        return self.__prefix_filter
 
     @property
     def asn_filter(self):
@@ -226,8 +225,8 @@ class BGPFilter:
             raise FileNotFoundError
         self.__f_country_path = country_file_path
 
-    @cidr_filter.setter
-    def cidr_filter(self, values):
+    @prefix_filter.setter
+    def prefix_filter(self, values):
         """
         CIDR filter option
             Keep records that match to one of specified cidr.
@@ -241,14 +240,14 @@ class BGPFilter:
             CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
         """
         try:
-            isCIDR, match_type, cidr_list = values
+            cidr_list, match_type = values
         except ValueError:
             raise ValueError(
                 "match type and prefixes list are required for filtering by prefixes"
             )
 
-        if isCIDR:
-            if cidr_list is None or len(cidr_list) == 0:
+        if cidr_list is not None:
+            if len(cidr_list) == 0:
                 raise Exception(
                     "Please specify one or more prefixes when filtering by prefix"
                 )
@@ -258,8 +257,8 @@ class BGPFilter:
                 )
             for c in cidr_list:
                 ipaddress.ip_network(c)
-            self.__cidr_match_type_filter = "prefix-" + match_type
-            self.__cidr_filter = cidr_list
+            self.__prefix_match_type_filter = "prefix-" + match_type
+            self.__prefix_filter = cidr_list
 
     @countries_filter.setter
     def countries_filter(self, country_list):
@@ -281,8 +280,8 @@ class BGPFilter:
     @asn_filter.setter
     def asn_filter(self, asn_list):
         """Filter using specified AS number list
-            Skip a record if its as-path doesn't contain one of specified AS numbers
-            Use _ for negation
+            Skip a record if its source-AS is not one of specified AS numbers
+            Use _ symbol for negation
 
         Args:
             asn_list (list): List of AS numbers
@@ -298,13 +297,11 @@ class BGPFilter:
                     f_list.append(i)
 
             if len(f_list) >= 1:
-                self.__asn_filter += " and path (_" + "_|_".join(f_list) + "_)"
+                self.__asn_filter += " and path (_" + "|_".join(f_list) + ")$"
             if len(not_f_list) >= 1:
                 self.__asn_filter = (
-                    " and path !(_" + "_|_".join(not_f_list) + "_)"
+                    " and path !(_" + "|_".join(not_f_list) + ")$"
                 )
-
-            print(self.__asn_filter)
 
     @collectors.setter
     def collectors(self, collectors):
@@ -330,6 +327,11 @@ class BGPFilter:
 
     @ipversion.setter
     def ipversion(self, version):
+        """Set string for filter field
+
+        Args:
+            version (Integer): Possible values ["4" or "6"]
+        """
         self.__ipversion = (
             " and ipversion " + version if version in ["4", "6"] else ""
         )
@@ -337,7 +339,6 @@ class BGPFilter:
     ###############
     #   PRINTERS  #
     ###############
-
 
     def __country_by_prefix(self, p):
         """
@@ -356,7 +357,7 @@ class BGPFilter:
     def __check_country(self, e):
         """
         Args:
-            e (_type_): _description_
+            e (bgp record)
 
         Returns:
             boolean: if e.country code is in self.__countries_filter list
@@ -377,7 +378,6 @@ class BGPFilter:
         - Start stream with args
         - Print each record as JSON format
         """
-        self.__isStarted = True
         self.__f_country = maxminddb.open_database(self.__f_country_path)
         print(f"Loaded Geo Open database : {self.__f_country_path}")
         print("Loading stream ...")
@@ -396,9 +396,9 @@ class BGPFilter:
             + self.__ipversion,
         )
 
-        if self.__cidr_match_type_filter is not None:
+        if self.__prefix_match_type_filter is not None:
             self._stream._maybe_add_filter(
-                self.__cidr_match_type_filter, None, self.__cidr_filter
+                self.__prefix_match_type_filter, None, self.__prefix_filter
             )
 
         print("Starting")
@@ -428,7 +428,9 @@ class BGPFilter:
         self.out.start()
 
         for e in self._stream:
-            e.country_code = self.__country_by_prefix(e._maybe_field("prefix")) or ''
+            e.country_code = (
+                self.__country_by_prefix(e._maybe_field("prefix")) or ""
+            )
             if self.__check_country(e):
                 self.out.input_data(e)
 
