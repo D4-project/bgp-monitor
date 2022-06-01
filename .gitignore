@@ -5,3 +5,5 @@ requirements-dev.txt
 monitor.cfg
 arguments.cfg
 tests.py
+pyproject.toml
+.flake8
