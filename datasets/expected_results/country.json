@@ -1,7 +1,8 @@
 [
 {
     "bgp:as-path": "49420 15830 60752",
-    "bgp:collector": null,
+    "bgp:as-source": "60752",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "91.212.242.251",
     "bgp:peer": "91.212.242.251",
@@ -12,7 +13,8 @@
 },
 {
     "bgp:as-path": "205148 49102 15830 60752",
-    "bgp:collector": null,
+    "bgp:as-source": "60752",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "93.159.187.1",
     "bgp:peer": "93.159.187.1",
@@ -23,7 +25,8 @@
 },
 {
     "bgp:as-path": "49102 15830 60752",
-    "bgp:collector": null,
+    "bgp:as-source": "60752",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "93.159.141.1",
     "bgp:peer": "93.159.141.1",
@@ -34,7 +37,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -45,7 +49,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -56,7 +61,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -67,7 +73,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -78,7 +85,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -89,7 +97,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -100,7 +109,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -111,7 +121,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -122,7 +133,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -133,7 +145,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -144,7 +157,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -155,7 +169,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -166,7 +181,8 @@
 },
 {
     "bgp:as-path": "131477 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -177,7 +193,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -188,7 +205,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -199,7 +217,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -210,7 +229,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -221,7 +241,8 @@
 },
 {
     "bgp:as-path": "131477 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a09:4bc7:d021::",
     "bgp:peer": "2a09:4bc7:d021::",
@@ -232,7 +253,8 @@
 },
 {
     "bgp:as-path": "4608 24115 199524 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "203.119.104.1",
     "bgp:peer": "203.119.104.1",
@@ -243,7 +265,8 @@
 },
 {
     "bgp:as-path": "202365 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a00:1ca8:2a::e0",
     "bgp:peer": "2a00:1ca8:2a::e0",
@@ -254,7 +277,8 @@
 },
 {
     "bgp:as-path": "3333 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "::ffff:193.0.0.56",
     "bgp:peer": "193.0.0.56",
@@ -265,7 +289,8 @@
 },
 {
     "bgp:as-path": "44103 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2a0e:fd40:1::1",
     "bgp:peer": "2a0e:fd40:1::1",
@@ -276,7 +301,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 15965 47944",
-    "bgp:collector": null,
+    "bgp:as-source": "47944",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -287,7 +313,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 29467",
-    "bgp:collector": null,
+    "bgp:as-source": "29467",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -298,7 +325,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 12684",
-    "bgp:collector": null,
+    "bgp:as-source": "12684",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -309,7 +337,8 @@
 },
 {
     "bgp:as-path": "49134 53356 47787 1299 206610",
-    "bgp:collector": null,
+    "bgp:as-source": "206610",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -320,7 +349,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -331,7 +361,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -342,7 +373,8 @@
 },
 {
     "bgp:as-path": "49134 53356 47787 1299 206610",
-    "bgp:collector": null,
+    "bgp:as-source": "206610",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -353,7 +385,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -364,7 +397,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -375,18 +409,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
-    "bgp:country_code": "LU",
-    "bgp:next-hop": "2602:fed2:fc0:5e::1",
-    "bgp:peer": "2602:fed2:fc0:5e::1",
-    "bgp:peer_asn": 49134,
-    "bgp:prefix": "2a11:27c0:10::/44",
-    "bgp:time": 1650971795.0,
-    "bgp:type": "A"
-},
-{
-    "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -397,7 +421,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -408,7 +433,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -419,7 +445,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -429,19 +456,9 @@
     "bgp:type": "A"
 },
 {
-    "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:collector": null,
-    "bgp:country_code": "LU",
-    "bgp:next-hop": "2602:fed2:fc0:5e::1",
-    "bgp:peer": "2602:fed2:fc0:5e::1",
-    "bgp:peer_asn": 49134,
-    "bgp:prefix": "2a11:27c0::/44",
-    "bgp:time": 1650971795.0,
-    "bgp:type": "A"
-},
-{
     "bgp:as-path": "49134 53356 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -452,7 +469,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 31133 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -463,7 +481,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 25273",
-    "bgp:collector": null,
+    "bgp:as-source": "25273",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -474,7 +493,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 25273",
-    "bgp:collector": null,
+    "bgp:as-source": "25273",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -485,7 +505,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 199524 199524 199524 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -496,7 +517,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -507,7 +529,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
@@ -518,7 +541,8 @@
 },
 {
     "bgp:as-path": "49134 53356 6939 8359 199524",
-    "bgp:collector": null,
+    "bgp:as-source": "199524",
+    "bgp:collector": "",
     "bgp:country_code": "LU",
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",

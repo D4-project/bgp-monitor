@@ -1,9 +1,9 @@
 .vscode
 __pycache__
 tests
-.pre-commit-config.yaml
 requirements-dev.txt
-pyproject.toml
-ail-feeder-bgp.cfg
+monitor.cfg
+arguments.cfg
 tests.py
+pyproject.toml
 .flake8
