@@ -248,9 +248,8 @@ class BGPFilter:
 
         if cidr_list is not None:
             if len(cidr_list) == 0:
-                raise Exception(
-                    "Please specify one or more prefixes when filtering by prefix"
-                )
+                # "Please specify one or more prefixes when filtering by prefix"
+                return
             if match_type not in ["exact", "less", "more", "any"]:
                 raise ValueError(
                     "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
