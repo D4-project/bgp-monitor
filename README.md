@@ -52,7 +52,8 @@ optional arguments:
     pip3 install -r requirements.txt
     ~~~
 
-3. Define config file based on etc/ail-feeder-bgp.cfg.sample
+3. Define config file based on etc/monitor.cfg.sample
+   You can filter many AS number and/or prefixes in etc/arguments.cfg.sample instead of using long command line
 
 ### Test your installation
 
@@ -63,31 +64,31 @@ Read [`TESTING.md`](./datasets/TESTING.md) for more informations
 Default stream testing :
 
 ~~~shell
-python3 feeder.py
+python3 monitor.py --verbose
 ~~~
 
 Filter that exact match 84.205.67.0/24:
 
 ~~~shell
-python3 feeder.py -pf --cidr_list 84.205.67.0/24 --match exact
+python3 monitor.py -pf 84.205.67.0/24 --match exact
 ~~~
 
 Retrieve records instead of live stream
 
 ~~~shell
-python3 feeder.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00"
+python3 monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
 ~~~
 
 Specify a project / list of collectors :
 
 ~~~shell
-python3 feeder.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00"
+python3 monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
 ~~~
 
-Use a single file as source instead of a broker:
+Use a single file (Default: Updates) as source instead of a broker:
 
 ~~~shell
-python3 feeder.py --input_data ../datasets/updates.20220425.1215 --input_file_type upd-file
+python3 monitor.py --input_data ../datasets/updates.20220425.1215
 ~~~
 
 You can get archive files here :
