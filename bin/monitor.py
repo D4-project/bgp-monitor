@@ -9,16 +9,29 @@ import configparser
 
 configPath = "../etc/monitor.cfg"
 
-if __name__ == "__main__":
 
-    # args
+def asnPrefixFromFile(file):
+    res = {"asn_list": [], "prefix_list": [], "match": "more"}
+
+    for line in file.read().splitlines():
+        if len(line) > 0:
+            splitted_line = line.split(" ")
+            if splitted_line[0] == ">":
+                res["prefix_list"].append(splitted_line[1])
+            elif splitted_line[0] == "AS":
+                res["asn_list"].append(splitted_line[1])
+            elif splitted_line[0] == "MATCH":
+                res["match"] = splitted_line[1]
+    return res
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Tool for BGP filtering and monitoring", allow_abbrev=True
     )
     parser.add_argument(
         "-v", "--version", action="version", version="%(prog)s 1.0"
     )
-
     parser.add_argument(
         "--verbose", action="store_true", help="Print BGP records in console"
     )
@@ -96,7 +109,7 @@ if __name__ == "__main__":
         "-r",
         "--record",
         action="store_true",
-        help="Retrieve records in the interval --until_time and --from-time arguments (which are required)",
+        help="Retrieve records in the interval --until_time and --f-time arguments (which are required)",
     )
     parser.add_argument(
         "--start",
@@ -168,29 +181,35 @@ if __name__ == "__main__":
     else:
         raise FileNotFoundError("[-] No conf file found at {configPath}")
 
-    # filter
+    # BGPStream filter
     filter = BGPFilter.BGPFilter()
 
     filter.project = args.project  # ris / routeviews
     filter.collectors = args.collectors  # there are many collectors
     filter.countries_filter = args.country_filter  # Country codes
-    filter.asn_filter = args.asn_filter  # asn list
     filter.ipversion = args.ipversion  # 4 / 6
-    filter.prefix_filter = (args.prefix_filter, args.match)
 
-    # List of prefix + specificity
-    filter.record_mode(
-        args.record, args.start, args.stop
-    )  # Timestamp for begin and end
+    filter.record_mode(args.record, args.start, args.stop)
     if args.input_data:
         filter.data_source(
             args.input_record_type, args.input_file_format, args.input_data
         )
 
-    # GeoOpen DB
     if "geoopen" in config:
         filter.country_file = config["geoopen"]["path"]
 
+    if args.config is not None:
+        res = asnPrefixFromFile(args.config)
+        filter.prefix_filter = (
+            res["prefix_list"] + (args.prefix_filter or []),
+            args.match,
+        )
+        filter.asn_filter = res["asn_list"] + (args.asn_filter or [])
+    else:
+        filter.asn_filter = args.asn_filter  # asn list
+        filter.prefix_filter = (args.prefix_filter, args.match)
+
+    # Output
     bout = bgpout.BGPOut()
     bout.json_out = args.json_output
     bout.expected_result = args.expected_result
