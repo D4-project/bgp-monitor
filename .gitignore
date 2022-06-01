@@ -2,5 +2,6 @@
 __pycache__
 tests
 requirements-dev.txt
-ail-feeder-bgp.cfg
+monitor.cfg
+arguments.cfg
 tests.py

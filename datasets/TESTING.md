@@ -1,6 +1,6 @@
 # Testing
 
-Here are commands and expected result files :
+The are commands for testing, you can check your results using --expected_result option :
 
 1. Default, filter nothing
 

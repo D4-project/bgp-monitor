@@ -7,7 +7,7 @@ import argparse
 import BGPFilter
 import configparser
 
-configPath = "../etc/ail-feeder-bgp.cfg"
+configPath = "../etc/monitor.cfg"
 
 if __name__ == "__main__":
 
@@ -21,6 +21,13 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--verbose", action="store_true", help="Print BGP records in console"
+    )
+
+    parser.add_argument(
+        "--config",
+        type=argparse.FileType("r"),
+        nargs="?",
+        help="Use separated file to define arguments list",
     )
 
     parser.add_argument(
@@ -66,7 +73,7 @@ if __name__ == "__main__":
         "--match",
         default="more",
         choices=["more", "less", "exact", "any"],
-        help="Type of match -> exact: Exact match | less: Exact match or less specific | more: Exact match or more specific",
+        help="Type of match -> exact: Exact match | more: Exact match or more specific (Contained by one of the prefixes) | less: Exact match or less specific (Contain of one or the prefixes). Default: more",
     )
 
     parser.add_argument(
@@ -159,7 +166,7 @@ if __name__ == "__main__":
         config = configparser.ConfigParser()
         config.read(configPath)
     else:
-        raise FileNotFoundError("[-] No conf file found")
+        raise FileNotFoundError("[-] No conf file found at {configPath}")
 
     # filter
     filter = BGPFilter.BGPFilter()

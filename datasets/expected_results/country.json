@@ -415,18 +415,6 @@
     "bgp:next-hop": "2602:fed2:fc0:5e::1",
     "bgp:peer": "2602:fed2:fc0:5e::1",
     "bgp:peer_asn": 49134,
-    "bgp:prefix": "2a11:27c0:10::/44",
-    "bgp:time": 1650971795.0,
-    "bgp:type": "A"
-},
-{
-    "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:as-source": "199524",
-    "bgp:collector": "",
-    "bgp:country_code": "LU",
-    "bgp:next-hop": "2602:fed2:fc0:5e::1",
-    "bgp:peer": "2602:fed2:fc0:5e::1",
-    "bgp:peer_asn": 49134,
     "bgp:prefix": "2a03:90c0:4b0::/44",
     "bgp:time": 1650971795.0,
     "bgp:type": "A"
@@ -464,18 +452,6 @@
     "bgp:peer": "2602:fed2:fc0:5e::1",
     "bgp:peer_asn": 49134,
     "bgp:prefix": "2a03:90c0:2a0::/44",
-    "bgp:time": 1650971795.0,
-    "bgp:type": "A"
-},
-{
-    "bgp:as-path": "49134 53356 6939 199524",
-    "bgp:as-source": "199524",
-    "bgp:collector": "",
-    "bgp:country_code": "LU",
-    "bgp:next-hop": "2602:fed2:fc0:5e::1",
-    "bgp:peer": "2602:fed2:fc0:5e::1",
-    "bgp:peer_asn": 49134,
-    "bgp:prefix": "2a11:27c0::/44",
     "bgp:time": 1650971795.0,
     "bgp:type": "A"
 },
