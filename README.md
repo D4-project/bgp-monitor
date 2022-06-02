@@ -1,5 +1,7 @@
 # BGP monitor
 
+A tool that allows filtering of BGP records, by AS numbers, prefixes, countries, etc ...
+
 ## Usage
 
 ~~~~shell
