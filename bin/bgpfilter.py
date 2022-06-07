@@ -1,3 +1,9 @@
+"""
+Contains a whole class and methods that retrieves bgp records filtered by prefixes, as numbers, countries, etc ...
+"""
+
+__all__ = ["BGPFilter"]
+
 import ipaddress
 import os
 import re
@@ -5,6 +11,9 @@ import maxminddb
 import pycountry
 import pybgpstream
 from datetime import datetime
+from typing import List, Tuple
+
+from bgpout import BGPOut
 
 collectors_list = {
     "routeviews": [
@@ -75,11 +84,14 @@ collectors_list = {
         "rrc26",
     ],
 }
+""" Collector list"""
 project_types = {"ris": "ris-live", "routeviews": "routeviews-stream"}
 
 
 class BGPFilter:
-    """BGP stream filter"""
+    """
+    BGP stream filter
+    """
 
     def __init__(self):
         self.__isRecord = False
@@ -90,54 +102,84 @@ class BGPFilter:
         self.__asn_filter = None
         self.__ipversion = ""
         self.__prefix_filter = None
+        self.__asn_list = None
         self.__prefix_match_type_filter = None
         self.__project = list(project_types.keys())[0]
         self.__collectors = None
         self.__data_source = {"source_type": "broker"}
-        self.out = None
+        self.out: BGPOut = None
+        """`bgpout.BGPOut()` instance that will receive all records"""
 
     ###############
     #   GETTERS   #
     ###############
 
     @property
-    def start_time(self):
-        return self.__start_time
-
-    @property
-    def end_time(self):
-        return self.__end_time
-
-    @property
     def isRecord(self) -> bool:
+        """Retrieve in past or in live mode.
+        see `BGPFilter.record_mode()`"""
         return self.__isRecord
 
     @property
-    def country_file(self):
+    def start_time(self) -> str:
+        """Start of the interval for record mode.
+        see `BGPFilter.record_mode()`"""
+        return self.__start_time
+
+    @property
+    def end_time(self) -> str:
+        """End of the interval for record mode.
+        see `BGPFilter.record_mode()`"""
+        return self.__end_time
+
+    @property
+    def country_file(self) -> str:
+        """Path to the Geo Open MaxMindDB File"""
         return self.__f_country_path
 
     @property
-    def countries_filter(self):
+    def countries_filter(self) -> List[str]:
+        """
+        List of country codes to filter
+
+        Filter using specified country.
+            Keep records that the origin of their prefix is contained in country_list.
+
+        Args:
+            country_list (List[str]): List of country codes
+
+        Raises:
+            LookupError: If an element in country_list is not valid.
+        """
         return self.__countries_filter
 
     @property
-    def prefix_filter(self):
+    def prefix_filter(self) -> List[str]:
+        """List of prefixes (CIDR format) to filter"""
         return self.__prefix_filter
 
     @property
-    def asn_filter(self):
-        return self.__asn_filter
+    def asn_filter(self) -> List[str]:
+        """List of AS numbers"""
+        return self.__asn_list
 
     @property
-    def collectors(self):
+    def collectors(self) -> List[str]:
+        """List of collectors to list"""
         return self.__collectors
 
     @property
-    def project(self):
+    def project(self) -> str:
+        """Accepted project : `ris` or `routeviews`"""
         return self.__project
 
     @property
-    def ipversion(self):
+    def ipversion(self) -> str:
+        """
+        Formatted string for ip version filtering.
+
+        Accepted versions : `4` or `6`
+        """
         return self.__ipversion
 
     ###############
@@ -146,17 +188,23 @@ class BGPFilter:
 
     def record_mode(self, isRecord, start, end):
         """
-        Define record mode or live stream.
-            start and end will not be modified if isRecord is False
+        Define if retrieve from an interval or live stream
+            start and end won't be modified if isRecord is False
+
         Args:
-            isRecord (bool)
-            start (string): Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
-            end (string): Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
+            - isRecord (bool) : record or live mode
+            - start (string): Beginning of the interval.
+
+                Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00
+
+            - end (string): End of the interval.
+
+                Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00
 
         Raises:
-            ValueError: If start > end
-                        If start or end not defined
-                        If invalid date format
+            - ValueError: Start > End
+            - ValueError: Start or end not defined
+            - ValueError: Invalid date format
         """
         self.__isRecord = isRecord
         if isRecord:
@@ -179,13 +227,13 @@ class BGPFilter:
             self.__start_time = start
             self.__end_time = end
 
-    def data_source(self, record_type, file_format, file_path):
+    def data_source(self, record_type: str, file_format: str, file_path: str):
         """
         Use single file as data source
 
         Args:
-            record_type (str): rib or upd
-            file_format (str): mrt, bmp or ris-live
+            record_type (str): Type of records stored in the file (rib or upd)
+            file_format (str): Format of the file (mrt, bmp or ris-live)
             file_path (str): path to archive file
 
         Raises:
@@ -213,11 +261,11 @@ class BGPFilter:
         }
 
     @country_file.setter
-    def country_file(self, country_file_path):
+    def country_file(self, country_file_path: str):
         """
         Setter for the GeoOpen country mmdb file
 
-        Parameters:
+        Args:
             country_file_path (String): Path to Geo Open MaxMindDB File
         """
         if not os.path.isfile(country_file_path):
@@ -225,18 +273,18 @@ class BGPFilter:
         self.__f_country_path = country_file_path
 
     @prefix_filter.setter
-    def prefix_filter(self, values):
+    def prefix_filter(self, values: Tuple[List[str], str]):
         """
-        CIDR filter option
-            Keep records that match to one of specified cidr.
+        Prefix filter option
+            Keep records that match to one of specified prefixes (cidr format).
 
-        Parameters:
-            match_type: Type of match
+        Args:
+            prefix_list (List[string]):  Format: ip/subnet | Example: 130.0.192.0/21
+            match_type (string): Type of match
                 exact: Exact match
                 less: Exact match or less specific (contained by)
                 more: Exact match or more specific (contains)
                 any: less and more
-            CIDR (string):  Format: ip/subnet | Example: 130.0.192.0/21
         """
         try:
             cidr_list, match_type = values
@@ -255,17 +303,17 @@ class BGPFilter:
                 )
             for c in cidr_list:
                 ipaddress.ip_network(c)
-            self.__prefix_match_type_filter = "prefix-" + match_type
+            self.__prefix_match_type_filter = match_type
             self.__prefix_filter = cidr_list
 
     @countries_filter.setter
-    def countries_filter(self, country_list):
+    def countries_filter(self, country_list: List[str]):
         """
         Filter using specified country.
             Keep records that the origin of their prefix is contained in country_list.
 
-        Parameters:
-            country_list (list): List of country codes
+        Args:
+            country_list (List[str]): List of country codes
 
         Raises:
             LookupError: If an element in country_list is not valid.
@@ -291,8 +339,10 @@ class BGPFilter:
             for i in asn_list:
                 if re.match("_[0-9]+", i):
                     not_f_list.append(i.replace("_", ""))
-                else:
+                    self.__asn_list.append(i)
+                elif re.match("[0-9]+", i):
                     f_list.append(i)
+                    self.__asn_list.append(i)
 
             if len(f_list) >= 1:
                 self.__asn_filter += " and path (_" + "|_".join(f_list) + ")$"
@@ -310,7 +360,7 @@ class BGPFilter:
             self.__collectors = collectors
 
     @project.setter
-    def project(self, project):
+    def project(self, project: str):
         """
         Args:
             project (string): ris or routesviews
@@ -397,7 +447,9 @@ class BGPFilter:
 
         if self.__prefix_match_type_filter is not None:
             self._stream._maybe_add_filter(
-                self.__prefix_match_type_filter, None, self.__prefix_filter
+                "prefix-" + self.__prefix_match_type_filter,
+                None,
+                self.__prefix_filter,
             )
 
         print("Starting")
@@ -435,8 +487,7 @@ class BGPFilter:
 
     def stop(self):
         """
-        Stop BGPStream
-            Close JSON output file
+        Close JSON output file and stop BGPStream
         """
         self.out.stop()
         print("Stream ended")

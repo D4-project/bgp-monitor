@@ -1,16 +1,28 @@
 #!/usr/bin/env python
+"""
+Main execution, handle arguments, init each instances
+"""
 
 import os
 import signal
 import bgpout
 import argparse
-import BGPFilter
 import configparser
+
+from bgpfilter import BGPFilter
 
 configPath = "../etc/monitor.cfg"
 
 
 def asnPrefixFromFile(file):
+    """Read prefixes and AS numbers from files
+
+    Args:
+        file (File): File that contains as numbers and prefixes
+
+    Returns:
+        Dict: Dictionnary with prefix_list, asn_list, match type
+    """
     res = {"asn_list": [], "prefix_list": [], "match": "more"}
 
     for line in file.read().splitlines():
@@ -182,7 +194,7 @@ if __name__ == "__main__":
         raise FileNotFoundError("[-] No conf file found at {configPath}")
 
     # BGPStream filter
-    filter = BGPFilter.BGPFilter()
+    filter = BGPFilter()
 
     filter.project = args.project  # ris / routeviews
     filter.collectors = args.collectors  # there are many collectors

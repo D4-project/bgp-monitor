@@ -1,34 +1,57 @@
+"""
+Ingest all records, queue, reformat, send, publish, save them.
+"""
+
+__all__ = ["BGPOut"]
+
 import os
 import sys
 import json
 import threading
 from queue import Queue
+from pybgpstream import BGPElem
+from typing import TextIO
 
 
 class BGPOut:
-    def __init__(self, stream_name="bgpmonitor") -> None:
-        self.__source_uuid = None
+    """
+    BGP Output
+    - Ingest records, convert them to json, print to console and/or write them to files.
+    - Save all records in database.
+    - Can store bgp records in queue before processing them if desired.
+    """
+
+    def __init__(self) -> None:
         self.__expected_result = None
         self.__json_out = None
-        self.verbose = False
-        self.__queue = Queue()
-        self.isStarted = False
-        self.stream_name = stream_name
+        self.verbose: bool = False
+        """print to console"""
+        self.isQueue: bool = False
+        """Enable queue, can prevent from blocking BGPStream"""
+        self.isStarted: bool = False
+        """Is the stream started or not"""
 
     #######################
     #   GETTERS/SETTERS   #
     #######################
 
     @property
-    def queue(self):
-        return self.__queue
+    def isQueue(self) -> bool:
+        """Are the records queued, can prevent from blocking BGPStream"""
+        return self.__queue is not None
 
-    @queue.setter
-    def queue(self, isQueue):
+    @isQueue.setter
+    def isQueue(self, isQueue):
         self.__queue = Queue() if isQueue else None
 
     @property
-    def json_out(self):
+    def json_out(self) -> TextIO:
+        """
+        (File): Print JSON in it
+
+        Raises:
+            Exception: If unable write/read in it
+        """
         return self.__json_out
 
     @json_out.setter
@@ -37,14 +60,16 @@ class BGPOut:
         Setter for JSON output
         Parameters:
             json_out (File): Where to output json
+
         Raises:
-            Exception: If unable to use
+            Exception: If unable write/read in it
         """
         if hasattr(json_out, "write"):
             self.__json_out = json_out
 
     @property
-    def expected_result(self):
+    def expected_result(self) -> TextIO:
+        """Expected result when execution end"""
         return self.__expected_result
 
     @expected_result.setter
@@ -60,7 +85,12 @@ class BGPOut:
     ########
 
     def start(self):
-        """Start daemon for queue and write to json"""
+        """
+        Start output
+
+        - Init json output if specified
+        - Start queue if enabled
+        """
         if self.__json_out:
             self.__json_out.write("[")
         self.isStarted = True
@@ -72,10 +102,14 @@ class BGPOut:
             ).start()
 
     def stop(self):
-        """Close file output"""
+        """
+        - Set state as stopped
+        - Close file output
+        - Check if result is as expected
+        """
         if self.isStarted:
             self.isStarted = False
-            closeFile(self.__json_out)
+            self.closeFile(self.__json_out)
             if self.__expected_result:
                 print("Testing result: ")
                 with open(self.__json_out.name, "r+") as js:
@@ -85,8 +119,8 @@ class BGPOut:
                         else "Result is not as expected"
                     )
 
-    def __bgp_conv(self, e):
-        """Return a BGPElem as json
+    def __bgp_conv(self, e: BGPElem) -> dict:
+        """Return a `BGPElem` formatted in json
 
         Parameters:
             e (BGPElem)
@@ -131,23 +165,41 @@ class BGPOut:
             self.__iteration(self.__queue.get())
             self.__queue.task_done()
 
-    def input_data(self, data):
-        """receive bgp elem"""
+    def input_data(self, data: BGPElem) -> None:
+        """
+        Input BGP element
+
+        - Put it in queue if enable
+        - Else process it immediatly
+        Args:
+            data (`BGPElem`)
+        """
         self.__queue.put(data) if self.__queue else self.__iteration(data)
 
+    def closeFile(self, file):
+        """Close a JSON file
 
-def checkFiles(f1, f2):
+        Args:
+            file (File): The file to close
+        """
+        if file == sys.stdout or file is None:
+            return
+        file.seek(file.tell() - 1, os.SEEK_SET)
+        file.truncate()
+        file.write("]")
+        file.close()
+
+
+def checkFiles(f1, f2) -> bool:
+    """
+    Check if two json files are equal
+
+    Args:
+        f1, f2 (File): json files
+    """
+
     f1.seek(0, os.SEEK_SET)
     f2.seek(0, os.SEEK_SET)
     json1 = json.load(f1)
     json2 = json.load(f2)
     return json1 == json2
-
-
-def closeFile(file):
-    if file == sys.stdout or file is None:
-        return
-    file.seek(file.tell() - 1, os.SEEK_SET)
-    file.truncate()
-    file.write("]")
-    file.close()
