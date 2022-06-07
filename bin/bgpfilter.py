@@ -336,6 +336,7 @@ class BGPFilter:
         f_list = []
         not_f_list = []
         if asn_list is not None and len(asn_list) >= 1:
+            self.__asn_list = []
             for i in asn_list:
                 if re.match("_[0-9]+", i):
                     not_f_list.append(i.replace("_", ""))

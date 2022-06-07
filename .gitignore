@@ -2,8 +2,8 @@
 __pycache__
 tests
 requirements-dev.txt
-monitor.cfg
-arguments.cfg
+config.cfg
+filter_list.cfg
 tests.py
 pyproject.toml
 .flake8

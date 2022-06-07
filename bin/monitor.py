@@ -11,7 +11,7 @@ import configparser
 
 from bgpfilter import BGPFilter
 
-configPath = "../etc/monitor.cfg"
+configPath = "../etc/config.cfg"
 
 
 def asnPrefixFromFile(file):
@@ -27,7 +27,7 @@ def asnPrefixFromFile(file):
 
     for line in file.read().splitlines():
         if len(line) > 0:
-            splitted_line = line.split(" ")
+            splitted_line = line.split()
             if splitted_line[0] == ">":
                 res["prefix_list"].append(splitted_line[1])
             elif splitted_line[0] == "AS":
@@ -39,7 +39,9 @@ def asnPrefixFromFile(file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Tool for BGP filtering and monitoring", allow_abbrev=True
+        description="Tool for BGP filtering and monitoring",
+        allow_abbrev=True,
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument(
         "-v", "--version", action="version", version="%(prog)s 1.0"
@@ -49,10 +51,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--config",
+        "--filter_list",
         type=argparse.FileType("r"),
         nargs="?",
-        help="Use separated file to define arguments list",
+        help="Use separated file to define list of prefixes and/or AS Numbers.\n Check etc/filter_list.cfg.sample for file format",
+        metavar="<path>",
     )
 
     parser.add_argument(
@@ -60,7 +63,7 @@ if __name__ == "__main__":
         "--json_output",
         nargs="?",
         type=argparse.FileType("w+"),
-        help="File in which to display JSON output. If not set, default sys.stdout will be used.",
+        help="File in which to display JSON output.\n If not set, default sys.stdout will be used.",
     )
 
     parser.add_argument(
@@ -74,7 +77,7 @@ if __name__ == "__main__":
         "-af",
         "--asn_filter",
         nargs="+",
-        help="Filter using specified AS number list, skip a record if its AS-source is not one of specified AS numbers. Using _ symbol for negation",
+        help="Filter using specified AS number list, skip a record if its AS-source is not one of specified AS numbers.\n Use _ symbol for negation",
         metavar="<AS number>",
     )
 
@@ -90,7 +93,7 @@ if __name__ == "__main__":
         "-pf",
         "--prefix_filter",
         nargs="+",
-        help="Filter using specified prefix list, CIDR format: ip/subnet | Example: 130.0.192.0/21,130.0.100.0/21",
+        help="Filter using specified prefix list, CIDR format: ip/subnet.\n Example: 130.0.192.0/21,130.0.100.0/21",
         metavar="<prefix>",
     )
 
@@ -98,7 +101,11 @@ if __name__ == "__main__":
         "--match",
         default="more",
         choices=["more", "less", "exact", "any"],
-        help="Type of match -> exact: Exact match | more: Exact match or more specific (Contained by one of the prefixes) | less: Exact match or less specific (Contain of one or the prefixes). Default: more",
+        help="Type of match ->"
+        "exact: Exact match\n"
+        "more: Exact match or more specific (Contained by one of the prefixes)\n"
+        "less: Exact match or less specific (Contain one of the prefixes).\n"
+        "Default: more",
     )
 
     parser.add_argument(
@@ -125,12 +132,12 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--start",
-        help="Beginning of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:00:00",
+        help="Beginning of the interval.\n  -> Timestamp format : YYYY-MM-DD hh:mm:ss.\n     Example: 2022-01-01 10:00:00",
         metavar="<begin>",
     )
     parser.add_argument(
         "--stop",
-        help="Ending of the interval. Timestamp format : YYYY-MM-DD hh:mm:ss -> Example: 2022-01-01 10:10:00",
+        help="End of the interval.\n  -> Timestamp format : YYYY-MM-DD hh:mm:ss.\n     Example: 2022-01-01 10:10:00",
         metavar="<end>",
     )
 
@@ -144,7 +151,7 @@ if __name__ == "__main__":
         "-id",
         "--input_data",
         type=str,
-        help="Path to a single file instead of broker.",
+        help="Retrieve data from a single file instead of a broker.",
         metavar="<path>",
     )
 
@@ -153,7 +160,7 @@ if __name__ == "__main__":
         "--input_record_type",
         choices=["upd", "rib"],
         default="upd",
-        help="Type of records contained in input_data file. Can be rib (Routing Information Base) or upd (Updates eg. Anoun/Withdr). Default: upd",
+        help="Type of records contained in input_data file.\n Can be rib (Routing Information Base) or upd (Updates eg. Anoun/Withdr).\n Default: upd",
     )
 
     parser.add_argument(
@@ -161,7 +168,7 @@ if __name__ == "__main__":
         "--input_file_format",
         choices=["mrt", "bmp", "ris-live"],
         default="mrt",
-        help="input data type format. ris-live avaible for updates only",
+        help="input data type format. ris-live is avaible for updates only",
     )
 
     parser.add_argument(
@@ -191,7 +198,7 @@ if __name__ == "__main__":
         config = configparser.ConfigParser()
         config.read(configPath)
     else:
-        raise FileNotFoundError("[-] No conf file found at {configPath}")
+        raise FileNotFoundError(f"[-] No conf file found at {configPath}")
 
     # BGPStream filter
     filter = BGPFilter()
@@ -210,8 +217,8 @@ if __name__ == "__main__":
     if "geoopen" in config:
         filter.country_file = config["geoopen"]["path"]
 
-    if args.config is not None:
-        res = asnPrefixFromFile(args.config)
+    if args.filter_list is not None:
+        res = asnPrefixFromFile(args.filter_list)
         filter.prefix_filter = (
             res["prefix_list"] + (args.prefix_filter or []),
             args.match,
