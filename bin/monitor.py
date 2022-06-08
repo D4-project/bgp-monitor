@@ -11,6 +11,7 @@ import configparser
 
 from bgpfilter import BGPFilter
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 configPath = "../etc/config.cfg"
 
 
