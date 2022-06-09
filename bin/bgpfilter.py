@@ -348,9 +348,7 @@ class BGPFilter:
             if len(f_list) >= 1:
                 self.__asn_filter += " and path (_" + "|_".join(f_list) + ")$"
             if len(not_f_list) >= 1:
-                self.__asn_filter = (
-                    " and path !(_" + "|_".join(not_f_list) + ")$"
-                )
+                self.__asn_filter = " and path !(_" + "|_".join(not_f_list) + ")$"
 
     @collectors.setter
     def collectors(self, collectors):
@@ -381,9 +379,7 @@ class BGPFilter:
         Args:
             version (Integer): Possible values ["4" or "6"]
         """
-        self.__ipversion = (
-            " and ipversion " + version if version in ["4", "6"] else ""
-        )
+        self.__ipversion = " and ipversion " + version if version in ["4", "6"] else ""
 
     ###############
     #   PRINTERS  #
@@ -468,21 +464,15 @@ class BGPFilter:
             )
         else:
             project = (
-                self.__project
-                if self.__isRecord
-                else project_types[self.__project]
+                self.__project if self.__isRecord else project_types[self.__project]
             )
             self._stream._maybe_add_filter("project", project, None)
-            self._stream._maybe_add_filter(
-                "collectors", None, self.__collectors
-            )
+            self._stream._maybe_add_filter("collectors", None, self.__collectors)
 
         self.out.start()
 
         for e in self._stream:
-            e.country_code = (
-                self.__country_by_prefix(e._maybe_field("prefix")) or ""
-            )
+            e.country_code = self.__country_by_prefix(e._maybe_field("prefix")) or ""
             if self.__check_country(e):
                 self.out.input_data(e)
 

@@ -44,9 +44,7 @@ if __name__ == "__main__":
         allow_abbrev=True,
         formatter_class=argparse.RawTextHelpFormatter,
     )
-    parser.add_argument(
-        "-v", "--version", action="version", version="%(prog)s 1.0"
-    )
+    parser.add_argument("-v", "--version", action="version", version="%(prog)s 1.0")
     parser.add_argument(
         "--verbose", action="store_true", help="Print BGP records in console"
     )

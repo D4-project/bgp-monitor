@@ -3,7 +3,7 @@ name: Python lint black and flake8
 on: [workflow_dispatch, push]
 
 jobs:
-  build:
+  code-format-and-check:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v3

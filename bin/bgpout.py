@@ -154,9 +154,7 @@ class BGPOut:
         if self.verbose:
             print("\n" + json.dumps(r, sort_keys=True) + ",")
         if self.__json_out:
-            self.json_out.write(
-                "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
-            )
+            self.json_out.write("\n" + json.dumps(r, sort_keys=True, indent=4) + ",")
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""

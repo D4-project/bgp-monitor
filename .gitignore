@@ -1,9 +1,4 @@
 .vscode
 __pycache__
-tests
-requirements-dev.txt
 config.cfg
 filter_list.cfg
-tests.py
-pyproject.toml
-.flake8
