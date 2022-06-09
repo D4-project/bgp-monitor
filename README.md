@@ -62,20 +62,31 @@ optional arguments:
 
 ## Installation
 
-1. [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream  
+### Manual install
+
+~~~shell
+git clone https://github.com/D4-project/bgp-monitor.git
+~~~
+
+[libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream  
    Note that some versions may not be supported yet (eg. Ubuntu 22.04)  
    Tested on Ubuntu 20.04
 
-2. Install requirements  
+Install requirements :
 
 ~~~shell
   pip3 install -r requirements.txt
 ~~~
 
-3. Define config file based on [etc/config.cfg.sample](./etc/config.cfg.sample)
+### Docker install
 
 ~~~shell
-  cp etc/config.cfg.sample etc/config.cfg
+git clone https://github.com/D4-project/bgp-monitor.git
+~~~
+
+~~~shell
+docker build -t bgp-monitor/bgp-monitor . # About 2 minutes
+docker run -it bgp-monitor:latest
 ~~~
 
 ### Test your installation
