@@ -94,7 +94,7 @@ Filter that exact match 84.205.67.0/24:
 
 ~~~shell
 python3 monitor.py -pf 84.205.67.0/24 --match exact --verbose
-~~~11
+~~~
 
 You can filter many AS number and/or prefixes in `etc/filter_file.cfg.sample` instead of using long command line:
 
