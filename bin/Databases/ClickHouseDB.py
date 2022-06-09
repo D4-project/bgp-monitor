@@ -36,8 +36,10 @@ class BGPClickHouse(database.Database):
         )
 
 
-# client = clickhouse_driver.Client(host="localhost", password="enes57", compression='lz4')
+# client = clickhouse_driver
+#           .Client(host="localhost", password="enes57", compression='lz4')
 
-
-# client.execute('INSERT INTO bgprecords VALUES ', [{'begin': 1653383977, 'end': 0, 'type': 'A', 'peerasn':
-# e.peer_asn, 'collector': e.collector, 'prefix': e._maybe_field('prefix'), 'aspath': "255126 15461 1564"}])
+# client.execute('INSERT INTO bgprecords VALUES ',
+# [{'begin': 1653383977, 'end': 0, 'type': 'A', 'peerasn':
+# e.peer_asn, 'collector': e.collector, 'prefix': e._maybe_field('prefix'),
+# 'aspath': "255126 15461 1564"}])

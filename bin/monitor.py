@@ -53,7 +53,10 @@ if __name__ == "__main__":
         "--filter_list",
         type=argparse.FileType("r"),
         nargs="?",
-        help="Use separated file to define list of prefixes and/or AS Numbers.\n Check etc/filter_list.cfg.sample for file format",
+        help=(
+            "Use separated file to define list of prefixes and/or AS Numbers.\n Check"
+            " etc/filter_list.cfg.sample for file format"
+        ),
         metavar="<path>",
     )
 
@@ -62,7 +65,10 @@ if __name__ == "__main__":
         "--json_output",
         nargs="?",
         type=argparse.FileType("w+"),
-        help="File in which to display JSON output.\n If not set, default sys.stdout will be used.",
+        help=(
+            "File in which to display JSON output.\n If not set, default sys.stdout"
+            " will be used."
+        ),
     )
 
     parser.add_argument(
@@ -76,7 +82,10 @@ if __name__ == "__main__":
         "-af",
         "--asn_filter",
         nargs="+",
-        help="Filter using specified AS number list, skip a record if its AS-source is not one of specified AS numbers.\n Use _ symbol for negation",
+        help=(
+            "Filter using specified AS number list, skip a record if its AS-source is"
+            " not one of specified AS numbers.\n Use _ symbol for negation"
+        ),
         metavar="<AS number>",
     )
 
@@ -92,7 +101,10 @@ if __name__ == "__main__":
         "-pf",
         "--prefix_filter",
         nargs="+",
-        help="Filter using specified prefix list, CIDR format: ip/subnet.\n Example: 130.0.192.0/21,130.0.100.0/21",
+        help=(
+            "Filter using specified prefix list, CIDR format: ip/subnet.\n Example:"
+            " 130.0.192.0/21,130.0.100.0/21"
+        ),
         metavar="<prefix>",
     )
 
@@ -100,11 +112,13 @@ if __name__ == "__main__":
         "--match",
         default="more",
         choices=["more", "less", "exact", "any"],
-        help="Type of match ->"
-        "exact: Exact match\n"
-        "more: Exact match or more specific (Contained by one of the prefixes)\n"
-        "less: Exact match or less specific (Contain one of the prefixes).\n"
-        "Default: more",
+        help=(
+            "Type of match ->"
+            "exact: Exact match\n"
+            "more: Exact match or more specific (Contained by one of the prefixes)\n"
+            "less: Exact match or less specific (Contain one of the prefixes).\n"
+            "Default: more"
+        ),
     )
 
     parser.add_argument(
@@ -119,7 +133,10 @@ if __name__ == "__main__":
         "-c",
         "--collectors",
         nargs="+",
-        help="Collectors. For complete list of collectors, see https://bgpstream.caida.org/data",
+        help=(
+            "Collectors. For complete list of collectors, see"
+            " https://bgpstream.caida.org/data"
+        ),
         metavar="<collector>",
     )
 
@@ -127,16 +144,25 @@ if __name__ == "__main__":
         "-r",
         "--record",
         action="store_true",
-        help="Retrieve records in the interval --until_time and --f-time arguments (which are required)",
+        help=(
+            "Retrieve records in the interval --until_time and --f-time arguments"
+            " (which are required)"
+        ),
     )
     parser.add_argument(
         "--start",
-        help="Beginning of the interval.\n  -> Timestamp format : YYYY-MM-DD hh:mm:ss.\n     Example: 2022-01-01 10:00:00",
+        help=(
+            "Beginning of the interval.\n  -> Timestamp format : YYYY-MM-DD hh:mm:ss.\n"
+            "     Example: 2022-01-01 10:00:00"
+        ),
         metavar="<begin>",
     )
     parser.add_argument(
         "--stop",
-        help="End of the interval.\n  -> Timestamp format : YYYY-MM-DD hh:mm:ss.\n     Example: 2022-01-01 10:10:00",
+        help=(
+            "End of the interval.\n  -> Timestamp format : YYYY-MM-DD hh:mm:ss.\n    "
+            " Example: 2022-01-01 10:10:00"
+        ),
         metavar="<end>",
     )
 
@@ -159,7 +185,10 @@ if __name__ == "__main__":
         "--input_record_type",
         choices=["upd", "rib"],
         default="upd",
-        help="Type of records contained in input_data file.\n Can be rib (Routing Information Base) or upd (Updates eg. Anoun/Withdr).\n Default: upd",
+        help=(
+            "Type of records contained in input_data file.\n Can be rib (Routing"
+            " Information Base) or upd (Updates eg. Anoun/Withdr).\n Default: upd"
+        ),
     )
 
     parser.add_argument(

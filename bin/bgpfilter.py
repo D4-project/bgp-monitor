@@ -1,5 +1,6 @@
 """
-Contains a whole class and methods that retrieves bgp records filtered by prefixes, as numbers, countries, etc ...
+Contains a whole class and methods that retrieves bgp records filtered by prefixes,
+ as numbers, countries, etc ...
 """
 
 __all__ = ["BGPFilter"]
@@ -299,7 +300,8 @@ class BGPFilter:
                 return
             if match_type not in ["exact", "less", "more", "any"]:
                 raise ValueError(
-                    "Match type must be specified and one of ['exact', 'less', 'more', 'any']"
+                    "Match type must be specified and one of ['exact', 'less', 'more',"
+                    " 'any']"
                 )
             for c in cidr_list:
                 ipaddress.ip_network(c)
@@ -391,7 +393,8 @@ class BGPFilter:
             p (prefix): CIDR format. Example: 130.0.192.0/21
 
         Returns:
-            string: country code of the given prefix. None if not found in GeoOpen database
+            string: country code of the given prefix.
+                None if not found in GeoOpen database
         """
         if p is None:
             return None
