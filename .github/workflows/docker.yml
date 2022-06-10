@@ -20,4 +20,4 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: bgp-monitor:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:latest
