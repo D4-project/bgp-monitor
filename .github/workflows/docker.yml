@@ -4,6 +4,8 @@ on: [workflow_dispatch, push]
 jobs:
   docker:
     runs-on: ubuntu-20.04
+    environment:
+      name: Docker
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
