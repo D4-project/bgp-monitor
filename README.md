@@ -4,6 +4,7 @@ A tool that allows filtering of BGP records, by AS numbers, prefixes, countries,
 
 ## Usage
 
+~~~shell
 usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [-jo [JSON_OUTPUT]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]]
                   [-ip <version>] [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r]
                   [--start <begin>] [--stop <end>] [--queue] [-id <path>] [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
@@ -12,7 +13,7 @@ Tool for BGP filtering and monitoring
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
+  -v, --version         show program s version number and exit
   --verbose             Print BGP records in console
   --filter_list [<path>]
                         Use separated file to define list of prefixes and/or AS Numbers.
@@ -78,6 +79,8 @@ Install requirements :
 
 ### Docker install
 
+#### Or manually build from source
+
 ~~~shell
 git clone https://github.com/D4-project/bgp-monitor.git
 ~~~
@@ -86,6 +89,13 @@ git clone https://github.com/D4-project/bgp-monitor.git
 docker build -t bgp-monitor/bgp-monitor . # About 2 minutes
 docker run -it bgp-monitor:latest
 ~~~
+
+#### Pull and run image from dockerhub
+
+~~~shell
+docker run -it ustaenes/bgp-monitor:latest
+~~~
+
 
 ### Test your installation
 
