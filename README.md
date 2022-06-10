@@ -4,18 +4,17 @@ A tool that allows filtering of BGP records, by AS numbers, prefixes, countries,
 
 ## Usage
 
-~~~~shell
-usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<filter_list path>]] [-jo [JSON_OUTPUT]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]] [-ip <version>] [-pf <prefix> [<prefix> ...]]
-                  [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r] [--start <begin>] [--stop <end>] [--queue] [-id <path>] [-ir {upd,rib}] [-if {mrt,bmp,ris-live}]
-                  [--expected_result [<path>]]
+usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [-jo [JSON_OUTPUT]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]]
+                  [-ip <version>] [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r]
+                  [--start <begin>] [--stop <end>] [--queue] [-id <path>] [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
 
 Tool for BGP filtering and monitoring
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program s version number and exit
+  -v, --version         show program's version number and exit
   --verbose             Print BGP records in console
-  --filter_list [<filter_list path>]
+  --filter_list [<path>]
                         Use separated file to define list of prefixes and/or AS Numbers.
                          Check etc/filter_list.cfg.sample for file format
   -jo [JSON_OUTPUT], --json_output [JSON_OUTPUT]
@@ -58,7 +57,6 @@ optional arguments:
                         input data type format. ris-live is avaible for updates only
   --expected_result [<path>], -expected [<path>]
                         Check that the result is the same as the expected result
-~~~~
 
 ## Installation
 
