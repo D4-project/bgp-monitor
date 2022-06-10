@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 LABEL version="1.0" org="CIRCL" description="Tool for bgp monitoring"
 
-WORKDIR /opt/bgp-monitor
+RUN echo "export PATH=/opt/bgp-monitor/bin:${PATH}" >> /root/.bashrc
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y sudo curl apt-transport-https apt-utils ssl-cert ca-certificates gnupg lsb-release wget\
@@ -13,8 +13,11 @@ RUN sudo apt update; sudo apt-get install -y bgpstream \
     && apt-get install -y python3-pip \
     && pip3 install pybgpstream
 
-COPY ./ ./
-RUN pip3 install -r requirements.txt
+COPY ./ /opt/bgp-monitor/
+RUN pip3 install -r /opt/bgp-monitor/requirements.txt \
+    && chmod +x /opt/bgp-monitor/bin/monitor.py
+
+WORKDIR /opt/bgp-monitor/bin
 
 # For future use
 # EXPOSE 80/tcp

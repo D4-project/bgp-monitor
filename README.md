@@ -1,5 +1,9 @@
 # BGP monitor
 
+**What is BGP ?**
+
+.....................
+
 A tool that allows filtering of BGP records, by AS numbers, prefixes, countries, etc ...
 
 ## Usage
@@ -58,48 +62,49 @@ optional arguments:
                         input data type format. ris-live is avaible for updates only
   --expected_result [<path>], -expected [<path>]
                         Check that the result is the same as the expected result
+~~~
+
+---
 
 ## Installation
 
-### Manual install
+### Manual installation
+
+1. First of all, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream)
+   Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
+   **Implemented and tested on Ubuntu 20.04**
+
+2. Clone repo and Install requirements :
 
 ~~~shell
 git clone https://github.com/D4-project/bgp-monitor.git
+pip3 install -r requirements.txt
 ~~~
 
-[libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream  
-   Note that some versions may not be supported yet (eg. Ubuntu 22.04)  
-   Tested on Ubuntu 20.04
+---
 
-Install requirements :
+### Docker installation
+
+#### Manual build from source
 
 ~~~shell
-  pip3 install -r requirements.txt
+docker build https://github.com/D4-project/bgp-monitor.git#main
+docker run -it bgp-monitor
 ~~~
 
-### Docker install
+---
 
-#### Or manually build from source
-
-~~~shell
-git clone https://github.com/D4-project/bgp-monitor.git
-~~~
-
-~~~shell
-docker build -t bgp-monitor/bgp-monitor . # About 2 minutes
-docker run -it bgp-monitor:latest
-~~~
-
-#### Pull and run image from dockerhub
+#### DockerHub : Easy way
 
 ~~~shell
 docker run -it ustaenes/bgp-monitor:latest
 ~~~
 
+---
 
 ### Test your installation
 
-Read [`TESTING.md`](./datasets/TESTING.md) for more informations
+Read [`TESTING.md`](./testing/TESTING.md) for more informations
 
 ## Examples of use
 
@@ -144,6 +149,8 @@ You can get archive files here :
 - [Routeviews DataSets](<http://archive.routeviews.org/>)
 - [RIS RIPE DataSets](<https://data.ris.ripe.net/>)
 
+---
+
 ## Output
 
 - `type`
@@ -178,6 +185,8 @@ You can get archive files here :
 ~~~~
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
+
+---
 
 ## More informations
 
