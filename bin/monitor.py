@@ -9,7 +9,6 @@ import bgpout
 import argparse
 from configobj import ConfigObj
 from bgpfilter import BGPFilter
-from Databases import *
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,13 +57,13 @@ if __name__ == "__main__":
         ),
         metavar="<path>",
     )
-    
+
     parser.add_argument(
         "--config",
         default="../etc/config.cfg",
         help="Use different config file",
-        metavar="<path>"
-        )
+        metavar="<path>",
+    )
 
     parser.add_argument(
         "-jo",
@@ -75,7 +74,7 @@ if __name__ == "__main__":
             "File in which to display JSON output.\n If not set, default sys.stdout"
             " will be used."
         ),
-        metavar="<path>"
+        metavar="<path>",
     )
 
     parser.add_argument(
@@ -263,12 +262,11 @@ if __name__ == "__main__":
         filter.prefix_filter = (args.prefix_filter, args.match)
 
     # Output
-    bout = bgpout.BGPOut(config['databases'])
+    bout = bgpout.BGPOut(config["databases"])
     bout.json_out = args.json_output
     bout.expected_result = args.expected_result
     bout.queue = args.queue  # Boolean
     bout.verbose = args.verbose
-
 
     filter.out = bout
 
@@ -279,4 +277,3 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, stop)
     filter.start()
     filter.stop()
-

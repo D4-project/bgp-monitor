@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class Database(ABC):
     def __init__(self, config=None):
         """ """
@@ -14,7 +15,8 @@ class Database(ABC):
         start_time=None,
         end_time=None,
         countries=None,
-    ): pass
+    ):
+        pass
 
     @abstractmethod
     def save(self, record):

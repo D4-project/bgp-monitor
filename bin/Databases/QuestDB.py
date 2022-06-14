@@ -1,8 +1,10 @@
 from Databases.database import Database
 
+
 class QuestDB(Database):
     name = "quest"
-    def __init__(self, config= None):
+
+    def __init__(self, config=None):
         super().__init__(config)
 
     def get(
@@ -13,7 +15,8 @@ class QuestDB(Database):
         start_time=None,
         end_time=None,
         countries=None,
-    ): pass
+    ):
+        pass
 
     def save(self, record):
         pass

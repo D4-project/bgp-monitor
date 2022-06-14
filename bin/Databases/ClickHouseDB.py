@@ -1,8 +1,9 @@
 from Databases.database import Database
 
+
 class ClickHouseDB(Database):
     name = "clickhouse"
-    
+
     def __init__(self):
         super().__init__()
 
@@ -19,7 +20,17 @@ class ClickHouseDB(Database):
         return res
 
     def save(self, record):
-        self.client.execute("INSERT INTO bgp VALUES ",{'begin': int(record.time), 'type': record.type, 'peerasn': record.peer_asn, 'collector': record.collector, 'prefix': record._maybe_field('prefix') or '', 'aspath': record._maybe_field('as-path') or ''})
+        self.client.execute(
+            "INSERT INTO bgp VALUES ",
+            {
+                "begin": int(record.time),
+                "type": record.type,
+                "peerasn": record.peer_asn,
+                "collector": record.collector,
+                "prefix": record._maybe_field("prefix") or "",
+                "aspath": record._maybe_field("as-path") or "",
+            },
+        )
 
     def start(self):
         # client.execute('CREATE DATABASE BGP')

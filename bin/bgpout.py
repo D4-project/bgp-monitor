@@ -22,7 +22,7 @@ class BGPOut:
     - Can store bgp records in queue before processing them if desired.
     """
 
-    def __init__(self, database_conf= None) -> None:
+    def __init__(self, database_conf=None) -> None:
         self.__databases = []
         self.__expected_result = None
         self.__json_out = None
@@ -42,10 +42,11 @@ class BGPOut:
     def databases(self) -> list:
         """
         List of databases classes.
-        
-        A class is loaded if it inherits from `Database` and parameters are given in config.cfg"""
+
+        A class is loaded if it inherits from `Database`
+        and parameters are given in config.cfg"""
         return self.__databases
-    
+
     @databases.setter
     def databases(self, config):
         if config is not None:

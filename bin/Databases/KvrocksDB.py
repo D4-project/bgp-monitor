@@ -1,8 +1,10 @@
 from Databases.database import Database
 
+
 class KvrocksDB(Database):
-    name="kvrocks"
-    def __init__(self, config= None):
+    name = "kvrocks"
+
+    def __init__(self, config=None):
         super().__init__(config)
 
     def get(
