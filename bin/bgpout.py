@@ -23,8 +23,7 @@ class BGPOut:
     """
 
     def __init__(self, database_conf= None) -> None:
-        self.databases = database_conf
-        self.__databases = None
+        self.__databases = []
         self.__expected_result = None
         self.__json_out = None
         self.verbose: bool = False
@@ -33,6 +32,7 @@ class BGPOut:
         """Enable queue, can prevent from blocking BGPStream"""
         self.isStarted: bool = False
         """Is the stream started or not"""
+        self.databases = database_conf
 
     #######################
     #   GETTERS/SETTERS   #
@@ -40,8 +40,11 @@ class BGPOut:
 
     @property
     def databases(self) -> list:
-        """List of databases classes"""
-        return self.__databases    
+        """
+        List of databases classes.
+        
+        A class is loaded if it inherits from `Database` and parameters are given in config.cfg"""
+        return self.__databases
     
     @databases.setter
     def databases(self, config):
