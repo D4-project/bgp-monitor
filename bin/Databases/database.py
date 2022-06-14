@@ -1,23 +1,21 @@
-import abc
+from abc import ABC, abstractmethod
 
-
-class Database(abc.ABC):
-    def __init__(self, client) -> None:
+class Database(ABC):
+    def __init__(self, config=None):
         """ """
-        pass
+        self.client = config
 
-    @abc.abstractmethod
+    @abstractmethod
     def get(
         self,
-        as_numbers,
-        prefixes,
-        match_type,
-        start_time,
-        end_time,
+        as_numbers=None,
+        prefixes=None,
+        match_type="more",
+        start_time=None,
+        end_time=None,
         countries=None,
-    ):
-        pass
+    ): pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def save(self, record):
         pass

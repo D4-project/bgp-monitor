@@ -11,6 +11,7 @@ import threading
 from queue import Queue
 from pybgpstream import BGPElem
 from typing import TextIO
+from Databases import *
 
 
 class BGPOut:
@@ -21,7 +22,9 @@ class BGPOut:
     - Can store bgp records in queue before processing them if desired.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, database_conf= None) -> None:
+        self.databases = database_conf
+        self.__databases = None
         self.__expected_result = None
         self.__json_out = None
         self.verbose: bool = False
@@ -34,6 +37,19 @@ class BGPOut:
     #######################
     #   GETTERS/SETTERS   #
     #######################
+
+    @property
+    def databases(self) -> list:
+        """List of databases classes"""
+        return self.__databases    
+    
+    @databases.setter
+    def databases(self, config):
+        if config is not None:
+            for db in config:
+                for db_class in Database.__subclasses__():
+                    if db_class.name == db:
+                        self.__databases.append(db_class())
 
     @property
     def isQueue(self) -> bool:

@@ -1,7 +1,7 @@
 from Databases.database import Database
 
-class KvrocksDB(Database):
-    name="kvrocks"
+class QuestDB(Database):
+    name = "quest"
     def __init__(self, config= None):
         super().__init__(config)
 
@@ -13,8 +13,7 @@ class KvrocksDB(Database):
         start_time=None,
         end_time=None,
         countries=None,
-    ):
-        pass
+    ): pass
 
     def save(self, record):
         pass

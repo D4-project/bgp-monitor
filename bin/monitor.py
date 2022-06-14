@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.8
 """
 Main execution, handle arguments, init each instances
 """
@@ -7,12 +7,11 @@ import os
 import signal
 import bgpout
 import argparse
-import configparser
-
+from configobj import ConfigObj
 from bgpfilter import BGPFilter
+from Databases import *
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-configPath = "../etc/config.cfg"
 
 
 def asnPrefixFromFile(file):
@@ -59,6 +58,13 @@ if __name__ == "__main__":
         ),
         metavar="<path>",
     )
+    
+    parser.add_argument(
+        "--config",
+        default="../etc/config.cfg",
+        help="Use different config file",
+        metavar="<path>"
+        )
 
     parser.add_argument(
         "-jo",
@@ -69,6 +75,7 @@ if __name__ == "__main__":
             "File in which to display JSON output.\n If not set, default sys.stdout"
             " will be used."
         ),
+        metavar="<path>"
     )
 
     parser.add_argument(
@@ -222,11 +229,10 @@ if __name__ == "__main__":
         parser.error("--expected_result requires --json_output")
 
     # config
-    if os.path.isfile(configPath):
-        config = configparser.ConfigParser()
-        config.read(configPath)
+    if os.path.isfile(args.config):
+        config = ConfigObj(args.config)
     else:
-        raise FileNotFoundError(f"[-] No conf file found at {configPath}")
+        raise FileNotFoundError(f"[-] No conf file found at {args.config}")
 
     # BGPStream filter
     filter = BGPFilter()
@@ -257,11 +263,12 @@ if __name__ == "__main__":
         filter.prefix_filter = (args.prefix_filter, args.match)
 
     # Output
-    bout = bgpout.BGPOut()
+    bout = bgpout.BGPOut(config['databases'])
     bout.json_out = args.json_output
     bout.expected_result = args.expected_result
     bout.queue = args.queue  # Boolean
     bout.verbose = args.verbose
+
 
     filter.out = bout
 
@@ -272,3 +279,4 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, stop)
     filter.start()
     filter.stop()
+
