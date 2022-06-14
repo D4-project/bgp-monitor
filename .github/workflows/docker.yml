@@ -1,6 +1,10 @@
 name: Docker image build and publish
 
-on: [workflow_dispatch, push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 jobs:
   docker:
     runs-on: ubuntu-20.04
