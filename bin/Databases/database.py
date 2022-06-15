@@ -20,7 +20,7 @@ class Database(ABC):
     @abstractmethod
     def save(self, record):
         pass
-    
+
     @abstractmethod
     def start(self):
         pass
@@ -52,7 +52,7 @@ class BGPDatabases:
     def save(self, record):
         for db in self.__databases:
             db.save(record)
-            
+
     def start(self):
         for db in self.__databases:
             db.start()

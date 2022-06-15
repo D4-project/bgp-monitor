@@ -1,12 +1,13 @@
 from Databases.database import Database
 from clickhouse_driver import Client
 
+
 class ClickHouseDB(Database):
     name = "clickhouse"
 
     def __init__(self, config):
         super().__init__()
-        self.client = Client(host=config['host'])
+        self.client = Client(host=config["host"])
 
     def get(
         self,
@@ -22,20 +23,20 @@ class ClickHouseDB(Database):
 
     def save(self, record):
         self.client.execute(
-            "INSERT INTO bgp VALUES ",[
-            {
-                "begin": int(record.time),
-                "type": record.type,
-                "peerasn": record.peer_asn,
-                "collector": record.collector,
-                "country": record.country_code,
-                "sourceasn": record.source,
-                "prefix": record._maybe_field("prefix") or "",
-                "aspath": record._maybe_field("as-path") or "",
-
-            }]
+            "INSERT INTO bgp VALUES ",
+            [
+                {
+                    "begin": int(record.time),
+                    "type": record.type,
+                    "peerasn": record.peer_asn,
+                    "collector": record.collector,
+                    "country": record.country_code,
+                    "sourceasn": record.source,
+                    "prefix": record._maybe_field("prefix") or "",
+                    "aspath": record._maybe_field("as-path") or "",
+                }
+            ],
         )
-            
 
     def start(self):
         # client.execute('CREATE DATABASE BGP')

@@ -11,7 +11,6 @@ import threading
 from queue import Queue
 from pybgpstream import BGPElem
 from typing import TextIO
-from Databases import *
 from Databases.database import BGPDatabases
 from bgpgraph import BGPGraph
 
@@ -143,7 +142,7 @@ class BGPOut:
             data["bgp:country_code"] = e.country_code
         if e.type in ["A", "R"]:  # updateribs
             data["bgp:as-path"] = e._maybe_field("as-path") or ""
-            data["bgp:as-source"] = e.source or "" # data["bgp:as-path"].split()[-1]
+            data["bgp:as-source"] = e.source or ""  # data["bgp:as-path"].split()[-1]
             data["bgp:next-hop"] = e._maybe_field("next-hop") or ""
 
         return data
@@ -156,7 +155,9 @@ class BGPOut:
             if self.verbose:
                 print("\n" + json.dumps(r, sort_keys=True) + ",")
             if self.__json_out:
-                self.json_out.write("\n" + json.dumps(r, sort_keys=True, indent=4) + ",")
+                self.json_out.write(
+                    "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
+                )
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""
