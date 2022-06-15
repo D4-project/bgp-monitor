@@ -19,4 +19,4 @@ jobs:
     - name: Analysing the code
       run: |
         black .
-        flake8 --per-file-ignores="./bin/bgpout.py:F403,F405" --max-line-length 88 .
+        flake8 --max-line-length 88 .
