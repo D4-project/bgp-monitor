@@ -12,6 +12,8 @@ from queue import Queue
 from pybgpstream import BGPElem
 from typing import TextIO
 from Databases import *
+from Databases.database import BGPDatabases
+from bgpgraph import BGPGraph
 
 
 class BGPOut:
@@ -22,8 +24,7 @@ class BGPOut:
     - Can store bgp records in queue before processing them if desired.
     """
 
-    def __init__(self, database_conf=None) -> None:
-        self.__databases = []
+    def __init__(self) -> None:
         self.__expected_result = None
         self.__json_out = None
         self.verbose: bool = False
@@ -32,28 +33,12 @@ class BGPOut:
         """Enable queue, can prevent from blocking BGPStream"""
         self.isStarted: bool = False
         """Is the stream started or not"""
-        self.databases = database_conf
+        self.databases = BGPDatabases({})
+        self.graph = BGPGraph()
 
     #######################
     #   GETTERS/SETTERS   #
     #######################
-
-    @property
-    def databases(self) -> list:
-        """
-        List of databases classes.
-
-        A class is loaded if it inherits from `Database`
-        and parameters are given in config.cfg"""
-        return self.__databases
-
-    @databases.setter
-    def databases(self, config):
-        if config is not None:
-            for db in config:
-                for db_class in Database.__subclasses__():
-                    if db_class.name == db:
-                        self.__databases.append(db_class())
 
     @property
     def isQueue(self) -> bool:
@@ -158,23 +143,20 @@ class BGPOut:
             data["bgp:country_code"] = e.country_code
         if e.type in ["A", "R"]:  # updateribs
             data["bgp:as-path"] = e._maybe_field("as-path") or ""
-            data["bgp:as-source"] = data["bgp:as-path"].split()[-1] or ""
+            data["bgp:as-source"] = e.source or "" # data["bgp:as-path"].split()[-1]
             data["bgp:next-hop"] = e._maybe_field("next-hop") or ""
-        elif e.type == "S":  # peer state
-            data["bgp:old-state"] = e._maybe_field("old-state") or ""
-            data["bgp:new-state"] = e._maybe_field("new-state") or ""
 
         return data
 
     def __iteration(self, e):
-        if e.type not in ["A", "R"]:
-            return
-        r = self.__bgp_conv(e)
-
-        if self.verbose:
-            print("\n" + json.dumps(r, sort_keys=True) + ",")
-        if self.__json_out:
-            self.json_out.write("\n" + json.dumps(r, sort_keys=True, indent=4) + ",")
+        if self.graph.update(e):
+            self.databases.save(e)
+        if self.verbose or self.json_out:
+            r = self.__bgp_conv(e)
+            if self.verbose:
+                print("\n" + json.dumps(r, sort_keys=True) + ",")
+            if self.__json_out:
+                self.json_out.write("\n" + json.dumps(r, sort_keys=True, indent=4) + ",")
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""

@@ -9,6 +9,7 @@ import bgpout
 import argparse
 from configobj import ConfigObj
 from bgpfilter import BGPFilter
+from Databases.database import BGPDatabases
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -262,11 +263,12 @@ if __name__ == "__main__":
         filter.prefix_filter = (args.prefix_filter, args.match)
 
     # Output
-    bout = bgpout.BGPOut(config["databases"])
+    bout = bgpout.BGPOut()
     bout.json_out = args.json_output
     bout.expected_result = args.expected_result
     bout.queue = args.queue  # Boolean
     bout.verbose = args.verbose
+    bout.databases = BGPDatabases(config["databases"])
 
     filter.out = bout
 
