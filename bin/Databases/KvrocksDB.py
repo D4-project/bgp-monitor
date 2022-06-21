@@ -53,8 +53,8 @@ class KvrocksDB(Database):
             self.pipe.zadd(
                 "bgp-{}:{}:{}".format(e.prefix, e.path, e.source),
                 {
-                    f"{e.time}:{e.type}:{e.peer_asn}:{e.collector}:{e.country_code}":
-                        int(float(e.time))
+                    f"{e.time}:{e.type}:{e.peer_asn}:"
+                    f"{e.collector}:{e.country_code}": int(float(e.time))
                 },
             )
             self.pipe.execute()
@@ -77,7 +77,7 @@ class KvrocksDB(Database):
             self.pipe.zadd(
                 "bgp-{}:{}".format(record.prefix, record._maybe_field("as-path")),
                 {
-                    f"{record.time}:{record.type}:{record.peer_asn}:{record.collector}":
-                        int(float(record.time))
+                    f"{record.time}:{record.type}:{record.peer_asn}:"
+                    f"{record.collector}": int(float(record.time))
                 },
             )
