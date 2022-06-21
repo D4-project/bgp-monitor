@@ -26,7 +26,7 @@ class ClickHouseDB(Database):
             "INSERT INTO bgp VALUES ",
             [
                 {
-                    "begin": int(record.time),
+                    "time": int(record.time),
                     "type": record.type,
                     "peerasn": record.peer_asn,
                     "collector": record.collector,
@@ -44,7 +44,7 @@ class ClickHouseDB(Database):
         # self.client.execute("DROP TABLE IF EXISTS bgp")
         self.client.execute(
             "CREATE TABLE IF NOT EXISTS bgp ("
-            "begin DateTime,"
+            "time DateTime,"
             "type FixedString(1),"
             "peerasn Int32,"
             "collector String,"

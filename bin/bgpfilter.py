@@ -470,7 +470,7 @@ class BGPFilter:
                 self.__project if self.__isRecord else project_types[self.__project]
             )
             self._stream._maybe_add_filter("project", project, None)
-            self._stream._maybe_add_filter("collectors", None, self.__collectors)
+            self._stream._maybe_add_filter("collector", None, self.__collectors)
 
         self.out.start()
 

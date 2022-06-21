@@ -129,12 +129,13 @@ class BGPOut:
         Parameters:
             e (BGPElem)
         """
+
         data = {
             "bgp:type": e.type,
             "bgp:time": e.time,
             "bgp:peer": e.peer_address,
             "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e._maybe_field("collector") or "",
+            "bgp:collector": e.collector,
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
@@ -148,8 +149,6 @@ class BGPOut:
         return data
 
     def __iteration(self, e):
-        if self.graph.update(e):
-            self.databases.save(e)
         if self.verbose or self.json_out:
             r = self.__bgp_conv(e)
             if self.verbose:
@@ -158,6 +157,9 @@ class BGPOut:
                 self.json_out.write(
                     "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
                 )
+
+        if self.graph.update(e):
+            self.databases.save(e)
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""
