@@ -113,6 +113,7 @@ class BGPOut:
         """
         if self.isStarted:
             self.isStarted = False
+            self.databases.stop()
             self.closeFile(self.__json_out)
             if self.__expected_result:
                 print("Testing result: ")

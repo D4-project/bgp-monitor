@@ -4,7 +4,6 @@ pybgpstream
 pytz
 pyyaml
 libpq-dev
-psycopg2
 clickhouse-driver[lz4,zstd]
 clickhouse-driver[numpy]
 networkx

@@ -39,9 +39,7 @@ class KvrocksDB(Database):
         """
         e = record
 
-        e.prefix = e._maybe_field("prefix")
         if e.type == "A":
-            e.path = e._maybe_field("as-path")
             self.pipe.sadd(f"prefixes-{e.source}", e.prefix)  # pr AS {cidr, cidr }
             self.pipe.sadd(f"prefixes-{e.country_code}", e.prefix)  # pr LU {cidr, cidr}
             self.pipe.sadd(f"as-{e.prefix}", e.source)  # as-cidr {as, as, as }
@@ -81,3 +79,6 @@ class KvrocksDB(Database):
                     f"{record.collector}": int(float(record.time))
                 },
             )
+
+    def stop(self):
+        pass

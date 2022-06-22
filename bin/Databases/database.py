@@ -25,6 +25,10 @@ class Database(ABC):
     def start(self):
         pass
 
+    @abstractmethod
+    def stop(self):
+        pass
+
 
 class BGPDatabases:
     def __init__(self, database_conf=[]):
@@ -56,3 +60,7 @@ class BGPDatabases:
     def start(self):
         for db in self.__databases:
             db.start()
+
+    def stop(self):
+        for db in self.__databases:
+            db.stop()

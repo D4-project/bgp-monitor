@@ -56,6 +56,9 @@ class ClickHouseDB(Database):
             "SETTINGS old_parts_lifetime=10"
         )
 
+    def stop(self):
+        pass
+
 
 # client = clickhouse_driver
 #           .Client(host="localhost", password="enes57", compression='lz4')
