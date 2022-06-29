@@ -6,7 +6,7 @@ The Internet is a network of networks, and autonomous systems are the big networ
 Every computer that has access to the Internet is linked to an Autonomous System (AS).  
 
 More specifically, an autonomous system (AS) is a large network or group of networks that are all managed, controlled and supervised by a single entity or organization. It can be your Internet Service Provider (ISP), a private society (eg. Google, Facebook, etc), a government etc.  
-Each AS are connected to their neighbors called peers, which receives and advertise differents [BGP messages](#bgp-messages).  
+Each AS are connected to their neighbors called peers, which receives and advertise different [BGP messages](#bgp-messages).  
 Also, these connections form a network graph built using [AS Paths](#bgp-as-path).  
 
 ---
@@ -14,7 +14,7 @@ Also, these connections form a network graph built using [AS Paths](#bgp-as-path
 ### Routing policy
 
 Autonomous Systems are connected to their neighbors called peers, which receives and sends different [BGP messages](#bgp-messages).  
-A routing policy is also defined for each AS :
+A routing policy is also defined for each AS:
 - has its own list of [prefixes](#ip-address-prefixes) (IP ranges).
 - has a list of its peer AS
 
@@ -23,7 +23,7 @@ A routing policy is also defined for each AS :
 ## IP Address prefixes
 
 While networking, each Autonomous System announce or withdraw ranges of IP addresses.
-Also, a range of IP Adresses is defined in CIDR format.
+Also, a range of IP Addresses is defined in CIDR format.
 
 A prefix is a CIDR (Classless Inter-Domain Routing) format.
 It is composed as follow as "network/subnet" mask where Network is a normal ipv4 or ipv6 address and Subnet mask is a number between 0 and 32 which is the mask.
@@ -36,7 +36,7 @@ For example, 10.10.0.0/24 represents IP addresses 10.10.0.0 to 10.10.0.255
 
 Border Gateway Protocol (BGP) is a standardized gateway protocol designed to exchange routing and reachability information among [autonomous systems](#autonomous-systems) (AS) on the Internet.
 
-BGP is classified as a path-vector routing protocol and it makes routing decisions based on paths, network policies, or rule-sets configured by a network administrator.
+BGP is classified as a path-vector routing protocol and it makes routing decisions based on paths, network policies, or rulesets configured by a network administrator.
 
 ### BGP AS Path
 
@@ -48,21 +48,19 @@ Also, when a prefix is withdrawn, all AS-paths (or routes) to the prefix are rem
 
 ## BGP Messages
 
-BGP permet donc aux AS d'annoncer de nouvelles routes, pour  
-Les AS sont connectés entre eux de sorte former un graph, avec différents chemin pour accéder à différents préfix(link)  
-There are 3 types of bgp messages :
+There are 3 types of BGP messages:
 
 - `Open`:
   - Establish a TCP connection
   - Exchange information such as BGP Version number, AS Number, Hold Down Time value, BGP Identifier
-- `Keepalive` :
+- `Keepalive`:
   If no update or keepalive message is sent for more than 30 second, then the connection is closed.
 - `Update`:
   - Announce a new prefix (message can contain an AS-path)
   - Withdraw a prefix
   - Peer State change
   By default, update messages contains peers' IP address, asn, etc
-- `Notification` :  
+- `Notification`:  
   Used to send error codes
 - `Route-Refresh`
 
@@ -87,7 +85,7 @@ For more details, you can consult the following links:
 1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
    Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
 
-2. Clone repo and Install requirements :
+2. Clone repo and Install requirements:
 
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git
@@ -109,7 +107,7 @@ docker run -it ustaenes/bgp-monitor:latest
 
 ---
 
-# How to use ?
+# How to use?
 
 ## Example of commands
 
@@ -137,7 +135,7 @@ You can **filter many AS numbers and/or prefixes** in `etc/filter_file.cfg.sampl
 ./monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
 ```
 
-Specify a project / list of collectors :
+Specify a project / list of collectors:
 
 ```shell
 ./monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
@@ -151,7 +149,7 @@ Specify a project / list of collectors :
 
 ## Output
 
-BGP records are reformatted and presented as follows :
+BGP records are reformatted and presented as follows:
 
 - `type`
   - R: RIB table entry
@@ -171,13 +169,13 @@ BGP records are reformatted and presented as follows :
 
 # Testing
 
-Different steps to use external files, check that filters works etc
+Different steps to use external files, check that filters work etc
 
-# How it works ?
+# How it works?
 
 # Contribution
 
 UML of different classes + class docs + Scheme
 
-# How it's made ?
-You can check the following UML :
+# How it's made?
+You can check the following UML:
