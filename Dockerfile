@@ -1,5 +1,5 @@
 FROM ubuntu:20.04
-LABEL version="1.0" org="CIRCL" description="Tool for bgp monitoring"
+LABEL version="1.0" org="CIRCL" description="Tool for BGP monitoring"
 
 WORKDIR /opt/bgp-monitor
 RUN apt-get update \

@@ -9,7 +9,7 @@ from Databases.database import Database
 
 __pdoc__ = {}
 __pdoc__[".__pycache__"] = False
-__pdoc__[".__init__"] = False
+#__pdoc__[".__init__"] = False
 
 package_dir = os.path.dirname(os.path.abspath(__file__))
 for (_, module_name, _) in iter_modules([package_dir]):
