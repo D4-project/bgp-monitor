@@ -11,10 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
-      - run: ./docker/entrypoint.sh
-      - run: PYTHONPATH=$GITHUB_WORKSPACE/bin/ pdoc -o $GITHUB_WORKSPACE/docs/ -t $GITHUB_WORKSPACE/templates/ -d markdown $GITHUB_WORKSPACE/bin/ --favicon https://www.circl.lu/assets/images/circl-logo.png --logo https://www.circl.lu/assets/images/circl-logo.png
-
-      - run: tar --directory docs/ -hcf artifact.tar .
+      - run: |
+          sudo chmod +x ./docker/entrypoint.sh
+          ./docker/entrypoint.sh
+          PYTHONPATH=$GITHUB_WORKSPACE/bin/ pdoc -o $GITHUB_WORKSPACE/docs/ -t $GITHUB_WORKSPACE/templates/ -d markdown $GITHUB_WORKSPACE/bin/ --favicon https://www.circl.lu/assets/images/circl-logo.png --logo https://www.circl.lu/assets/images/circl-logo.png
+          tar --directory docs/ -hcf artifact.tar .
       - uses: actions/upload-artifact@v3
         with:
           name: github-pages
