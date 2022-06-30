@@ -107,9 +107,8 @@ docker run -it ustaenes/bgp-monitor:latest
 
 ---
 
-# How to use?
-
-## Example of commands
+# Usage
+## Examples of command-line usage
 
 **Default** stream testing (No filtering, massive print):
 

@@ -2,20 +2,22 @@
 
 ## Usage
 
-usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [-jo [JSON_OUTPUT]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]]
-                  [-ip <version>] [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r]
-                  [--start <begin>] [--stop <end>] [--queue] [-id <path>] [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
+```shell
+usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [--config <path>] [-jo [<path>]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]] [-ip <version>]
+                  [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r] [--start <begin>] [--stop <end>] [--queue] [-id <path>]
+                  [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
 
 Tool for BGP filtering and monitoring
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
+  -v, --version         show program\'s version number and exit
   --verbose             Print BGP records in console
   --filter_list [<path>]
                         Use separated file to define list of prefixes and/or AS Numbers.
                          Check etc/filter_list.cfg.sample for file format
-  -jo [JSON_OUTPUT], --json_output [JSON_OUTPUT]
+  --config <path>       Use different config file
+  -jo [<path>], --json_output [<path>]
                         File in which to display JSON output.
                          If not set, default sys.stdout will be used.
   -cf <country code> [<country code> ...], --country_filter <country code> [<country code> ...]
@@ -55,14 +57,15 @@ optional arguments:
                         input data type format. ris-live is avaible for updates only
   --expected_result [<path>], -expected [<path>]
                         Check that the result is the same as the expected result
+```
 
 ## Installation
 
 ### Manual install
 
-~~~shell
+```shell
 git clone https://github.com/D4-project/bgp-monitor.git
-~~~
+```
 
 [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream  
    Note that some versions may not be supported yet (eg. Ubuntu 22.04)  
@@ -81,7 +84,7 @@ git clone https://github.com/D4-project/bgp-monitor.git
 ~~~
 
 ~~~shell
-docker build -t bgp-monitor/bgp-monitor . # About 2 minutes
+docker build -f docker/Dockerfile -t bgp-monitor/bgp-monitor . # About 2 minutes
 docker run -it bgp-monitor:latest
 ~~~
 
@@ -150,7 +153,7 @@ You can get archive files here :
 
 ## Example of json output
 
-~~~~json
+~~~json
 {
   "bgp:type": "A",
   "bgp:time": 1650632262.23,
@@ -162,8 +165,7 @@ You can get archive files here :
   "bgp:as-path": "",
   "bgp:next-hop": "2.56.11.1"
 }
-
-~~~~
+~~~
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
 
