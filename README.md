@@ -1,7 +1,5 @@
 # BGP monitor
 
-A tool that allows filtering of BGP records, by AS numbers, prefixes, countries, etc ...
-
 ## Usage
 
 usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [-jo [JSON_OUTPUT]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]]
