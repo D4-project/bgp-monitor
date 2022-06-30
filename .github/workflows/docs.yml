@@ -1,10 +1,6 @@
 name: documentation
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - dev
+on: [workflow_dispatch, push]
 
 permissions:
   contents: read
