@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
-      - run: pip install -e .
+      - run: pip install pdoc
       - run: PYTHONPATH=/root/bin/ pdoc -o ./docs/ -t ./templates/ -d markdown ./bin/ --favicon https://www.circl.lu/assets/images/circl-logo.png --logo https://www.circl.lu/assets/images/circl-logo.png
 
       - run: tar --directory docs/ -hcf artifact.tar .
