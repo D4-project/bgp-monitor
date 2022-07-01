@@ -6,30 +6,17 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-20.04
     steps:
+      - name: Build
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
       - run: |
           sudo chmod +x ./docker/entrypoint.sh
           ./docker/entrypoint.sh
           PYTHONPATH=$GITHUB_WORKSPACE/bin/ pdoc -o $GITHUB_WORKSPACE/docs/ -t $GITHUB_WORKSPACE/templates/ -d markdown $GITHUB_WORKSPACE/bin/ --favicon https://www.circl.lu/assets/images/circl-logo.png --logo https://www.circl.lu/assets/images/circl-logo.png
-          tar --directory docs/ -hcf artifact.tar .
-      - uses: actions/upload-artifact@v3
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: github-pages
-          path: ./artifact.tar
-  
-  deploy:
-    needs: build
-    runs-on: ubuntu-20.04
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v1
+          github_token: ${{ secrets.GITHUB_TOKEN }}
