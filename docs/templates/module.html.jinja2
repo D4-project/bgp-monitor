@@ -1,5 +1,12 @@
 {% extends "default/module.html.jinja2" %}
-{# if module.modulename = "bgp-monitor" #}
+
+{% if module.modulename == "bin" %}
+    {% block title %}BGP monitor{% endblock%}
+{% endif %}
+{% if module.modulename == "bin" %}
+    {% defaultmacro module_name() %}<h1 class="modulename">BGP monitor</h1>{% enddefaultmacro%}
+{% endif %}
+
 {% block module_contents %}
     {{ super() }}
     {% if module.modulename == 'bin' %}
@@ -60,9 +67,9 @@
                 }
 
                 class BGPGraph
-                class ClickHouseDB
-                class QuestDB
-                class KvrocksDB
+                class ClickHouseDB~Database~
+                class QuestDB~Database~
+                class KvrocksDB~Database~
 
                 BGPFilter "1" -- "0" BGPOut
                 BGPOut "1" --> BGPDatabases : send data
