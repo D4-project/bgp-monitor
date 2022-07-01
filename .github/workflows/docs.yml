@@ -3,13 +3,12 @@ name: documentation
 on: [workflow_dispatch, push]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-deploy:
     runs-on: ubuntu-20.04
     steps:
-      - name: Build
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
       - run: |
