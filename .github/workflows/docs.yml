@@ -15,7 +15,7 @@ jobs:
           sudo chmod +x ./docker/entrypoint.sh
           sudo ./docker/entrypoint.sh
           mkdir public
-          sudo PYTHONPATH=$GITHUB_WORKSPACE/bin/ pdoc -o $GITHUB_WORKSPACE/public/ -t $GITHUB_WORKSPACE/templates/ -d markdown $GITHUB_WORKSPACE/bin/ --favicon https://www.circl.lu/assets/images/circl-logo.png --logo https://www.circl.lu/assets/images/circl-logo.png
+          sudo PYTHONPATH=$GITHUB_WORKSPACE/bin/ pdoc -o $GITHUB_WORKSPACE/public/ -t $GITHUB_WORKSPACE/docs/templates/ -d markdown $GITHUB_WORKSPACE/bin/ --favicon https://www.circl.lu/assets/images/circl-logo.png --logo https://www.circl.lu/assets/images/circl-logo.png
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
