@@ -1,23 +1,66 @@
-import abc
+from abc import ABC, abstractmethod
 
 
-class Database(abc.ABC):
-    def __init__(self, client) -> None:
-        """ """
+class Database(ABC):
+    def __init__(self):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get(
         self,
-        as_numbers,
-        prefixes,
-        match_type,
-        start_time,
-        end_time,
+        as_numbers=None,
+        prefixes=None,
+        match_type="more",
+        start_time=None,
+        end_time=None,
         countries=None,
     ):
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def save(self, record):
         pass
+
+    @abstractmethod
+    def start(self):
+        pass
+
+    @abstractmethod
+    def stop(self):
+        pass
+
+
+class BGPDatabases:
+    def __init__(self, database_conf=[]):
+        self.__databases = []
+        self.databases = database_conf
+        self.start()
+
+    @property
+    def databases(self) -> list:
+        """
+        List of databases classes.
+
+        A class is loaded if it inherits from `Database`
+        and parameters are given in config.cfg"""
+        return self.__databases
+
+    @databases.setter
+    def databases(self, config):
+        if config is not None:
+            for db in config:
+                for db_class in Database.__subclasses__():
+                    if db_class.name == db:
+                        self.__databases.append(db_class(config[db]))
+
+    def save(self, record):
+        for db in self.__databases:
+            db.save(record)
+
+    def start(self):
+        for db in self.__databases:
+            db.start()
+
+    def stop(self):
+        for db in self.__databases:
+            db.stop()

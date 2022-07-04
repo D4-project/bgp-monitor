@@ -1,28 +1,23 @@
 # BGP monitor
 
-**What is BGP ?**
-
-.....................
-
-A tool that allows filtering of BGP records, by AS numbers, prefixes, countries, etc ...
-
 ## Usage
 
-~~~shell
-usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [-jo [JSON_OUTPUT]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]]
-                  [-ip <version>] [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r]
-                  [--start <begin>] [--stop <end>] [--queue] [-id <path>] [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
+```shell
+usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [--config <path>] [-jo [<path>]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]] [-ip <version>]
+                  [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r] [--start <begin>] [--stop <end>] [--queue] [-id <path>]
+                  [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
 
 Tool for BGP filtering and monitoring
 
 optional arguments:
   -h, --help            show this help message and exit
-  -v, --version         show program s version number and exit
+  -v, --version         show program\'s version number and exit
   --verbose             Print BGP records in console
   --filter_list [<path>]
                         Use separated file to define list of prefixes and/or AS Numbers.
                          Check etc/filter_list.cfg.sample for file format
-  -jo [JSON_OUTPUT], --json_output [JSON_OUTPUT]
+  --config <path>       Use different config file
+  -jo [<path>], --json_output [<path>]
                         File in which to display JSON output.
                          If not set, default sys.stdout will be used.
   -cf <country code> [<country code> ...], --country_filter <country code> [<country code> ...]
@@ -62,94 +57,134 @@ optional arguments:
                         input data type format. ris-live is avaible for updates only
   --expected_result [<path>], -expected [<path>]
                         Check that the result is the same as the expected result
-~~~
+```
 
 ---
 
 ## Installation
 
-### Manual installation
+### From source
 
-1. First of all, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream)
+1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
    Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
-   **Implemented and tested on Ubuntu 20.04**
 
-2. Clone repo and Install requirements :
+2. Clone repo and Install requirements:
 
-~~~shell
+```shell
 git clone https://github.com/D4-project/bgp-monitor.git
 pip3 install -r requirements.txt
-~~~
+```
+
+You can export the path to the repo if you want to execute it from anywhere:
+
+```shell
+chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
+export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
+```
+
+### Database
+
+Therefore, you can install the desired database:
+
+- [kvrocks](https://github.com/apache/incubator-kvrocks)
+- [Questdb](https://github.com/questdb/questdb)
+- [Clickhouse](https://clickhouse.com/docs/en/quick-start)
+
+Don't forget to uncomment the corresponding lines in the [config file](./etc/config.cfg)
 
 ---
 
-### Docker installation
+## Docker install
 
-#### Manual build from source
+### From source
 
-~~~shell
-docker build https://github.com/D4-project/bgp-monitor.git#main
-docker run -it bgp-monitor
-~~~
+You can run bgp-monitor without database and run your own instance separately :
 
----
+```shell
+git clone https://github.com/D4-project/bgp-monitor.git
+docker build -f docker/Dockerfile -t bgp-monitor . # Build bgp-monitor image
+docker build -f docker/{dbname}/Dockerfile -t bgp-monitor-{dbname} . # Generate an other image from the previous
+docker run -it bgp-monitor-{dbname}:latest
+```
 
-#### DockerHub : Easy way
+### From DockerHub
 
-~~~shell
+You can install generated images from **Dockerhub**:
+
+```shell
 docker run -it ustaenes/bgp-monitor:latest
-~~~
+```
+
+:warning: Not yet available :warning:
+
+```shell
+docker run -it ustaenes/bgp-monitor-kvrocks:latest
+```
+
+```shell
+docker run -it ustaenes/bgp-monitor-questdb:latest
+```
+
+```shell
+docker run -it ustaenes/bgp-monitor-clickhouse:latest
+```
 
 ---
 
-### Test your installation
+## Usage
 
-Read [`TESTING.md`](./testing/TESTING.md) for more informations
+### Examples of command-line usage
 
-## Examples of use
+**Default** stream testing (No filtering, massive print):
 
-Default stream testing (No filtering):
+```shell
+monitor.py --verbose
+```
 
-~~~shell
-python3 monitor.py --verbose
-~~~
+**Filter ip addresses** 84.205.67.0 through 84.205.67.255:
 
-Filter that exact match 84.205.67.0/24:
+```shell
+monitor.py -pf 84.205.67.0/24 --verbose
+```
 
-~~~shell
-python3 monitor.py -pf 84.205.67.0/24 --match exact --verbose
-~~~
+You can **filter many AS numbers and/or prefixes** in `etc/filter_file.cfg.sample` instead of using long command line:
 
-You can filter many AS number and/or prefixes in `etc/filter_file.cfg.sample` instead of using long command line:
+```shell
+monitor.py --filter_file etc/filter_file.cfg.sample --verbose
+```
 
-~~~shell
-python3 monitor.py --filter_file etc/filter_file.cfg.sample --verbose
-~~~
+**Retrieve past records** instead of live stream
 
-Retrieve records instead of live stream
+```shell
+monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
+```
 
-~~~shell
-python3 monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
-~~~
+Specify a project / list of collectors:
 
-Specify a project / list of collectors :
+```shell
+monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
+```
 
-~~~shell
-python3 monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
-~~~
+**Retrieve** records **from single file** as source instead of a broker:
 
-Use a single file (Default: Updates) as source instead of a broker:
+```shell
+monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+```
 
-~~~shell
-python3 monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
-~~~
+### Testing
 
-You can get archive files here :
+To test different filters, you can download some datasets here :
 
 - [Routeviews DataSets](<http://archive.routeviews.org/>)
 - [RIS RIPE DataSets](<https://data.ris.ripe.net/>)
 
----
+It will be easier to work with static data instead of ris-live stream:
+
+```shell
+./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+```
+
+Note that you can use options like `--json_out` (to save the output) or `--expected_result` (check if json_out is equal to the specified file)
 
 ## Output
 
@@ -169,7 +204,7 @@ You can get archive files here :
 
 ## Example of json output
 
-~~~~json
+```json
 {
   "bgp:type": "A",
   "bgp:time": 1650632262.23,
@@ -181,8 +216,7 @@ You can get archive files here :
   "bgp:as-path": "",
   "bgp:next-hop": "2.56.11.1"
 }
-
-~~~~
+```
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
 
@@ -190,9 +224,9 @@ See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html
 
 ## More informations
 
-- Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
-- Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)
 - [BGPStream Filtering](<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
 - [BGPStream python library](<https://bgpstream.caida.org/docs/api/pybgpstream>)
 - [Data sources](<https://bgpstream.caida.org/data>)
 - [Geo Open Databases](<https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/>)
+- Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
+- Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)

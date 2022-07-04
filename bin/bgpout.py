@@ -11,6 +11,8 @@ import threading
 from queue import Queue
 from pybgpstream import BGPElem
 from typing import TextIO
+from Databases.database import BGPDatabases
+from bgpgraph import BGPGraph
 
 
 class BGPOut:
@@ -30,6 +32,8 @@ class BGPOut:
         """Enable queue, can prevent from blocking BGPStream"""
         self.isStarted: bool = False
         """Is the stream started or not"""
+        self.databases = BGPDatabases({})
+        self.graph = BGPGraph()
 
     #######################
     #   GETTERS/SETTERS   #
@@ -109,6 +113,7 @@ class BGPOut:
         """
         if self.isStarted:
             self.isStarted = False
+            self.databases.stop()
             self.closeFile(self.__json_out)
             if self.__expected_result:
                 print("Testing result: ")
@@ -125,12 +130,13 @@ class BGPOut:
         Parameters:
             e (BGPElem)
         """
+
         data = {
             "bgp:type": e.type,
             "bgp:time": e.time,
             "bgp:peer": e.peer_address,
             "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e._maybe_field("collector") or "",
+            "bgp:collector": e.collector,
         }
 
         if e.type in ["A", "R", "W"]:  # updateribs
@@ -138,23 +144,23 @@ class BGPOut:
             data["bgp:country_code"] = e.country_code
         if e.type in ["A", "R"]:  # updateribs
             data["bgp:as-path"] = e._maybe_field("as-path") or ""
-            data["bgp:as-source"] = data["bgp:as-path"].split()[-1] or ""
+            data["bgp:as-source"] = e.source or ""  # data["bgp:as-path"].split()[-1]
             data["bgp:next-hop"] = e._maybe_field("next-hop") or ""
-        elif e.type == "S":  # peer state
-            data["bgp:old-state"] = e._maybe_field("old-state") or ""
-            data["bgp:new-state"] = e._maybe_field("new-state") or ""
 
         return data
 
     def __iteration(self, e):
-        if e.type not in ["A", "R"]:
-            return
-        r = self.__bgp_conv(e)
+        if self.verbose or self.json_out:
+            r = self.__bgp_conv(e)
+            if self.verbose:
+                print("\n" + json.dumps(r, sort_keys=True) + ",")
+            if self.__json_out:
+                self.json_out.write(
+                    "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
+                )
 
-        if self.verbose:
-            print("\n" + json.dumps(r, sort_keys=True) + ",")
-        if self.__json_out:
-            self.json_out.write("\n" + json.dumps(r, sort_keys=True, indent=4) + ",")
+        if self.graph.update(e):
+            self.databases.save(e)
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""

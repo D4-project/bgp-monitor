@@ -1,6 +1,10 @@
 name: Docker image build and publish
 
-on: [workflow_dispatch, push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 jobs:
   docker:
     runs-on: ubuntu-20.04
@@ -16,8 +20,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
+      - name: Default - Build and push
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:latest
+          dockerfile: ./docker/Dockerfile
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor
+          tags: latest

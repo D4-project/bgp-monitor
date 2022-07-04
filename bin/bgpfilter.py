@@ -470,12 +470,19 @@ class BGPFilter:
                 self.__project if self.__isRecord else project_types[self.__project]
             )
             self._stream._maybe_add_filter("project", project, None)
-            self._stream._maybe_add_filter("collectors", None, self.__collectors)
+            self._stream._maybe_add_filter("collector", None, self.__collectors)
 
         self.out.start()
 
         for e in self._stream:
-            e.country_code = self.__country_by_prefix(e._maybe_field("prefix")) or ""
+            if e.type not in ["A", "R", "W"]:  # Keep updates only
+                continue
+
+            e.prefix = e._maybe_field("prefix")
+            e.country_code = self.__country_by_prefix(e.prefix) or ""
+            e.path = e._maybe_field("as-path")
+            e.source = e.path.split()[-1] if e.path is not None else ""
+
             if self.__check_country(e):
                 self.out.input_data(e)
 

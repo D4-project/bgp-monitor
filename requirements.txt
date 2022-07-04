@@ -3,3 +3,10 @@ pycountry
 pybgpstream
 pytz
 pyyaml
+clickhouse-driver[lz4,zstd]
+clickhouse-driver[numpy]
+networkx
+pdoc
+redis
+matplotlib
+configobj
