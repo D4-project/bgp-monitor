@@ -59,81 +59,132 @@ optional arguments:
                         Check that the result is the same as the expected result
 ```
 
+---
+
 ## Installation
 
-### Manual install
+### From source
+
+1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
+   Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
+
+2. Clone repo and Install requirements:
 
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git
+pip3 install -r requirements.txt
 ```
 
-[libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) must be installed prior to installing PyBGPStream  
-   Note that some versions may not be supported yet (eg. Ubuntu 22.04)  
-   Tested on Ubuntu 20.04
+You can export the path to the repo if you want to execute it from anywhere:
 
-Install requirements :
+```shell
+chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
+export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
+```
 
-~~~shell
-  pip3 install -r requirements.txt
-~~~
+### Database
 
-### Docker install
+Therefore, you can install the desired database:
 
-~~~shell
+- [kvrocks](https://github.com/apache/incubator-kvrocks)
+- [Questdb](https://github.com/questdb/questdb)
+- [Clickhouse](https://clickhouse.com/docs/en/quick-start)
+
+Don't forget to uncomment the corresponding lines in the [config file](./etc/config.cfg)
+
+---
+
+## Docker install
+
+### From source
+
+You can run bgp-monitor without database and run your own instance separately :
+
+```shell
 git clone https://github.com/D4-project/bgp-monitor.git
-~~~
+docker build -f docker/Dockerfile -t bgp-monitor . # Build bgp-monitor image
+docker build -f docker/{dbname}/Dockerfile -t bgp-monitor-{dbname} . # Generate an other image from the previous
+docker run -it bgp-monitor-{dbname}:latest
+```
 
-~~~shell
-docker build -f docker/Dockerfile -t bgp-monitor/bgp-monitor . # About 2 minutes
-docker run -it bgp-monitor:latest
-~~~
+### From DockerHub
 
-### Test your installation
+You can install generated images from **Dockerhub**:
 
-Read [`TESTING.md`](./datasets/TESTING.md) for more informations
+```shell
+docker run -it ustaenes/bgp-monitor:latest
+```
 
-## Examples of use
+:warning: Not yet available :warning:
 
-Default stream testing (No filtering):
+```shell
+docker run -it ustaenes/bgp-monitor-kvrocks:latest
+```
 
-~~~shell
-python3 monitor.py --verbose
-~~~
+```shell
+docker run -it ustaenes/bgp-monitor-questdb:latest
+```
 
-Filter that exact match 84.205.67.0/24:
+```shell
+docker run -it ustaenes/bgp-monitor-clickhouse:latest
+```
 
-~~~shell
-python3 monitor.py -pf 84.205.67.0/24 --match exact --verbose
-~~~
+---
 
-You can filter many AS number and/or prefixes in `etc/filter_file.cfg.sample` instead of using long command line:
+## Usage
 
-~~~shell
-python3 monitor.py --filter_file etc/filter_file.cfg.sample --verbose
-~~~
+### Examples of command-line usage
 
-Retrieve records instead of live stream
+**Default** stream testing (No filtering, massive print):
 
-~~~shell
-python3 monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
-~~~
+```shell
+monitor.py --verbose
+```
 
-Specify a project / list of collectors :
+**Filter ip addresses** 84.205.67.0 through 84.205.67.255:
 
-~~~shell
-python3 monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
-~~~
+```shell
+monitor.py -pf 84.205.67.0/24 --verbose
+```
 
-Use a single file (Default: Updates) as source instead of a broker:
+You can **filter many AS numbers and/or prefixes** in `etc/filter_file.cfg.sample` instead of using long command line:
 
-~~~shell
-python3 monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
-~~~
+```shell
+monitor.py --filter_file etc/filter_file.cfg.sample --verbose
+```
 
-You can get archive files here :
+**Retrieve past records** instead of live stream
+
+```shell
+monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
+```
+
+Specify a project / list of collectors:
+
+```shell
+monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
+```
+
+**Retrieve** records **from single file** as source instead of a broker:
+
+```shell
+monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+```
+
+### Testing
+
+To test different filters, you can download some datasets here :
 
 - [Routeviews DataSets](<http://archive.routeviews.org/>)
 - [RIS RIPE DataSets](<https://data.ris.ripe.net/>)
+
+It will be easier to work with static data instead of ris-live stream:
+
+```shell
+./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+```
+
+Note that you can use options like `--json_out` (to save the output) or `--expected_result` (check if json_out is equal to the specified file)
 
 ## Output
 
@@ -153,7 +204,7 @@ You can get archive files here :
 
 ## Example of json output
 
-~~~json
+```json
 {
   "bgp:type": "A",
   "bgp:time": 1650632262.23,
@@ -165,15 +216,15 @@ You can get archive files here :
   "bgp:as-path": "",
   "bgp:next-hop": "2.56.11.1"
 }
-~~~
+```
 
 See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html#bgpelem) for more details.
 
 ## More informations
 
-- Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
-- Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)
 - [BGPStream Filtering](<https://github.com/CAIDA/libbgpstream/blob/master/FILTERING>)
 - [BGPStream python library](<https://bgpstream.caida.org/docs/api/pybgpstream>)
 - [Data sources](<https://bgpstream.caida.org/data>)
 - [Geo Open Databases](<https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/>)
+- Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
+- Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)

@@ -80,7 +80,7 @@ For more details, you can consult the following links:
 
 # Installation
 
-## From source
+### From source
 
 1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
    Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
@@ -92,22 +92,64 @@ git clone https://github.com/D4-project/bgp-monitor.git
 pip3 install -r requirements.txt
 ```
 
-## Docker
+You can export the path to the repo if you want to execute it from anywhere:
 
 ```shell
-docker build https://github.com/D4-project/bgp-monitor.git#main
-docker run -it bgp-monitor
+chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
+export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
 ```
 
-### DockerHub
+### Database
+
+Therefore, you can install the desired database:
+
+- [kvrocks](https://github.com/apache/incubator-kvrocks)
+- [Questdb](https://github.com/questdb/questdb)
+- [Clickhouse](https://clickhouse.com/docs/en/quick-start)
+
+Don't forget to uncomment the corresponding lines in the [config file](./etc/config.cfg)
+
+---
+
+## Docker install
+
+### From source
+
+You can run bgp-monitor without database and run your own instance separately :
+
+```shell
+git clone https://github.com/D4-project/bgp-monitor.git
+docker build -f docker/Dockerfile -t bgp-monitor . # Build bgp-monitor image
+docker build -f docker/{dbname}/Dockerfile -t bgp-monitor-{dbname} . # Generate an other image from the previous
+docker run -it bgp-monitor-{dbname}:latest
+```
+
+### From DockerHub
+
+You can install generated images from **Dockerhub**:
 
 ```shell
 docker run -it ustaenes/bgp-monitor:latest
 ```
 
+:warning: Not yet available :warning:
+
+```shell
+docker run -it ustaenes/bgp-monitor-kvrocks:latest
+```
+
+```shell
+docker run -it ustaenes/bgp-monitor-questdb:latest
+```
+
+```shell
+docker run -it ustaenes/bgp-monitor-clickhouse:latest
+```
+
 ---
 
 # Usage
+
 ## Examples of command-line usage
 
 **Default** stream testing (No filtering, massive print):
@@ -168,13 +210,27 @@ BGP records are reformatted and presented as follows:
 
 # Testing
 
-Different steps to use external files, check that filters work etc
+To test different filters, you can download some datasets here :
+
+- [Routeviews DataSets](<http://archive.routeviews.org/>)
+- [RIS RIPE DataSets](<https://data.ris.ripe.net/>)
+
+It will be easier to work with static data instead of ris-live stream:
+
+```shell
+./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+```
+
+Note that you can use options like `--json_out` (to save the output) or `--expected_result` (check if json_out is equal to the specified file)
 
 # How it works?
+
+
+# License
 
 # Contribution
 
 UML of different classes + class docs + Scheme
 
 # How it's made?
-You can check the following UML:
+You can check the following UML :

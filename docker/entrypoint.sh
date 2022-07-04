@@ -9,5 +9,6 @@ sudo wget -O /etc/apt/trusted.gpg.d/caida.gpg https://pkg.caida.org/os/ubuntu/ke
 curl -s https://pkg.caida.org/os/$(lsb_release -si|awk '{print tolower($0)}')/bootstrap.sh | bash
 
 sudo apt update; sudo apt-get install -y bgpstream
-
 pip3 install -r requirements.txt
+
+echo "export PATH=$PATH:/opt/bgp-monitor/bin/" >> ~/.bashrc
