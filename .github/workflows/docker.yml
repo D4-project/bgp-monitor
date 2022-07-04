@@ -27,3 +27,4 @@ jobs:
           dockerfile: ./docker/Dockerfile
           image: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor
           tags: latest
+          context: .
