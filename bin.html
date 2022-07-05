@@ -32,9 +32,7 @@
     <li><a href="#bgp-border-gateway-protocol">BGP (Border Gateway Protocol)</a></li>
     <li><a href="#bgp-messages">BGP Messages</a></li>
     <li><a href="#references-and-more-sources">References and more sources</a></li>
-  </ul></li>
-  <li><a href="#installation">Installation</a>
-  <ul>
+    <li><a href="#installation">Installation</a></li>
     <li><a href="#docker-install">Docker install</a></li>
   </ul></li>
   <li><a href="#usage">Usage</a>
@@ -162,7 +160,7 @@ Used to send error codes</li>
 
 <hr />
 
-<h1 id="installation">Installation</h1>
+<h2 id="installation">Installation</h2>
 
 <h3 id="from-source">From source</h3>
 
@@ -182,7 +180,9 @@ pip3 install -r requirements.txt
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/path/to/repo/bgp-monitor/bin/
 </code></pre></div>
 
-<h3 id="database">Database</h3>
+<ol>
+<li>Database</li>
+</ol>
 
 <p>Therefore, you can install the desired database:</p>
 
@@ -204,9 +204,23 @@ pip3 install -r requirements.txt
 
 <div class="pdoc-code codehilite"><pre><span></span><code>git clone https://github.com/D4-project/bgp-monitor.git
 docker build -f docker/Dockerfile -t bgp-monitor . <span class="c1"># Build bgp-monitor image</span>
-docker build -f docker/<span class="o">{</span>dbname<span class="o">}</span>/Dockerfile -t bgp-monitor-<span class="o">{</span>dbname<span class="o">}</span> . <span class="c1"># Generate an other image from the previous</span>
-docker run -it bgp-monitor-<span class="o">{</span>dbname<span class="o">}</span>:latest
 </code></pre></div>
+
+<h4 id="database">Database</h4>
+
+<p>You run an other docker image with pre-installed database (require bgp-monitor:latest / previous step) :</p>
+
+<div class="pdoc-code codehilite"><pre><span></span><code>docker build -f docker/<span class="o">{</span>dbname<span class="o">}</span>/Dockerfile -t bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span> . <span class="c1"># Generate an other image from the previous</span>
+docker run -it bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span>
+</code></pre></div>
+
+<p>Available dbname :</p>
+
+<ul>
+<li>kvrocks</li>
+<li>clickhouse</li>
+<li>quest</li>
+</ul>
 
 <h3 id="from-dockerhub">From DockerHub</h3>
 
@@ -215,15 +229,15 @@ docker run -it bgp-monitor-<span class="o">{</span>dbname<span class="o">}</span
 <div class="pdoc-code codehilite"><pre><span></span><code>docker run -it ustaenes/bgp-monitor:latest
 </code></pre></div>
 
-<p>:warning: Not yet available :warning:</p>
+<p>:warning: Not yet available :warning: :</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor-kvrocks:latest
+<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:kvrocks
 </code></pre></div>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor-questdb:latest
+<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:quest
 </code></pre></div>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor-clickhouse:latest
+<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:clickhouse
 </code></pre></div>
 
 <hr />
@@ -234,32 +248,32 @@ docker run -it bgp-monitor-<span class="o">{</span>dbname<span class="o">}</span
 
 <p><strong>Default</strong> stream testing (No filtering, massive print):</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py --verbose
+<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --verbose
 </code></pre></div>
 
 <p><strong>Filter ip addresses</strong> 84.205.67.0 through 84.205.67.255:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py -pf <span class="m">84</span>.205.67.0/24 --verbose
+<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py -pf <span class="m">84</span>.205.67.0/24 --verbose
 </code></pre></div>
 
 <p>You can <strong>filter many AS numbers and/or prefixes</strong> in <code>etc/filter_file.cfg.sample</code> instead of using long command line:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py --filter_file etc/filter_file.cfg.sample --verbose
+<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --filter_file etc/filter_file.cfg.sample --verbose
 </code></pre></div>
 
 <p><strong>Retrieve past records</strong> instead of live stream</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py --record --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
+<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --record --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
 </code></pre></div>
 
 <p>Specify a project / list of collectors:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py -p routeviews --collectors route-views.bdix --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
+<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py -p routeviews --collectors route-views.bdix --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
 </code></pre></div>
 
 <p><strong>Retrieve</strong> records <strong>from single file</strong> as source instead of a broker:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
 </code></pre></div>
 
 <h2 id="output">Output</h2>
