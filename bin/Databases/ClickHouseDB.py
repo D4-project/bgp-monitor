@@ -52,9 +52,10 @@ class ClickHouseDB(Database):
             "sourceasn String,"
             "prefix String,"
             "aspath String"
-            ") ENGINE = MergeTree ORDER BY (begin, prefix, aspath)"
+            ") ENGINE = MergeTree ORDER BY (time, prefix, aspath)"
             "SETTINGS old_parts_lifetime=10"
         )
+        print("created table")
 
     def stop(self):
         pass

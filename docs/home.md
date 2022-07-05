@@ -135,15 +135,15 @@ docker run -it ustaenes/bgp-monitor:latest
 :warning: Not yet available :warning:
 
 ```shell
-docker run -it ustaenes/bgp-monitor-kvrocks:latest
+docker run -it -P ustaenes/bgp-monitor-kvrocks:latest
 ```
 
 ```shell
-docker run -it ustaenes/bgp-monitor-questdb:latest
+docker run -it -P ustaenes/bgp-monitor-questdb:latest
 ```
 
 ```shell
-docker run -it ustaenes/bgp-monitor-clickhouse:latest
+docker run -it -P ustaenes/bgp-monitor-clickhouse:latest
 ```
 
 ---
