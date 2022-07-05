@@ -78,7 +78,8 @@ For more details, you can consult the following links:
 
 ---
 
-# Installation
+
+## Installation
 
 ### From source
 
@@ -99,7 +100,7 @@ chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
 export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
 ```
 
-### Database
+3. Database
 
 Therefore, you can install the desired database:
 
@@ -120,9 +121,22 @@ You can run bgp-monitor without database and run your own instance separately :
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git
 docker build -f docker/Dockerfile -t bgp-monitor . # Build bgp-monitor image
-docker build -f docker/{dbname}/Dockerfile -t bgp-monitor-{dbname} . # Generate an other image from the previous
-docker run -it bgp-monitor-{dbname}:latest
 ```
+
+#### Database
+
+You run an other docker image with pre-installed database (require bgp-monitor:latest / previous step) :
+
+```shell
+docker build -f docker/{dbname}/Dockerfile -t bgp-monitor:{dbname} . # Generate an other image from the previous
+docker run -it bgp-monitor:{dbname}
+```
+
+Available dbname :
+
+- kvrocks
+- clickhouse
+- quest
 
 ### From DockerHub
 
@@ -132,19 +146,20 @@ You can install generated images from **Dockerhub**:
 docker run -it ustaenes/bgp-monitor:latest
 ```
 
-:warning: Not yet available :warning:
+:warning: Not yet available :warning: :
 
 ```shell
-docker run -it -P ustaenes/bgp-monitor-kvrocks:latest
+docker run -it -P ustaenes/bgp-monitor:kvrocks
 ```
 
 ```shell
-docker run -it -P ustaenes/bgp-monitor-questdb:latest
+docker run -it -P ustaenes/bgp-monitor:quest
 ```
 
 ```shell
-docker run -it -P ustaenes/bgp-monitor-clickhouse:latest
+docker run -it -P ustaenes/bgp-monitor:clickhouse
 ```
+
 
 ---
 
@@ -155,37 +170,37 @@ docker run -it -P ustaenes/bgp-monitor-clickhouse:latest
 **Default** stream testing (No filtering, massive print):
 
 ```shell
-./monitor.py --verbose
+monitor.py --verbose
 ```
 
 **Filter ip addresses** 84.205.67.0 through 84.205.67.255:
 
 ```shell
-./monitor.py -pf 84.205.67.0/24 --verbose
+monitor.py -pf 84.205.67.0/24 --verbose
 ```
 
 You can **filter many AS numbers and/or prefixes** in `etc/filter_file.cfg.sample` instead of using long command line:
 
 ```shell
-./monitor.py --filter_file etc/filter_file.cfg.sample --verbose
+monitor.py --filter_file etc/filter_file.cfg.sample --verbose
 ```
 
 **Retrieve past records** instead of live stream
 
 ```shell
-./monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
+monitor.py --record --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
 ```
 
 Specify a project / list of collectors:
 
 ```shell
-./monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
+monitor.py -p routeviews --collectors route-views.bdix --start "2022-01-01 10:00:00" --stop "2022-01-01 10:10:00" --verbose
 ```
 
 **Retrieve** records **from single file** as source instead of a broker:
 
 ```shell
-./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
 ```
 
 ## Output

@@ -82,7 +82,7 @@ chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
 export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
 ```
 
-### Database
+3. Database
 
 Therefore, you can install the desired database:
 
@@ -103,9 +103,22 @@ You can run bgp-monitor without database and run your own instance separately :
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git
 docker build -f docker/Dockerfile -t bgp-monitor . # Build bgp-monitor image
-docker build -f docker/{dbname}/Dockerfile -t bgp-monitor-{dbname} . # Generate an other image from the previous
-docker run -it bgp-monitor-{dbname}:latest
 ```
+
+#### Database
+
+You run an other docker image with pre-installed database (require bgp-monitor:latest / previous step) :
+
+```shell
+docker build -f docker/{dbname}/Dockerfile -t bgp-monitor:{dbname} . # Generate an other image from the previous
+docker run -it bgp-monitor:{dbname}
+```
+
+Available dbname :
+
+- kvrocks
+- clickhouse
+- quest
 
 ### From DockerHub
 
@@ -115,18 +128,18 @@ You can install generated images from **Dockerhub**:
 docker run -it ustaenes/bgp-monitor:latest
 ```
 
-:warning: Not yet available :warning:
+:warning: Not yet available :warning: :
 
 ```shell
-docker run -it -P ustaenes/bgp-monitor-kvrocks:latest
+docker run -it -P ustaenes/bgp-monitor:kvrocks
 ```
 
 ```shell
-docker run -it -P ustaenes/bgp-monitor-questdb:latest
+docker run -it -P ustaenes/bgp-monitor:quest
 ```
 
 ```shell
-docker run -it -P ustaenes/bgp-monitor-clickhouse:latest
+docker run -it -P ustaenes/bgp-monitor:clickhouse
 ```
 
 ---
@@ -181,7 +194,7 @@ To test different filters, you can download some datasets here :
 It will be easier to work with static data instead of ris-live stream:
 
 ```shell
-./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
 ```
 
 Note that you can use options like `--json_out` (to save the output) or `--expected_result` (check if json_out is equal to the specified file)
