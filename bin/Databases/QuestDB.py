@@ -28,7 +28,7 @@ class QuestDB(Database):
     def save(self, record):
         """Save bgp record using InfluxDB Line protocol
         Args:
-            record (_type_): _description_
+            record (_type_): BGPElem
         """
 
         self.send_utf8(
@@ -36,7 +36,7 @@ class QuestDB(Database):
             f"country={record.country_code} peerasn={record.peer_asn},"
             f'peeraddress="{record.peer_address}",prefix="{record.prefix}",'
             f'aspath="{record.path}",source={record.source}'
-            f" {int(record.time*1000000000)}\n".encode()
+            f" {int(record.time*1000000000)}\n"
         )
 
     def stop(self):
