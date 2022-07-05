@@ -131,21 +131,22 @@
 </span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>            <span class="s2">&quot;sourceasn String,&quot;</span>
 </span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>            <span class="s2">&quot;prefix String,&quot;</span>
 </span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>            <span class="s2">&quot;aspath String&quot;</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>            <span class="s2">&quot;) ENGINE = MergeTree ORDER BY (begin, prefix, aspath)&quot;</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>            <span class="s2">&quot;) ENGINE = MergeTree ORDER BY (time, prefix, aspath)&quot;</span>
 </span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>            <span class="s2">&quot;SETTINGS old_parts_lifetime=10&quot;</span>
 </span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="p">)</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>        <span class="k">pass</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;created table&quot;</span><span class="p">)</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>        <span class="k">pass</span>
 </span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="c1"># client = clickhouse_driver</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="c1">#           .Client(host=&quot;localhost&quot;, password=&quot;enes57&quot;, compression=&#39;lz4&#39;)</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a><span class="c1"># client.execute(&#39;INSERT INTO bgprecords VALUES &#39;,</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="c1"># [{&#39;begin&#39;: 1653383977, &#39;end&#39;: 0, &#39;type&#39;: &#39;A&#39;, &#39;peerasn&#39;:</span>
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="c1"># e.peer_asn, &#39;collector&#39;: e.collector, &#39;prefix&#39;: e._maybe_field(&#39;prefix&#39;),</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="c1"># &#39;aspath&#39;: &quot;255126 15461 1564&quot;}])</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="c1"># client = clickhouse_driver</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="c1">#           .Client(host=&quot;localhost&quot;, password=&quot;enes57&quot;, compression=&#39;lz4&#39;)</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a><span class="c1"># client.execute(&#39;INSERT INTO bgprecords VALUES &#39;,</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a><span class="c1"># [{&#39;begin&#39;: 1653383977, &#39;end&#39;: 0, &#39;type&#39;: &#39;A&#39;, &#39;peerasn&#39;:</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a><span class="c1"># e.peer_asn, &#39;collector&#39;: e.collector, &#39;prefix&#39;: e._maybe_field(&#39;prefix&#39;),</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a><span class="c1"># &#39;aspath&#39;: &quot;255126 15461 1564&quot;}])</span>
 </span></pre></div>
 
 
@@ -211,12 +212,13 @@
 </span><span id="ClickHouseDB-53"><a href="#ClickHouseDB-53"><span class="linenos">53</span></a>            <span class="s2">&quot;sourceasn String,&quot;</span>
 </span><span id="ClickHouseDB-54"><a href="#ClickHouseDB-54"><span class="linenos">54</span></a>            <span class="s2">&quot;prefix String,&quot;</span>
 </span><span id="ClickHouseDB-55"><a href="#ClickHouseDB-55"><span class="linenos">55</span></a>            <span class="s2">&quot;aspath String&quot;</span>
-</span><span id="ClickHouseDB-56"><a href="#ClickHouseDB-56"><span class="linenos">56</span></a>            <span class="s2">&quot;) ENGINE = MergeTree ORDER BY (begin, prefix, aspath)&quot;</span>
+</span><span id="ClickHouseDB-56"><a href="#ClickHouseDB-56"><span class="linenos">56</span></a>            <span class="s2">&quot;) ENGINE = MergeTree ORDER BY (time, prefix, aspath)&quot;</span>
 </span><span id="ClickHouseDB-57"><a href="#ClickHouseDB-57"><span class="linenos">57</span></a>            <span class="s2">&quot;SETTINGS old_parts_lifetime=10&quot;</span>
 </span><span id="ClickHouseDB-58"><a href="#ClickHouseDB-58"><span class="linenos">58</span></a>        <span class="p">)</span>
-</span><span id="ClickHouseDB-59"><a href="#ClickHouseDB-59"><span class="linenos">59</span></a>
-</span><span id="ClickHouseDB-60"><a href="#ClickHouseDB-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ClickHouseDB-61"><a href="#ClickHouseDB-61"><span class="linenos">61</span></a>        <span class="k">pass</span>
+</span><span id="ClickHouseDB-59"><a href="#ClickHouseDB-59"><span class="linenos">59</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;created table&quot;</span><span class="p">)</span>
+</span><span id="ClickHouseDB-60"><a href="#ClickHouseDB-60"><span class="linenos">60</span></a>
+</span><span id="ClickHouseDB-61"><a href="#ClickHouseDB-61"><span class="linenos">61</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="ClickHouseDB-62"><a href="#ClickHouseDB-62"><span class="linenos">62</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -341,9 +343,10 @@ inheritance.</p>
 </span><span id="ClickHouseDB.start-53"><a href="#ClickHouseDB.start-53"><span class="linenos">53</span></a>            <span class="s2">&quot;sourceasn String,&quot;</span>
 </span><span id="ClickHouseDB.start-54"><a href="#ClickHouseDB.start-54"><span class="linenos">54</span></a>            <span class="s2">&quot;prefix String,&quot;</span>
 </span><span id="ClickHouseDB.start-55"><a href="#ClickHouseDB.start-55"><span class="linenos">55</span></a>            <span class="s2">&quot;aspath String&quot;</span>
-</span><span id="ClickHouseDB.start-56"><a href="#ClickHouseDB.start-56"><span class="linenos">56</span></a>            <span class="s2">&quot;) ENGINE = MergeTree ORDER BY (begin, prefix, aspath)&quot;</span>
+</span><span id="ClickHouseDB.start-56"><a href="#ClickHouseDB.start-56"><span class="linenos">56</span></a>            <span class="s2">&quot;) ENGINE = MergeTree ORDER BY (time, prefix, aspath)&quot;</span>
 </span><span id="ClickHouseDB.start-57"><a href="#ClickHouseDB.start-57"><span class="linenos">57</span></a>            <span class="s2">&quot;SETTINGS old_parts_lifetime=10&quot;</span>
 </span><span id="ClickHouseDB.start-58"><a href="#ClickHouseDB.start-58"><span class="linenos">58</span></a>        <span class="p">)</span>
+</span><span id="ClickHouseDB.start-59"><a href="#ClickHouseDB.start-59"><span class="linenos">59</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;created table&quot;</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -361,8 +364,8 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#ClickHouseDB.stop"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ClickHouseDB.stop-60"><a href="#ClickHouseDB.stop-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ClickHouseDB.stop-61"><a href="#ClickHouseDB.stop-61"><span class="linenos">61</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ClickHouseDB.stop-61"><a href="#ClickHouseDB.stop-61"><span class="linenos">61</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="ClickHouseDB.stop-62"><a href="#ClickHouseDB.stop-62"><span class="linenos">62</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
