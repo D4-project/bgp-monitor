@@ -36,11 +36,3 @@ jobs:
           push: true
           dockerfile: ./docker/${{ matrix.database }}/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:${{ matrix.database }}
-      - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor
-          readme-filepath: ${{ github.workspace }}/README.md
-          short-description: ${{ github.event.repository.description }}
