@@ -32,4 +32,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor
-          readme-filepath: $GITHUB_WORKSPACE/README.md
+          run: ls -latr
