@@ -7,6 +7,9 @@ on:
       - main
 jobs:
   docker:
+    strategy:
+      matrix:
+        database: [kvrocks, quest, clickhouse]
     runs-on: ubuntu-20.04
     environment:
       name: Docker
@@ -26,10 +29,17 @@ jobs:
           push: true
           dockerfile: ./docker/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:latest
+      - name: Databases - Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          dockerfile: ./docker/${{ matrix.database }}/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:${{ matrix.database }}
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor
-          run: ls -latr
+          readme-filepath: ${{ github.workspace }}/README.md
+          short-description: ${{ github.event.repository.description }}
