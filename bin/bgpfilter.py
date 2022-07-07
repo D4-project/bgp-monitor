@@ -474,17 +474,23 @@ class BGPFilter:
 
         self.out.start()
 
-        for e in self._stream:
-            if e.type not in ["A", "R", "W"]:  # Keep updates only
-                continue
+        try:
+            for e in self._stream.records():
+                if e.type not in ["A", "R", "W"]:  # Keep updates only
+                    continue
 
-            e.prefix = e._maybe_field("prefix")
-            e.country_code = self.__country_by_prefix(e.prefix) or ""
-            e.path = e._maybe_field("as-path")
-            e.source = e.path.split()[-1] if e.path is not None else ""
+                e.prefix = e._maybe_field("prefix")
+                e.country_code = self.__country_by_prefix(e.prefix) or ""
+                e.path = e._maybe_field("as-path")
+                e.source = e.path.split()[-1] if e.path is not None else ""
 
-            if self.__check_country(e):
-                self.out.input_data(e)
+                if self.__check_country(e):
+                    self.out.input_data(e)
+        except RuntimeError:
+            print(e)
+            print(e.status)
+            exit(0)
+        
 
     def stop(self):
         """
