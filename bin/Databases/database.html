@@ -102,62 +102,65 @@
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="nd">@abstractmethod</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="n">match_type</span><span class="o">=</span><span class="s2">&quot;more&quot;</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="n">time_start</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="n">time_end</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="n">record_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>        <span class="n">peer_asn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="n">collectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="n">countries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="p">):</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="k">pass</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>        <span class="k">pass</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>        <span class="k">pass</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="k">pass</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="k">class</span> <span class="nc">BGPDatabases</span><span class="p">:</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_conf</span><span class="o">=</span><span class="p">[]):</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="n">database_conf</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="nd">@property</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">        List of databases classes.</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">        A class is loaded if it inherits from `Database`</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="sd">        and parameters are given in config.cfg&quot;&quot;&quot;</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="nd">@databases</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>            <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>                <span class="k">for</span> <span class="n">db_class</span> <span class="ow">in</span> <span class="n">Database</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>                    <span class="k">if</span> <span class="n">db_class</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">db</span><span class="p">:</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_class</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">db</span><span class="p">]))</span>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>        <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="n">as_paths</span><span class="o">=</span><span class="kc">None</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="p">):</span> 
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="k">pass</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="k">pass</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>        <span class="k">pass</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="k">pass</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="k">class</span> <span class="nc">BGPDatabases</span><span class="p">:</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_conf</span><span class="o">=</span><span class="p">[]):</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="n">database_conf</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="nd">@property</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="sd">        List of databases classes.</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">        A class is loaded if it inherits from `Database`</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a><span class="sd">        and parameters are given in config.cfg&quot;&quot;&quot;</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="nd">@databases</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>            <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>                <span class="k">for</span> <span class="n">db_class</span> <span class="ow">in</span> <span class="n">Database</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>                    <span class="k">if</span> <span class="n">db_class</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">db</span><span class="p">:</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_class</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">db</span><span class="p">]))</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -180,26 +183,29 @@
 </span><span id="Database-9"><a href="#Database-9"><span class="linenos"> 9</span></a>    <span class="nd">@abstractmethod</span>
 </span><span id="Database-10"><a href="#Database-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
 </span><span id="Database-11"><a href="#Database-11"><span class="linenos">11</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="Database-12"><a href="#Database-12"><span class="linenos">12</span></a>        <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database-13"><a href="#Database-13"><span class="linenos">13</span></a>        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database-14"><a href="#Database-14"><span class="linenos">14</span></a>        <span class="n">match_type</span><span class="o">=</span><span class="s2">&quot;more&quot;</span><span class="p">,</span>
-</span><span id="Database-15"><a href="#Database-15"><span class="linenos">15</span></a>        <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database-16"><a href="#Database-16"><span class="linenos">16</span></a>        <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database-12"><a href="#Database-12"><span class="linenos">12</span></a>        <span class="n">time_start</span><span class="p">,</span>
+</span><span id="Database-13"><a href="#Database-13"><span class="linenos">13</span></a>        <span class="n">time_end</span><span class="p">,</span>
+</span><span id="Database-14"><a href="#Database-14"><span class="linenos">14</span></a>        <span class="n">record_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database-15"><a href="#Database-15"><span class="linenos">15</span></a>        <span class="n">peer_asn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database-16"><a href="#Database-16"><span class="linenos">16</span></a>        <span class="n">collectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="Database-17"><a href="#Database-17"><span class="linenos">17</span></a>        <span class="n">countries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database-18"><a href="#Database-18"><span class="linenos">18</span></a>    <span class="p">):</span>
-</span><span id="Database-19"><a href="#Database-19"><span class="linenos">19</span></a>        <span class="k">pass</span>
-</span><span id="Database-20"><a href="#Database-20"><span class="linenos">20</span></a>
-</span><span id="Database-21"><a href="#Database-21"><span class="linenos">21</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Database-22"><a href="#Database-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
-</span><span id="Database-23"><a href="#Database-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
-</span><span id="Database-24"><a href="#Database-24"><span class="linenos">24</span></a>
-</span><span id="Database-25"><a href="#Database-25"><span class="linenos">25</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Database-26"><a href="#Database-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Database-27"><a href="#Database-27"><span class="linenos">27</span></a>        <span class="k">pass</span>
-</span><span id="Database-28"><a href="#Database-28"><span class="linenos">28</span></a>
-</span><span id="Database-29"><a href="#Database-29"><span class="linenos">29</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Database-30"><a href="#Database-30"><span class="linenos">30</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Database-31"><a href="#Database-31"><span class="linenos">31</span></a>        <span class="k">pass</span>
+</span><span id="Database-18"><a href="#Database-18"><span class="linenos">18</span></a>        <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database-19"><a href="#Database-19"><span class="linenos">19</span></a>        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database-20"><a href="#Database-20"><span class="linenos">20</span></a>        <span class="n">as_paths</span><span class="o">=</span><span class="kc">None</span>
+</span><span id="Database-21"><a href="#Database-21"><span class="linenos">21</span></a>    <span class="p">):</span> 
+</span><span id="Database-22"><a href="#Database-22"><span class="linenos">22</span></a>        <span class="k">pass</span>
+</span><span id="Database-23"><a href="#Database-23"><span class="linenos">23</span></a>
+</span><span id="Database-24"><a href="#Database-24"><span class="linenos">24</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Database-25"><a href="#Database-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+</span><span id="Database-26"><a href="#Database-26"><span class="linenos">26</span></a>        <span class="k">pass</span>
+</span><span id="Database-27"><a href="#Database-27"><span class="linenos">27</span></a>
+</span><span id="Database-28"><a href="#Database-28"><span class="linenos">28</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Database-29"><a href="#Database-29"><span class="linenos">29</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Database-30"><a href="#Database-30"><span class="linenos">30</span></a>        <span class="k">pass</span>
+</span><span id="Database-31"><a href="#Database-31"><span class="linenos">31</span></a>
+</span><span id="Database-32"><a href="#Database-32"><span class="linenos">32</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Database-33"><a href="#Database-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Database-34"><a href="#Database-34"><span class="linenos">34</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -214,7 +220,7 @@ inheritance.</p>
                     <div class="decorator">@abstractmethod</div>
 
         <span class="def">def</span>
-        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">match_type</span><span class="o">=</span><span class="s1">&#39;more&#39;</span>,</span><span class="param">	<span class="n">start_time</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">end_time</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">countries</span><span class="o">=</span><span class="kc">None</span></span>)</span>
+        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">time_start</span>,</span><span class="param">	<span class="n">time_end</span>,</span><span class="param">	<span class="n">record_type</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">peer_asn</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">collectors</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">countries</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">as_paths</span><span class="o">=</span><span class="kc">None</span></span>)</span>
 
                 <label class="view-source-button" for="Database.get-view-source"><span>View Source</span></label>
 
@@ -223,14 +229,17 @@ inheritance.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Database.get-9"><a href="#Database.get-9"><span class="linenos"> 9</span></a>    <span class="nd">@abstractmethod</span>
 </span><span id="Database.get-10"><a href="#Database.get-10"><span class="linenos">10</span></a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span>
 </span><span id="Database.get-11"><a href="#Database.get-11"><span class="linenos">11</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="Database.get-12"><a href="#Database.get-12"><span class="linenos">12</span></a>        <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database.get-13"><a href="#Database.get-13"><span class="linenos">13</span></a>        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database.get-14"><a href="#Database.get-14"><span class="linenos">14</span></a>        <span class="n">match_type</span><span class="o">=</span><span class="s2">&quot;more&quot;</span><span class="p">,</span>
-</span><span id="Database.get-15"><a href="#Database.get-15"><span class="linenos">15</span></a>        <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database.get-16"><a href="#Database.get-16"><span class="linenos">16</span></a>        <span class="n">end_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database.get-12"><a href="#Database.get-12"><span class="linenos">12</span></a>        <span class="n">time_start</span><span class="p">,</span>
+</span><span id="Database.get-13"><a href="#Database.get-13"><span class="linenos">13</span></a>        <span class="n">time_end</span><span class="p">,</span>
+</span><span id="Database.get-14"><a href="#Database.get-14"><span class="linenos">14</span></a>        <span class="n">record_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database.get-15"><a href="#Database.get-15"><span class="linenos">15</span></a>        <span class="n">peer_asn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database.get-16"><a href="#Database.get-16"><span class="linenos">16</span></a>        <span class="n">collectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 </span><span id="Database.get-17"><a href="#Database.get-17"><span class="linenos">17</span></a>        <span class="n">countries</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-</span><span id="Database.get-18"><a href="#Database.get-18"><span class="linenos">18</span></a>    <span class="p">):</span>
-</span><span id="Database.get-19"><a href="#Database.get-19"><span class="linenos">19</span></a>        <span class="k">pass</span>
+</span><span id="Database.get-18"><a href="#Database.get-18"><span class="linenos">18</span></a>        <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database.get-19"><a href="#Database.get-19"><span class="linenos">19</span></a>        <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+</span><span id="Database.get-20"><a href="#Database.get-20"><span class="linenos">20</span></a>        <span class="n">as_paths</span><span class="o">=</span><span class="kc">None</span>
+</span><span id="Database.get-21"><a href="#Database.get-21"><span class="linenos">21</span></a>    <span class="p">):</span> 
+</span><span id="Database.get-22"><a href="#Database.get-22"><span class="linenos">22</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -249,9 +258,9 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#Database.save"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Database.save-21"><a href="#Database.save-21"><span class="linenos">21</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Database.save-22"><a href="#Database.save-22"><span class="linenos">22</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
-</span><span id="Database.save-23"><a href="#Database.save-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Database.save-24"><a href="#Database.save-24"><span class="linenos">24</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Database.save-25"><a href="#Database.save-25"><span class="linenos">25</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+</span><span id="Database.save-26"><a href="#Database.save-26"><span class="linenos">26</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -270,9 +279,9 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#Database.start"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Database.start-25"><a href="#Database.start-25"><span class="linenos">25</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Database.start-26"><a href="#Database.start-26"><span class="linenos">26</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Database.start-27"><a href="#Database.start-27"><span class="linenos">27</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Database.start-28"><a href="#Database.start-28"><span class="linenos">28</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Database.start-29"><a href="#Database.start-29"><span class="linenos">29</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Database.start-30"><a href="#Database.start-30"><span class="linenos">30</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -291,9 +300,9 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#Database.stop"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Database.stop-29"><a href="#Database.stop-29"><span class="linenos">29</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="Database.stop-30"><a href="#Database.stop-30"><span class="linenos">30</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Database.stop-31"><a href="#Database.stop-31"><span class="linenos">31</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Database.stop-32"><a href="#Database.stop-32"><span class="linenos">32</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="Database.stop-33"><a href="#Database.stop-33"><span class="linenos">33</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Database.stop-34"><a href="#Database.stop-34"><span class="linenos">34</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
@@ -312,40 +321,40 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#BGPDatabases"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases-34"><a href="#BGPDatabases-34"><span class="linenos">34</span></a><span class="k">class</span> <span class="nc">BGPDatabases</span><span class="p">:</span>
-</span><span id="BGPDatabases-35"><a href="#BGPDatabases-35"><span class="linenos">35</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_conf</span><span class="o">=</span><span class="p">[]):</span>
-</span><span id="BGPDatabases-36"><a href="#BGPDatabases-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="BGPDatabases-37"><a href="#BGPDatabases-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="n">database_conf</span>
-</span><span id="BGPDatabases-38"><a href="#BGPDatabases-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="BGPDatabases-39"><a href="#BGPDatabases-39"><span class="linenos">39</span></a>
-</span><span id="BGPDatabases-40"><a href="#BGPDatabases-40"><span class="linenos">40</span></a>    <span class="nd">@property</span>
-</span><span id="BGPDatabases-41"><a href="#BGPDatabases-41"><span class="linenos">41</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-</span><span id="BGPDatabases-42"><a href="#BGPDatabases-42"><span class="linenos">42</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="BGPDatabases-43"><a href="#BGPDatabases-43"><span class="linenos">43</span></a><span class="sd">        List of databases classes.</span>
-</span><span id="BGPDatabases-44"><a href="#BGPDatabases-44"><span class="linenos">44</span></a>
-</span><span id="BGPDatabases-45"><a href="#BGPDatabases-45"><span class="linenos">45</span></a><span class="sd">        A class is loaded if it inherits from `Database`</span>
-</span><span id="BGPDatabases-46"><a href="#BGPDatabases-46"><span class="linenos">46</span></a><span class="sd">        and parameters are given in config.cfg&quot;&quot;&quot;</span>
-</span><span id="BGPDatabases-47"><a href="#BGPDatabases-47"><span class="linenos">47</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span>
-</span><span id="BGPDatabases-48"><a href="#BGPDatabases-48"><span class="linenos">48</span></a>
-</span><span id="BGPDatabases-49"><a href="#BGPDatabases-49"><span class="linenos">49</span></a>    <span class="nd">@databases</span><span class="o">.</span><span class="n">setter</span>
-</span><span id="BGPDatabases-50"><a href="#BGPDatabases-50"><span class="linenos">50</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-</span><span id="BGPDatabases-51"><a href="#BGPDatabases-51"><span class="linenos">51</span></a>        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="BGPDatabases-52"><a href="#BGPDatabases-52"><span class="linenos">52</span></a>            <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-</span><span id="BGPDatabases-53"><a href="#BGPDatabases-53"><span class="linenos">53</span></a>                <span class="k">for</span> <span class="n">db_class</span> <span class="ow">in</span> <span class="n">Database</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
-</span><span id="BGPDatabases-54"><a href="#BGPDatabases-54"><span class="linenos">54</span></a>                    <span class="k">if</span> <span class="n">db_class</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">db</span><span class="p">:</span>
-</span><span id="BGPDatabases-55"><a href="#BGPDatabases-55"><span class="linenos">55</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_class</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">db</span><span class="p">]))</span>
-</span><span id="BGPDatabases-56"><a href="#BGPDatabases-56"><span class="linenos">56</span></a>
-</span><span id="BGPDatabases-57"><a href="#BGPDatabases-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
-</span><span id="BGPDatabases-58"><a href="#BGPDatabases-58"><span class="linenos">58</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="BGPDatabases-59"><a href="#BGPDatabases-59"><span class="linenos">59</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
-</span><span id="BGPDatabases-60"><a href="#BGPDatabases-60"><span class="linenos">60</span></a>
-</span><span id="BGPDatabases-61"><a href="#BGPDatabases-61"><span class="linenos">61</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="BGPDatabases-62"><a href="#BGPDatabases-62"><span class="linenos">62</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="BGPDatabases-63"><a href="#BGPDatabases-63"><span class="linenos">63</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-</span><span id="BGPDatabases-64"><a href="#BGPDatabases-64"><span class="linenos">64</span></a>
-</span><span id="BGPDatabases-65"><a href="#BGPDatabases-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="BGPDatabases-66"><a href="#BGPDatabases-66"><span class="linenos">66</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="BGPDatabases-67"><a href="#BGPDatabases-67"><span class="linenos">67</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases-37"><a href="#BGPDatabases-37"><span class="linenos">37</span></a><span class="k">class</span> <span class="nc">BGPDatabases</span><span class="p">:</span>
+</span><span id="BGPDatabases-38"><a href="#BGPDatabases-38"><span class="linenos">38</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_conf</span><span class="o">=</span><span class="p">[]):</span>
+</span><span id="BGPDatabases-39"><a href="#BGPDatabases-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="BGPDatabases-40"><a href="#BGPDatabases-40"><span class="linenos">40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="n">database_conf</span>
+</span><span id="BGPDatabases-41"><a href="#BGPDatabases-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="BGPDatabases-42"><a href="#BGPDatabases-42"><span class="linenos">42</span></a>
+</span><span id="BGPDatabases-43"><a href="#BGPDatabases-43"><span class="linenos">43</span></a>    <span class="nd">@property</span>
+</span><span id="BGPDatabases-44"><a href="#BGPDatabases-44"><span class="linenos">44</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+</span><span id="BGPDatabases-45"><a href="#BGPDatabases-45"><span class="linenos">45</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BGPDatabases-46"><a href="#BGPDatabases-46"><span class="linenos">46</span></a><span class="sd">        List of databases classes.</span>
+</span><span id="BGPDatabases-47"><a href="#BGPDatabases-47"><span class="linenos">47</span></a>
+</span><span id="BGPDatabases-48"><a href="#BGPDatabases-48"><span class="linenos">48</span></a><span class="sd">        A class is loaded if it inherits from `Database`</span>
+</span><span id="BGPDatabases-49"><a href="#BGPDatabases-49"><span class="linenos">49</span></a><span class="sd">        and parameters are given in config.cfg&quot;&quot;&quot;</span>
+</span><span id="BGPDatabases-50"><a href="#BGPDatabases-50"><span class="linenos">50</span></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span>
+</span><span id="BGPDatabases-51"><a href="#BGPDatabases-51"><span class="linenos">51</span></a>
+</span><span id="BGPDatabases-52"><a href="#BGPDatabases-52"><span class="linenos">52</span></a>    <span class="nd">@databases</span><span class="o">.</span><span class="n">setter</span>
+</span><span id="BGPDatabases-53"><a href="#BGPDatabases-53"><span class="linenos">53</span></a>    <span class="k">def</span> <span class="nf">databases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+</span><span id="BGPDatabases-54"><a href="#BGPDatabases-54"><span class="linenos">54</span></a>        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="BGPDatabases-55"><a href="#BGPDatabases-55"><span class="linenos">55</span></a>            <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+</span><span id="BGPDatabases-56"><a href="#BGPDatabases-56"><span class="linenos">56</span></a>                <span class="k">for</span> <span class="n">db_class</span> <span class="ow">in</span> <span class="n">Database</span><span class="o">.</span><span class="n">__subclasses__</span><span class="p">():</span>
+</span><span id="BGPDatabases-57"><a href="#BGPDatabases-57"><span class="linenos">57</span></a>                    <span class="k">if</span> <span class="n">db_class</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">db</span><span class="p">:</span>
+</span><span id="BGPDatabases-58"><a href="#BGPDatabases-58"><span class="linenos">58</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_class</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="n">db</span><span class="p">]))</span>
+</span><span id="BGPDatabases-59"><a href="#BGPDatabases-59"><span class="linenos">59</span></a>
+</span><span id="BGPDatabases-60"><a href="#BGPDatabases-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+</span><span id="BGPDatabases-61"><a href="#BGPDatabases-61"><span class="linenos">61</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="BGPDatabases-62"><a href="#BGPDatabases-62"><span class="linenos">62</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</span><span id="BGPDatabases-63"><a href="#BGPDatabases-63"><span class="linenos">63</span></a>
+</span><span id="BGPDatabases-64"><a href="#BGPDatabases-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="BGPDatabases-65"><a href="#BGPDatabases-65"><span class="linenos">65</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="BGPDatabases-66"><a href="#BGPDatabases-66"><span class="linenos">66</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</span><span id="BGPDatabases-67"><a href="#BGPDatabases-67"><span class="linenos">67</span></a>
+</span><span id="BGPDatabases-68"><a href="#BGPDatabases-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="BGPDatabases-69"><a href="#BGPDatabases-69"><span class="linenos">69</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="BGPDatabases-70"><a href="#BGPDatabases-70"><span class="linenos">70</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -361,10 +370,10 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#BGPDatabases.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.__init__-35"><a href="#BGPDatabases.__init__-35"><span class="linenos">35</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_conf</span><span class="o">=</span><span class="p">[]):</span>
-</span><span id="BGPDatabases.__init__-36"><a href="#BGPDatabases.__init__-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="BGPDatabases.__init__-37"><a href="#BGPDatabases.__init__-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="n">database_conf</span>
-</span><span id="BGPDatabases.__init__-38"><a href="#BGPDatabases.__init__-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.__init__-38"><a href="#BGPDatabases.__init__-38"><span class="linenos">38</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">database_conf</span><span class="o">=</span><span class="p">[]):</span>
+</span><span id="BGPDatabases.__init__-39"><a href="#BGPDatabases.__init__-39"><span class="linenos">39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="BGPDatabases.__init__-40"><a href="#BGPDatabases.__init__-40"><span class="linenos">40</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span> <span class="o">=</span> <span class="n">database_conf</span>
+</span><span id="BGPDatabases.__init__-41"><a href="#BGPDatabases.__init__-41"><span class="linenos">41</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -398,9 +407,9 @@ and parameters are given in config.cfg</p>
 
     </div>
     <a class="headerlink" href="#BGPDatabases.save"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.save-57"><a href="#BGPDatabases.save-57"><span class="linenos">57</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
-</span><span id="BGPDatabases.save-58"><a href="#BGPDatabases.save-58"><span class="linenos">58</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="BGPDatabases.save-59"><a href="#BGPDatabases.save-59"><span class="linenos">59</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.save-60"><a href="#BGPDatabases.save-60"><span class="linenos">60</span></a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+</span><span id="BGPDatabases.save-61"><a href="#BGPDatabases.save-61"><span class="linenos">61</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="BGPDatabases.save-62"><a href="#BGPDatabases.save-62"><span class="linenos">62</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -418,9 +427,9 @@ and parameters are given in config.cfg</p>
 
     </div>
     <a class="headerlink" href="#BGPDatabases.start"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.start-61"><a href="#BGPDatabases.start-61"><span class="linenos">61</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="BGPDatabases.start-62"><a href="#BGPDatabases.start-62"><span class="linenos">62</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="BGPDatabases.start-63"><a href="#BGPDatabases.start-63"><span class="linenos">63</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.start-64"><a href="#BGPDatabases.start-64"><span class="linenos">64</span></a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="BGPDatabases.start-65"><a href="#BGPDatabases.start-65"><span class="linenos">65</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="BGPDatabases.start-66"><a href="#BGPDatabases.start-66"><span class="linenos">66</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -438,9 +447,9 @@ and parameters are given in config.cfg</p>
 
     </div>
     <a class="headerlink" href="#BGPDatabases.stop"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.stop-65"><a href="#BGPDatabases.stop-65"><span class="linenos">65</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="BGPDatabases.stop-66"><a href="#BGPDatabases.stop-66"><span class="linenos">66</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
-</span><span id="BGPDatabases.stop-67"><a href="#BGPDatabases.stop-67"><span class="linenos">67</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPDatabases.stop-68"><a href="#BGPDatabases.stop-68"><span class="linenos">68</span></a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="BGPDatabases.stop-69"><a href="#BGPDatabases.stop-69"><span class="linenos">69</span></a>        <span class="k">for</span> <span class="n">db</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__databases</span><span class="p">:</span>
+</span><span id="BGPDatabases.stop-70"><a href="#BGPDatabases.stop-70"><span class="linenos">70</span></a>            <span class="n">db</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 </span></pre></div>
 
 
