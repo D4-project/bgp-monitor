@@ -1,25 +1,50 @@
+import collections
 from Databases.database import Database
 from clickhouse_driver import Client
 
 
 class ClickHouseDB(Database):
     name = "clickhouse"
-
+    
+    var_names = {
+        'time_start': 'time_start',
+        'time_end': 'time_end',
+        'record_type': 'type',
+        'peer_asn': 'peerasn',
+        'collectors': "collector",
+        'countries': 'country',
+        'as_numbers': 'sourceasn',
+        'prefixes': 'prefix',
+        'as_paths': 'aspath'
+    }
     def __init__(self, config):
         super().__init__()
-        self.client = Client(host=config["host"])
+        self.client = Client(host=config["host"], port= config["port"])
 
     def get(
         self,
+        time_start,
+        time_end,
+        record_type=None,
+        peer_asn=None,
+        collectors=None,
+        countries=None,
         as_numbers=None,
         prefixes=None,
-        match_type="more",
-        start_time=None,
-        end_time=None,
-        countries=None,
-    ):
-        res = self.client.execute_iter("SELECT * FROM bgp")
-        return res
+        as_paths=None
+    ): 
+        query = 'SELECT * FROM bgp'
+        params = { key: value for key, value in locals() if value is not None }
+        
+        if len(params) > 0 :
+            query += ' WHERE'
+            for k, v in params:
+                query += f" %({ClickHouseDB.var_names[k]}) "+("IN " if isinstance(v, collections.Sequence) else "== ") + f"%({k}) and"
+            query+= query.rsplit(' ', 1)[0]
+
+
+
+        return self.client.execute_iter(query, params)
 
     def save(self, record):
         self.client.execute(

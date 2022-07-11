@@ -8,13 +8,16 @@ class Database(ABC):
     @abstractmethod
     def get(
         self,
+        time_start,
+        time_end,
+        record_type=None,
+        peer_asn=None,
+        collectors=None,
+        countries=None,
         as_numbers=None,
         prefixes=None,
-        match_type="more",
-        start_time=None,
-        end_time=None,
-        countries=None,
-    ):
+        as_paths=None
+    ): 
         pass
 
     @abstractmethod
