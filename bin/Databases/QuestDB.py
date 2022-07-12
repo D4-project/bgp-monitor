@@ -21,7 +21,7 @@ class QuestDB(Database):
         countries=None,
         as_numbers=None,
         prefixes=None,
-        as_paths=None
+        as_paths=None,
     ):
         super().get()
         pass

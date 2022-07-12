@@ -25,8 +25,8 @@ class KvrocksDB(Database):
         countries=None,
         as_numbers=None,
         prefixes=None,
-        as_paths=None
-    ): 
+        as_paths=None,
+    ):
         """Can't be tested now"""
 
         pass

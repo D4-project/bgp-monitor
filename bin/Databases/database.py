@@ -16,8 +16,8 @@ class Database(ABC):
         countries=None,
         as_numbers=None,
         prefixes=None,
-        as_paths=None
-    ): 
+        as_paths=None,
+    ):
         pass
 
     @abstractmethod

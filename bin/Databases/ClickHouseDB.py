@@ -5,21 +5,22 @@ from clickhouse_driver import Client
 
 class ClickHouseDB(Database):
     name = "clickhouse"
-    
+
     var_names = {
-        'time_start': 'time_start',
-        'time_end': 'time_end',
-        'record_type': 'type',
-        'peer_asn': 'peerasn',
-        'collectors': "collector",
-        'countries': 'country',
-        'as_numbers': 'sourceasn',
-        'prefixes': 'prefix',
-        'as_paths': 'aspath'
+        "time_start": "time_start",
+        "time_end": "time_end",
+        "record_type": "type",
+        "peer_asn": "peerasn",
+        "collectors": "collector",
+        "countries": "country",
+        "as_numbers": "sourceasn",
+        "prefixes": "prefix",
+        "as_paths": "aspath",
     }
+
     def __init__(self, config):
         super().__init__()
-        self.client = Client(host=config["host"], port= config["port"])
+        self.client = Client(host=config["host"], port=int(config["port"]))
 
     def get(
         self,
@@ -31,19 +32,19 @@ class ClickHouseDB(Database):
         countries=None,
         as_numbers=None,
         prefixes=None,
-        as_paths=None
-    ): 
-        query = 'SELECT * FROM bgp'
-        params = { key: value for key, value in locals() if value is not None }
-        
-        if len(params) > 0 :
-            query += ' WHERE'
+        as_paths=None,
+    ):
+        query = "SELECT * FROM bgp WHERE"
+        params = {key: value for key, value in locals() if value is not None}
+
+        if len(params) > 0:
             for k, v in params:
-                query += f" %({ClickHouseDB.var_names[k]}) "+("IN " if isinstance(v, collections.Sequence) else "== ") + f"%({k}) and"
-            query+= query.rsplit(' ', 1)[0]
-
-
-
+                query += (
+                    f" %({ClickHouseDB.var_names[k]}) "
+                    + ("IN " if isinstance(v, collections.Sequence) else "== ")
+                    + f"%({k}) and"
+                )
+            query += query.rsplit(" ", 1)[0]
         return self.client.execute_iter(query, params)
 
     def save(self, record):
@@ -80,7 +81,7 @@ class ClickHouseDB(Database):
             ") ENGINE = MergeTree ORDER BY (time, prefix, aspath)"
             "SETTINGS old_parts_lifetime=10"
         )
-        print("created table")
+        print("Created table")
 
     def stop(self):
         pass

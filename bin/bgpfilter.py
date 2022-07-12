@@ -247,11 +247,7 @@ class BGPFilter:
             raise ValueError("Input file type must be rib or upd")
         if record_type == "rib" and file_format in ["mrt", "bmp"]:
             raise ValueError("Accepted input format types for rib : mrt, bmp")
-        elif record_type == "upd" and file_format not in [
-            "mrt",
-            "bmp",
-            "ris-live",
-        ]:
+        elif record_type == "upd" and file_format not in ["mrt", "bmp", "ris-live"]:
             raise ValueError(
                 "Accepted input format types for upd : mrt, bmp or ris-live"
             )
@@ -447,9 +443,7 @@ class BGPFilter:
 
         if self.__prefix_match_type_filter is not None:
             self._stream._maybe_add_filter(
-                "prefix-" + self.__prefix_match_type_filter,
-                None,
-                self.__prefix_filter,
+                "prefix-" + self.__prefix_match_type_filter, None, self.__prefix_filter
             )
 
         print("Starting")
@@ -475,7 +469,7 @@ class BGPFilter:
         self.out.start()
 
         try:
-            for e in self._stream.records():
+            for e in self._stream:
                 if e.type not in ["A", "R", "W"]:  # Keep updates only
                     continue
 
@@ -490,7 +484,6 @@ class BGPFilter:
             print(e)
             print(e.status)
             exit(0)
-        
 
     def stop(self):
         """

@@ -174,9 +174,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--queue",
-        action="store_true",
-        help="Enable queue option. Use a lot of memory",
+        "--queue", action="store_true", help="Enable queue option. Use a lot of memory"
     )
 
     parser.add_argument(

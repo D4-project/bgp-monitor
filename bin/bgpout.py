@@ -100,9 +100,7 @@ class BGPOut:
         self.isStarted = True
         if self.__queue:
             threading.Thread(
-                target=self.__process_queue,
-                daemon=True,
-                name="BGP monitor out",
+                target=self.__process_queue, daemon=True, name="BGP monitor out"
             ).start()
 
     def stop(self):
