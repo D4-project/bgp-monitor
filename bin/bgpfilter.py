@@ -19,20 +19,23 @@ import json
 
 from bgpout import BGPOut
 
+
 def get_collectors():
     """Query the BGPStream broker and identify the collectors that are available"""
     data = json.load(urllib_request.urlopen(COLLECTORS_URL))
     result = dict((x, []) for x in PROJECTS)
-    for coll in data['data']['collectors']:
-        p = data['data']['collectors'][coll]['project']
+    for coll in data["data"]["collectors"]:
+        p = data["data"]["collectors"][coll]["project"]
         if p in PROJECTS:
             result[p].append(coll)
     return result
+
 
 PROJECT_TYPES = {"ris": "ris-live", "routeviews": "routeviews-stream"}
 PROJECTS = [i for i in PROJECT_TYPES.keys()]
 COLLECTORS_URL = "http://bgpstream.caida.org/broker/meta/collectors"
 COLLECTORS = get_collectors()
+
 
 class BGPFilter:
     """
