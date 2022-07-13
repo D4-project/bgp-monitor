@@ -8,86 +8,31 @@ __all__ = ["BGPFilter"]
 import ipaddress
 import os
 import re
+from time import time
 import maxminddb
 import pycountry
 import pybgpstream
 from datetime import datetime
 from typing import List, Tuple
+import urllib.request as urllib_request
+import json
 
 from bgpout import BGPOut
 
-collectors_list = {
-    "routeviews": [
-        "route-views.amsix",
-        "route-views.bdix",
-        "route-views.bknix",
-        "route-views.chicago",
-        "route-views.chile",
-        "route-views.eqix",
-        "route-views.flix",
-        "route-views.fortaleza",
-        "route-views.gixa",
-        "route-views.gorex",
-        "route-views.isc",
-        "route-views.jinx",
-        "route-views.kixp",
-        "route-views.linx",
-        "route-views.mwix",
-        "route-views.napafrica",
-        "route-views.nwax",
-        "route-views.ny",
-        "route-views.perth",
-        "route-views.peru",
-        "route-views.phoix",
-        "route-views.rio",
-        "route-views.saopaulo",
-        "route-views.sfmix",
-        "route-views.sg",
-        "route-views.siex",
-        "route-views.soxrs",
-        "route-views.sydney",
-        "route-views.telxatl",
-        "route-views.uaeix",
-        "route-views.wide",
-        "route-views2",
-        "route-views2.saopaulo",
-        "route-views3",
-        "route-views4",
-        "route-views5",
-        "route-views6",
-    ],
-    "ris": [
-        "rrc00",
-        "rrc01",
-        "rrc02",
-        "rrc03",
-        "rrc04",
-        "rrc05",
-        "rrc06",
-        "rrc07",
-        "rrc08",
-        "rrc09",
-        "rrc10",
-        "rrc11",
-        "rrc12",
-        "rrc13",
-        "rrc14",
-        "rrc15",
-        "rrc16",
-        "rrc18",
-        "rrc19",
-        "rrc20",
-        "rrc21",
-        "rrc22",
-        "rrc23",
-        "rrc24",
-        "rrc25",
-        "rrc26",
-    ],
-}
-""" Collector list"""
-project_types = {"ris": "ris-live", "routeviews": "routeviews-stream"}
+def get_collectors():
+    """Query the BGPStream broker and identify the collectors that are available"""
+    data = json.load(urllib_request.urlopen(COLLECTORS_URL))
+    result = dict((x, []) for x in PROJECTS)
+    for coll in data['data']['collectors']:
+        p = data['data']['collectors'][coll]['project']
+        if p in PROJECTS:
+            result[p].append(coll)
+    return result
 
+PROJECT_TYPES = {"ris": "ris-live", "routeviews": "routeviews-stream"}
+PROJECTS = [i for i in PROJECT_TYPES.keys()]
+COLLECTORS_URL = "http://bgpstream.caida.org/broker/meta/collectors"
+COLLECTORS = get_collectors()
 
 class BGPFilter:
     """
@@ -105,7 +50,7 @@ class BGPFilter:
         self.__prefix_filter = None
         self.__asn_list = None
         self.__prefix_match_type_filter = None
-        self.__project = list(project_types.keys())[0]
+        self.__project = PROJECTS[0]
         self.__collectors = None
         self.__data_source = {"source_type": "broker"}
         self.out: BGPOut = None
@@ -227,6 +172,9 @@ class BGPFilter:
 
             self.__start_time = start
             self.__end_time = end
+        else:
+            self.start_time = int(time.time())
+            self.end_time = None
 
     def data_source(self, record_type: str, file_format: str, file_path: str):
         """
@@ -352,8 +300,8 @@ class BGPFilter:
     def collectors(self, collectors):
         if collectors is not None:
             for c in collectors:
-                if c not in collectors_list[self.__project]:
-                    raise ValueError("Invalid collector name.")
+                if c not in COLLECTORS[self.__project]:
+                    raise ValueError("Collector isn't available or isn't valid.")
             self.__collectors = collectors
 
     @project.setter
@@ -362,12 +310,12 @@ class BGPFilter:
         Args:
             project (string): ris or routesviews
         """
-        if self.__collectors != project and project in project_types.keys():
+        if self.__collectors != project and project in PROJECT_TYPES.keys():
             self.__project = project
             self.__collectors = None
         else:
             raise ValueError(
-                f"Invalid project name. Valid projects list : {project_types.keys()}"
+                f"Invalid project name. Valid projects list : {PROJECT_TYPES.keys()}"
             )
 
     @ipversion.setter
@@ -428,8 +376,8 @@ class BGPFilter:
         print("Loading stream ...")
 
         self._stream = pybgpstream.BGPStream(
-            from_time=(self.start_time if self.__isRecord else None),
-            until_time=(self.end_time if self.__isRecord else None),
+            from_time=self.start_time,
+            until_time=self.end_time,
             data_interface=(
                 "broker"
                 if self.__data_source["source_type"] == "broker"
@@ -461,7 +409,7 @@ class BGPFilter:
             )
         else:
             project = (
-                self.__project if self.__isRecord else project_types[self.__project]
+                self.__project if self.__isRecord else PROJECT_TYPES[self.__project]
             )
             self._stream._maybe_add_filter("project", project, None)
             self._stream._maybe_add_filter("collector", None, self.__collectors)
