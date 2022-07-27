@@ -5,24 +5,24 @@ Contains a whole class and methods that retrieves bgp records filtered by prefix
 
 __all__ = ["BGPFilter"]
 
-import ipaddress
 import os
 import re
-from time import time
+import json
+import ipaddress
 import maxminddb
 import pycountry
 import pybgpstream
+import urllib.request
+from time import time
 from datetime import datetime
 from typing import List, Tuple
-import urllib.request as urllib_request
-import json
 
 from bgpout import BGPOut
 
 
 def get_collectors():
     """Query the BGPStream broker and identify the collectors that are available"""
-    data = json.load(urllib_request.urlopen(COLLECTORS_URL))
+    data = json.load(urllib.request.urlopen(COLLECTORS_URL))
     result = dict((x, []) for x in PROJECTS)
     for coll in data["data"]["collectors"]:
         p = data["data"]["collectors"][coll]["project"]
@@ -33,7 +33,7 @@ def get_collectors():
 
 PROJECT_TYPES = {"ris": "ris-live", "routeviews": "routeviews-stream"}
 PROJECTS = [i for i in PROJECT_TYPES.keys()]
-COLLECTORS_URL = "http://bgpstream.caida.org/broker/meta/collectors"
+COLLECTORS_URL = "https://broker.bgpstream.caida.org/v2/meta/collectors"
 COLLECTORS = get_collectors()
 
 
@@ -176,8 +176,9 @@ class BGPFilter:
             self.__start_time = start
             self.__end_time = end
         else:
-            self.start_time = int(time.time())
-            self.end_time = None
+            self.__start_time = int(time())
+            self.__end_time = 0
+            
 
     def data_source(self, record_type: str, file_format: str, file_path: str):
         """
@@ -377,7 +378,7 @@ class BGPFilter:
         self.__f_country = maxminddb.open_database(self.__f_country_path)
         print(f"Loaded Geo Open database : {self.__f_country_path}")
         print("Loading stream ...")
-
+        
         self._stream = pybgpstream.BGPStream(
             from_time=self.start_time,
             until_time=self.end_time,
@@ -417,24 +418,34 @@ class BGPFilter:
             self._stream._maybe_add_filter("project", project, None)
             self._stream._maybe_add_filter("collector", None, self.__collectors)
 
+        if self.__isRecord:
+            self._stream.stream.set_live_mode()
+        '''
+        self._stream = pybgpstream.BGPStream(
+            from_time=int(time()),until_time=0, record_type="updates", project="ris-live"
+        )
+        self._stream.stream.set_live_mode()'''
+        cpt = 0 
+        tmp = None
+        ot = time()
         self.out.start()
 
-        try:
-            for e in self._stream:
-                if e.type not in ["A", "R", "W"]:  # Keep updates only
-                    continue
+        cpt = 0
+        for e in self._stream:
+            cpt+=1
 
-                e.prefix = e._maybe_field("prefix")
-                e.country_code = self.__country_by_prefix(e.prefix) or ""
-                e.path = e._maybe_field("as-path")
-                e.source = e.path.split()[-1] if e.path is not None else ""
+            if cpt % 10000 == 0:
+                nt = time()
+                print(f"Counter : {cpt} - Time {e.time} - {nt - ot}s")
+                ot = nt
 
-                if self.__check_country(e):
-                    self.out.input_data(e)
-        except RuntimeError:
-            print(e)
-            print(e.status)
-            exit(0)
+            e.prefix = e._maybe_field("prefix") or ""
+            e.country_code = self.__country_by_prefix(e.prefix) or ""
+            e.path = e._maybe_field("as-path") or ""
+            e.source = e.path.split()[-1] if e.path != "" else ""
+
+            if self.__check_country(e):
+                self.out.input_data(e)
 
     def stop(self):
         """

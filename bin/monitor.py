@@ -11,6 +11,7 @@ from configobj import ConfigObj
 from bgpfilter import BGPFilter
 from Databases.database import BGPDatabases
 
+# define bin/ as default workdir
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 

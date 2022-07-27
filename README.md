@@ -86,9 +86,9 @@ export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
 
 Therefore, you can install the desired database:
 
-- [kvrocks](https://github.com/apache/incubator-kvrocks)
 - [Questdb](https://github.com/questdb/questdb)
 - [Clickhouse](https://clickhouse.com/docs/en/quick-start)
+- [kvrocks](https://github.com/apache/incubator-kvrocks)
 
 Don't forget to uncomment the corresponding lines in the [config file](./etc/config.cfg)
 
@@ -127,8 +127,6 @@ You can install generated images from **Dockerhub**:
 ```shell
 docker run -it ustaenes/bgp-monitor:latest
 ```
-
-:warning: Not yet available :warning: :
 
 ```shell
 docker run -it -P ustaenes/bgp-monitor:kvrocks

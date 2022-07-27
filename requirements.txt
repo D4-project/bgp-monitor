@@ -10,3 +10,4 @@ pdoc
 redis
 matplotlib
 configobj
+psycopg2-binary

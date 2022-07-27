@@ -7,6 +7,9 @@
     {% defaultmacro module_name() %}<h1 class="modulename">BGP monitor</h1>{% enddefaultmacro%}
 {% endif %}
 
+{% set edit_url = "https://github.com/D4-project/bgp-monitor/" %}
+
+
 {% block module_contents %}
     {{ super() }}
     {% if module.modulename == 'bin' %}

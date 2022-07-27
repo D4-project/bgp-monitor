@@ -33,7 +33,6 @@ class BGPOut:
         self.isStarted: bool = False
         """Is the stream started or not"""
         self.databases = BGPDatabases({})
-        self.graph = BGPGraph()
 
     #######################
     #   GETTERS/SETTERS   #
@@ -157,8 +156,8 @@ class BGPOut:
                     "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
                 )
 
-        if self.graph.update(e):
-            self.databases.save(e)
+        #if self.graph.update(e):
+        self.databases.save(e)
 
     def __process_queue(self):
         """Iterate over queue to process each bgp element"""
