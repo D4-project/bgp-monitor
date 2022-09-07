@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.0.2"/>
+    <meta name="generator" content="pdoc 12.1.0"/>
     <title>BGP monitor</title>
             <link rel="icon" href="https://d4-project.org/assets/images/logo.png"/>
 
@@ -51,7 +51,6 @@
         <h2>Submodules</h2>
         <ul>
                 <li><a href="bin/Databases.html">Databases</a></li>
-                <li><a href="bin/api.html">api</a></li>
                 <li><a href="bin/bgpfilter.html">bgpfilter</a></li>
                 <li><a href="bin/bgpgraph.html">bgpgraph</a></li>
                 <li><a href="bin/bgpout.html">bgpout</a></li>
@@ -69,7 +68,6 @@
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/D4-project/bgp-monitor/">Edit on GitHub</a>
                 <h1 class="modulename">BGP monitor</h1>
                         <div class="docstring"><h1 id="definitions">Definitions</h1>
 
@@ -522,7 +520,11 @@ docker run -it bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span
                 let heading;
                 switch (result.doc.type) {
                     case "function":
-                        heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span><span class="signature">${doc.signature}:</span>`;
+                        if (doc.fullname.endsWith(".__init__")) {
+                            heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
+                        } else {
+                            heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span>${doc.signature}`;
+                        }
                         break;
                     case "class":
                         heading = `<span class="def">class</span> <span class="name">${doc.fullname}</span>`;

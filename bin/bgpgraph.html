@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.0.2"/>
+    <meta name="generator" content="pdoc 12.1.0"/>
     <title>BGP monitor</title>
             <link rel="icon" href="https://d4-project.org/assets/images/logo.png"/>
 
@@ -39,9 +39,6 @@
                                 <a class="function" href="#BGPGraph.__init__">BGPGraph</a>
                         </li>
                         <li>
-                                <a class="function" href="#BGPGraph.get">get</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#BGPGraph.filter_edge">filter_edge</a>
                         </li>
                         <li>
@@ -63,7 +60,6 @@
     </nav>
     <main class="pdoc">
             <section class="module-info">
-                        <a class="pdoc-button git-button" href="https://github.com/D4-project/bgp-monitor/">Edit on GitHub</a>
                     <h1 class="modulename">
 <a href="./../bin.html">bin</a><wbr>.bgpgraph    </h1>
 
@@ -72,71 +68,64 @@
 
                         <label class="view-source-button" for="bgpgraph-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># import time</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">time</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="c1"># import matplotlib.pyplot as plt</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="k">class</span> <span class="nc">BGPGraph</span><span class="p">:</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">match_type</span><span class="o">=</span><span class="s2">&quot;more&quot;</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>        <span class="k">pass</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">][</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span><span class="p">)</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">        Insert or delete paths in the graph.</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">        Return true if graph changed.</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>            <span class="c1"># Node attributes : prefix, time</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>                <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>                <span class="o">**</span><span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">}</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>            <span class="p">)</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">:</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">}}</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>            <span class="p">)</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>            <span class="c1"># remove path</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>            <span class="c1"># check if edge has any prefix/ as ? if yes remove the edge</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]]:</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>            <span class="c1"># for self.graph.edges()</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>            <span class="c1"># view = nx.subgraph_view(self.graph, filter_edge=self.filter_edge)</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>            <span class="c1"># for e in view.edges():</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>            <span class="c1">#    print</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>            <span class="c1"># print(self.graph)</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>            <span class="c1"># print(view)</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>            <span class="c1"># nx.draw(view, with_labels=True, font_weight=&quot;bold&quot;)</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>            <span class="c1"># nx.draw_shell(view, with_labels=True, font_weight=&quot;bold&quot;)</span>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>            <span class="c1"># plt.show()</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>            <span class="c1"># time.sleep(10)</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>        <span class="c1"># Check if graph is updated</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">        if self.cpt == 100:</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a><span class="sd">            nx.draw(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">            nx.draw_shell(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="sd">            plt.show()</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="sd">            time.sleep(10)</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">            exit(0)</span>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">class</span> <span class="nc">BGPGraph</span><span class="p">:</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">][</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span><span class="p">)</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">        Insert or delete paths in the graph.</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">        Return true if graph changed.</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>            <span class="c1"># Node attributes : prefix, time</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>                <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>                <span class="n">prefix</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">],</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>                <span class="n">date</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>                <span class="n">source</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>            <span class="p">)</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">:</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">}}</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>            <span class="p">)</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>            <span class="c1"># remove path</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>            <span class="c1"># check if edge has any prefix/ as ? if yes remove the edge</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>            <span class="c1"># for self.graph.edges()</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>            <span class="n">view</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">subgraph_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">filter_edge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">edges</span><span class="p">():</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>                <span class="nb">print</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">draw_shell</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="c1"># Check if graph is updated</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a><span class="sd">        if self.cpt == 100:</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a><span class="sd">            nx.draw(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a><span class="sd">            nx.draw_shell(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="sd">            plt.show()</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="sd">            time.sleep(10)</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">            exit(0)</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -152,65 +141,59 @@
 
     </div>
     <a class="headerlink" href="#BGPGraph"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph-8"><a href="#BGPGraph-8"><span class="linenos"> 8</span></a><span class="k">class</span> <span class="nc">BGPGraph</span><span class="p">:</span>
-</span><span id="BGPGraph-9"><a href="#BGPGraph-9"><span class="linenos"> 9</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="BGPGraph-10"><a href="#BGPGraph-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-</span><span id="BGPGraph-11"><a href="#BGPGraph-11"><span class="linenos">11</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span id="BGPGraph-12"><a href="#BGPGraph-12"><span class="linenos">12</span></a>
-</span><span id="BGPGraph-13"><a href="#BGPGraph-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">match_type</span><span class="o">=</span><span class="s2">&quot;more&quot;</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="BGPGraph-14"><a href="#BGPGraph-14"><span class="linenos">14</span></a>        <span class="k">pass</span>
-</span><span id="BGPGraph-15"><a href="#BGPGraph-15"><span class="linenos">15</span></a>
-</span><span id="BGPGraph-16"><a href="#BGPGraph-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
-</span><span id="BGPGraph-17"><a href="#BGPGraph-17"><span class="linenos">17</span></a>        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">][</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span><span class="p">)</span>
-</span><span id="BGPGraph-18"><a href="#BGPGraph-18"><span class="linenos">18</span></a>
-</span><span id="BGPGraph-19"><a href="#BGPGraph-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="BGPGraph-20"><a href="#BGPGraph-20"><span class="linenos">20</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="BGPGraph-21"><a href="#BGPGraph-21"><span class="linenos">21</span></a><span class="sd">        Insert or delete paths in the graph.</span>
-</span><span id="BGPGraph-22"><a href="#BGPGraph-22"><span class="linenos">22</span></a><span class="sd">        Return true if graph changed.</span>
-</span><span id="BGPGraph-23"><a href="#BGPGraph-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="BGPGraph-24"><a href="#BGPGraph-24"><span class="linenos">24</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="BGPGraph-25"><a href="#BGPGraph-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="BGPGraph-26"><a href="#BGPGraph-26"><span class="linenos">26</span></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
-</span><span id="BGPGraph-27"><a href="#BGPGraph-27"><span class="linenos">27</span></a>            <span class="c1"># Node attributes : prefix, time</span>
-</span><span id="BGPGraph-28"><a href="#BGPGraph-28"><span class="linenos">28</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
-</span><span id="BGPGraph-29"><a href="#BGPGraph-29"><span class="linenos">29</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
-</span><span id="BGPGraph-30"><a href="#BGPGraph-30"><span class="linenos">30</span></a>                <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
-</span><span id="BGPGraph-31"><a href="#BGPGraph-31"><span class="linenos">31</span></a>                <span class="o">**</span><span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">}</span>
-</span><span id="BGPGraph-32"><a href="#BGPGraph-32"><span class="linenos">32</span></a>            <span class="p">)</span>
-</span><span id="BGPGraph-33"><a href="#BGPGraph-33"><span class="linenos">33</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span>
-</span><span id="BGPGraph-34"><a href="#BGPGraph-34"><span class="linenos">34</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">:</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">}}</span>
-</span><span id="BGPGraph-35"><a href="#BGPGraph-35"><span class="linenos">35</span></a>            <span class="p">)</span>
-</span><span id="BGPGraph-36"><a href="#BGPGraph-36"><span class="linenos">36</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="BGPGraph-37"><a href="#BGPGraph-37"><span class="linenos">37</span></a>            <span class="c1"># remove path</span>
-</span><span id="BGPGraph-38"><a href="#BGPGraph-38"><span class="linenos">38</span></a>            <span class="c1"># check if edge has any prefix/ as ? if yes remove the edge</span>
-</span><span id="BGPGraph-39"><a href="#BGPGraph-39"><span class="linenos">39</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
-</span><span id="BGPGraph-40"><a href="#BGPGraph-40"><span class="linenos">40</span></a>
-</span><span id="BGPGraph-41"><a href="#BGPGraph-41"><span class="linenos">41</span></a>            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="BGPGraph-42"><a href="#BGPGraph-42"><span class="linenos">42</span></a>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]]:</span>
-</span><span id="BGPGraph-43"><a href="#BGPGraph-43"><span class="linenos">43</span></a>                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
-</span><span id="BGPGraph-44"><a href="#BGPGraph-44"><span class="linenos">44</span></a>
-</span><span id="BGPGraph-45"><a href="#BGPGraph-45"><span class="linenos">45</span></a>            <span class="c1"># for self.graph.edges()</span>
-</span><span id="BGPGraph-46"><a href="#BGPGraph-46"><span class="linenos">46</span></a>            <span class="c1"># view = nx.subgraph_view(self.graph, filter_edge=self.filter_edge)</span>
-</span><span id="BGPGraph-47"><a href="#BGPGraph-47"><span class="linenos">47</span></a>            <span class="c1"># for e in view.edges():</span>
-</span><span id="BGPGraph-48"><a href="#BGPGraph-48"><span class="linenos">48</span></a>            <span class="c1">#    print</span>
-</span><span id="BGPGraph-49"><a href="#BGPGraph-49"><span class="linenos">49</span></a>            <span class="c1"># print(self.graph)</span>
-</span><span id="BGPGraph-50"><a href="#BGPGraph-50"><span class="linenos">50</span></a>            <span class="c1"># print(view)</span>
-</span><span id="BGPGraph-51"><a href="#BGPGraph-51"><span class="linenos">51</span></a>            <span class="c1"># nx.draw(view, with_labels=True, font_weight=&quot;bold&quot;)</span>
-</span><span id="BGPGraph-52"><a href="#BGPGraph-52"><span class="linenos">52</span></a>            <span class="c1"># nx.draw_shell(view, with_labels=True, font_weight=&quot;bold&quot;)</span>
-</span><span id="BGPGraph-53"><a href="#BGPGraph-53"><span class="linenos">53</span></a>            <span class="c1"># plt.show()</span>
-</span><span id="BGPGraph-54"><a href="#BGPGraph-54"><span class="linenos">54</span></a>            <span class="c1"># time.sleep(10)</span>
-</span><span id="BGPGraph-55"><a href="#BGPGraph-55"><span class="linenos">55</span></a>
-</span><span id="BGPGraph-56"><a href="#BGPGraph-56"><span class="linenos">56</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="BGPGraph-57"><a href="#BGPGraph-57"><span class="linenos">57</span></a>
-</span><span id="BGPGraph-58"><a href="#BGPGraph-58"><span class="linenos">58</span></a>        <span class="c1"># Check if graph is updated</span>
-</span><span id="BGPGraph-59"><a href="#BGPGraph-59"><span class="linenos">59</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="BGPGraph-60"><a href="#BGPGraph-60"><span class="linenos">60</span></a><span class="sd">        if self.cpt == 100:</span>
-</span><span id="BGPGraph-61"><a href="#BGPGraph-61"><span class="linenos">61</span></a><span class="sd">            nx.draw(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
-</span><span id="BGPGraph-62"><a href="#BGPGraph-62"><span class="linenos">62</span></a><span class="sd">            nx.draw_shell(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
-</span><span id="BGPGraph-63"><a href="#BGPGraph-63"><span class="linenos">63</span></a><span class="sd">            plt.show()</span>
-</span><span id="BGPGraph-64"><a href="#BGPGraph-64"><span class="linenos">64</span></a><span class="sd">            time.sleep(10)</span>
-</span><span id="BGPGraph-65"><a href="#BGPGraph-65"><span class="linenos">65</span></a><span class="sd">            exit(0)</span>
-</span><span id="BGPGraph-66"><a href="#BGPGraph-66"><span class="linenos">66</span></a><span class="sd">        &quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph-7"><a href="#BGPGraph-7"><span class="linenos"> 7</span></a><span class="k">class</span> <span class="nc">BGPGraph</span><span class="p">:</span>
+</span><span id="BGPGraph-8"><a href="#BGPGraph-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="BGPGraph-9"><a href="#BGPGraph-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</span><span id="BGPGraph-10"><a href="#BGPGraph-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="BGPGraph-11"><a href="#BGPGraph-11"><span class="linenos">11</span></a>
+</span><span id="BGPGraph-12"><a href="#BGPGraph-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+</span><span id="BGPGraph-13"><a href="#BGPGraph-13"><span class="linenos">13</span></a>        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">][</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span><span class="p">)</span>
+</span><span id="BGPGraph-14"><a href="#BGPGraph-14"><span class="linenos">14</span></a>
+</span><span id="BGPGraph-15"><a href="#BGPGraph-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="BGPGraph-16"><a href="#BGPGraph-16"><span class="linenos">16</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BGPGraph-17"><a href="#BGPGraph-17"><span class="linenos">17</span></a><span class="sd">        Insert or delete paths in the graph.</span>
+</span><span id="BGPGraph-18"><a href="#BGPGraph-18"><span class="linenos">18</span></a><span class="sd">        Return true if graph changed.</span>
+</span><span id="BGPGraph-19"><a href="#BGPGraph-19"><span class="linenos">19</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="BGPGraph-20"><a href="#BGPGraph-20"><span class="linenos">20</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="BGPGraph-21"><a href="#BGPGraph-21"><span class="linenos">21</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="BGPGraph-22"><a href="#BGPGraph-22"><span class="linenos">22</span></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
+</span><span id="BGPGraph-23"><a href="#BGPGraph-23"><span class="linenos">23</span></a>            <span class="c1"># Node attributes : prefix, time</span>
+</span><span id="BGPGraph-24"><a href="#BGPGraph-24"><span class="linenos">24</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
+</span><span id="BGPGraph-25"><a href="#BGPGraph-25"><span class="linenos">25</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
+</span><span id="BGPGraph-26"><a href="#BGPGraph-26"><span class="linenos">26</span></a>                <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+</span><span id="BGPGraph-27"><a href="#BGPGraph-27"><span class="linenos">27</span></a>                <span class="n">prefix</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">],</span>
+</span><span id="BGPGraph-28"><a href="#BGPGraph-28"><span class="linenos">28</span></a>                <span class="n">date</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+</span><span id="BGPGraph-29"><a href="#BGPGraph-29"><span class="linenos">29</span></a>                <span class="n">source</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+</span><span id="BGPGraph-30"><a href="#BGPGraph-30"><span class="linenos">30</span></a>            <span class="p">)</span>
+</span><span id="BGPGraph-31"><a href="#BGPGraph-31"><span class="linenos">31</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span>
+</span><span id="BGPGraph-32"><a href="#BGPGraph-32"><span class="linenos">32</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">:</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">}}</span>
+</span><span id="BGPGraph-33"><a href="#BGPGraph-33"><span class="linenos">33</span></a>            <span class="p">)</span>
+</span><span id="BGPGraph-34"><a href="#BGPGraph-34"><span class="linenos">34</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="BGPGraph-35"><a href="#BGPGraph-35"><span class="linenos">35</span></a>            <span class="c1"># remove path</span>
+</span><span id="BGPGraph-36"><a href="#BGPGraph-36"><span class="linenos">36</span></a>            <span class="c1"># check if edge has any prefix/ as ? if yes remove the edge</span>
+</span><span id="BGPGraph-37"><a href="#BGPGraph-37"><span class="linenos">37</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
+</span><span id="BGPGraph-38"><a href="#BGPGraph-38"><span class="linenos">38</span></a>            <span class="c1"># for self.graph.edges()</span>
+</span><span id="BGPGraph-39"><a href="#BGPGraph-39"><span class="linenos">39</span></a>            <span class="n">view</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">subgraph_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">filter_edge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
+</span><span id="BGPGraph-40"><a href="#BGPGraph-40"><span class="linenos">40</span></a>            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">edges</span><span class="p">():</span>
+</span><span id="BGPGraph-41"><a href="#BGPGraph-41"><span class="linenos">41</span></a>                <span class="nb">print</span>
+</span><span id="BGPGraph-42"><a href="#BGPGraph-42"><span class="linenos">42</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+</span><span id="BGPGraph-43"><a href="#BGPGraph-43"><span class="linenos">43</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+</span><span id="BGPGraph-44"><a href="#BGPGraph-44"><span class="linenos">44</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+</span><span id="BGPGraph-45"><a href="#BGPGraph-45"><span class="linenos">45</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">draw_shell</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+</span><span id="BGPGraph-46"><a href="#BGPGraph-46"><span class="linenos">46</span></a>            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="BGPGraph-47"><a href="#BGPGraph-47"><span class="linenos">47</span></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</span><span id="BGPGraph-48"><a href="#BGPGraph-48"><span class="linenos">48</span></a>
+</span><span id="BGPGraph-49"><a href="#BGPGraph-49"><span class="linenos">49</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="BGPGraph-50"><a href="#BGPGraph-50"><span class="linenos">50</span></a>
+</span><span id="BGPGraph-51"><a href="#BGPGraph-51"><span class="linenos">51</span></a>        <span class="c1"># Check if graph is updated</span>
+</span><span id="BGPGraph-52"><a href="#BGPGraph-52"><span class="linenos">52</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BGPGraph-53"><a href="#BGPGraph-53"><span class="linenos">53</span></a><span class="sd">        if self.cpt == 100:</span>
+</span><span id="BGPGraph-54"><a href="#BGPGraph-54"><span class="linenos">54</span></a><span class="sd">            nx.draw(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
+</span><span id="BGPGraph-55"><a href="#BGPGraph-55"><span class="linenos">55</span></a><span class="sd">            nx.draw_shell(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
+</span><span id="BGPGraph-56"><a href="#BGPGraph-56"><span class="linenos">56</span></a><span class="sd">            plt.show()</span>
+</span><span id="BGPGraph-57"><a href="#BGPGraph-57"><span class="linenos">57</span></a><span class="sd">            time.sleep(10)</span>
+</span><span id="BGPGraph-58"><a href="#BGPGraph-58"><span class="linenos">58</span></a><span class="sd">            exit(0)</span>
+</span><span id="BGPGraph-59"><a href="#BGPGraph-59"><span class="linenos">59</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -226,28 +209,9 @@
 
     </div>
     <a class="headerlink" href="#BGPGraph.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.__init__-9"><a href="#BGPGraph.__init__-9"><span class="linenos"> 9</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="BGPGraph.__init__-10"><a href="#BGPGraph.__init__-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
-</span><span id="BGPGraph.__init__-11"><a href="#BGPGraph.__init__-11"><span class="linenos">11</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">=</span> <span class="mi">0</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
-                            <div id="BGPGraph.get" class="classattr">
-                                        <input id="BGPGraph.get-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">match_type</span><span class="o">=</span><span class="s1">&#39;more&#39;</span>,</span><span class="param">	<span class="n">countries</span><span class="o">=</span><span class="kc">None</span></span>)</span>
-
-                <label class="view-source-button" for="BGPGraph.get-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#BGPGraph.get"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.get-13"><a href="#BGPGraph.get-13"><span class="linenos">13</span></a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">as_numbers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">match_type</span><span class="o">=</span><span class="s2">&quot;more&quot;</span><span class="p">,</span> <span class="n">countries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="BGPGraph.get-14"><a href="#BGPGraph.get-14"><span class="linenos">14</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.__init__-8"><a href="#BGPGraph.__init__-8"><span class="linenos"> 8</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="BGPGraph.__init__-9"><a href="#BGPGraph.__init__-9"><span class="linenos"> 9</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+</span><span id="BGPGraph.__init__-10"><a href="#BGPGraph.__init__-10"><span class="linenos">10</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">=</span> <span class="mi">0</span>
 </span></pre></div>
 
 
@@ -259,14 +223,14 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">filter_edge</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">n1</span>, </span><span class="param"><span class="n">n2</span></span>)</span>
+        <span class="name">filter_edge</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">n1</span>, </span><span class="param"><span class="n">n2</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="BGPGraph.filter_edge-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#BGPGraph.filter_edge"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.filter_edge-16"><a href="#BGPGraph.filter_edge-16"><span class="linenos">16</span></a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
-</span><span id="BGPGraph.filter_edge-17"><a href="#BGPGraph.filter_edge-17"><span class="linenos">17</span></a>        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">][</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.filter_edge-12"><a href="#BGPGraph.filter_edge-12"><span class="linenos">12</span></a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+</span><span id="BGPGraph.filter_edge-13"><a href="#BGPGraph.filter_edge-13"><span class="linenos">13</span></a>        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="n">n1</span><span class="p">][</span><span class="n">n2</span><span class="p">][</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -284,54 +248,51 @@
 
     </div>
     <a class="headerlink" href="#BGPGraph.update"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.update-19"><a href="#BGPGraph.update-19"><span class="linenos">19</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="BGPGraph.update-20"><a href="#BGPGraph.update-20"><span class="linenos">20</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="BGPGraph.update-21"><a href="#BGPGraph.update-21"><span class="linenos">21</span></a><span class="sd">        Insert or delete paths in the graph.</span>
-</span><span id="BGPGraph.update-22"><a href="#BGPGraph.update-22"><span class="linenos">22</span></a><span class="sd">        Return true if graph changed.</span>
-</span><span id="BGPGraph.update-23"><a href="#BGPGraph.update-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="BGPGraph.update-24"><a href="#BGPGraph.update-24"><span class="linenos">24</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="BGPGraph.update-25"><a href="#BGPGraph.update-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">+=</span> <span class="mi">1</span>
-</span><span id="BGPGraph.update-26"><a href="#BGPGraph.update-26"><span class="linenos">26</span></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
-</span><span id="BGPGraph.update-27"><a href="#BGPGraph.update-27"><span class="linenos">27</span></a>            <span class="c1"># Node attributes : prefix, time</span>
-</span><span id="BGPGraph.update-28"><a href="#BGPGraph.update-28"><span class="linenos">28</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
-</span><span id="BGPGraph.update-29"><a href="#BGPGraph.update-29"><span class="linenos">29</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
-</span><span id="BGPGraph.update-30"><a href="#BGPGraph.update-30"><span class="linenos">30</span></a>                <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
-</span><span id="BGPGraph.update-31"><a href="#BGPGraph.update-31"><span class="linenos">31</span></a>                <span class="o">**</span><span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">}</span>
-</span><span id="BGPGraph.update-32"><a href="#BGPGraph.update-32"><span class="linenos">32</span></a>            <span class="p">)</span>
-</span><span id="BGPGraph.update-33"><a href="#BGPGraph.update-33"><span class="linenos">33</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span>
-</span><span id="BGPGraph.update-34"><a href="#BGPGraph.update-34"><span class="linenos">34</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">:</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">}}</span>
-</span><span id="BGPGraph.update-35"><a href="#BGPGraph.update-35"><span class="linenos">35</span></a>            <span class="p">)</span>
-</span><span id="BGPGraph.update-36"><a href="#BGPGraph.update-36"><span class="linenos">36</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="BGPGraph.update-37"><a href="#BGPGraph.update-37"><span class="linenos">37</span></a>            <span class="c1"># remove path</span>
-</span><span id="BGPGraph.update-38"><a href="#BGPGraph.update-38"><span class="linenos">38</span></a>            <span class="c1"># check if edge has any prefix/ as ? if yes remove the edge</span>
-</span><span id="BGPGraph.update-39"><a href="#BGPGraph.update-39"><span class="linenos">39</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
-</span><span id="BGPGraph.update-40"><a href="#BGPGraph.update-40"><span class="linenos">40</span></a>
-</span><span id="BGPGraph.update-41"><a href="#BGPGraph.update-41"><span class="linenos">41</span></a>            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-</span><span id="BGPGraph.update-42"><a href="#BGPGraph.update-42"><span class="linenos">42</span></a>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]]:</span>
-</span><span id="BGPGraph.update-43"><a href="#BGPGraph.update-43"><span class="linenos">43</span></a>                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">v</span><span class="p">]</span>
-</span><span id="BGPGraph.update-44"><a href="#BGPGraph.update-44"><span class="linenos">44</span></a>
-</span><span id="BGPGraph.update-45"><a href="#BGPGraph.update-45"><span class="linenos">45</span></a>            <span class="c1"># for self.graph.edges()</span>
-</span><span id="BGPGraph.update-46"><a href="#BGPGraph.update-46"><span class="linenos">46</span></a>            <span class="c1"># view = nx.subgraph_view(self.graph, filter_edge=self.filter_edge)</span>
-</span><span id="BGPGraph.update-47"><a href="#BGPGraph.update-47"><span class="linenos">47</span></a>            <span class="c1"># for e in view.edges():</span>
-</span><span id="BGPGraph.update-48"><a href="#BGPGraph.update-48"><span class="linenos">48</span></a>            <span class="c1">#    print</span>
-</span><span id="BGPGraph.update-49"><a href="#BGPGraph.update-49"><span class="linenos">49</span></a>            <span class="c1"># print(self.graph)</span>
-</span><span id="BGPGraph.update-50"><a href="#BGPGraph.update-50"><span class="linenos">50</span></a>            <span class="c1"># print(view)</span>
-</span><span id="BGPGraph.update-51"><a href="#BGPGraph.update-51"><span class="linenos">51</span></a>            <span class="c1"># nx.draw(view, with_labels=True, font_weight=&quot;bold&quot;)</span>
-</span><span id="BGPGraph.update-52"><a href="#BGPGraph.update-52"><span class="linenos">52</span></a>            <span class="c1"># nx.draw_shell(view, with_labels=True, font_weight=&quot;bold&quot;)</span>
-</span><span id="BGPGraph.update-53"><a href="#BGPGraph.update-53"><span class="linenos">53</span></a>            <span class="c1"># plt.show()</span>
-</span><span id="BGPGraph.update-54"><a href="#BGPGraph.update-54"><span class="linenos">54</span></a>            <span class="c1"># time.sleep(10)</span>
-</span><span id="BGPGraph.update-55"><a href="#BGPGraph.update-55"><span class="linenos">55</span></a>
-</span><span id="BGPGraph.update-56"><a href="#BGPGraph.update-56"><span class="linenos">56</span></a>        <span class="k">return</span> <span class="kc">True</span>
-</span><span id="BGPGraph.update-57"><a href="#BGPGraph.update-57"><span class="linenos">57</span></a>
-</span><span id="BGPGraph.update-58"><a href="#BGPGraph.update-58"><span class="linenos">58</span></a>        <span class="c1"># Check if graph is updated</span>
-</span><span id="BGPGraph.update-59"><a href="#BGPGraph.update-59"><span class="linenos">59</span></a>        <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="BGPGraph.update-60"><a href="#BGPGraph.update-60"><span class="linenos">60</span></a><span class="sd">        if self.cpt == 100:</span>
-</span><span id="BGPGraph.update-61"><a href="#BGPGraph.update-61"><span class="linenos">61</span></a><span class="sd">            nx.draw(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
-</span><span id="BGPGraph.update-62"><a href="#BGPGraph.update-62"><span class="linenos">62</span></a><span class="sd">            nx.draw_shell(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
-</span><span id="BGPGraph.update-63"><a href="#BGPGraph.update-63"><span class="linenos">63</span></a><span class="sd">            plt.show()</span>
-</span><span id="BGPGraph.update-64"><a href="#BGPGraph.update-64"><span class="linenos">64</span></a><span class="sd">            time.sleep(10)</span>
-</span><span id="BGPGraph.update-65"><a href="#BGPGraph.update-65"><span class="linenos">65</span></a><span class="sd">            exit(0)</span>
-</span><span id="BGPGraph.update-66"><a href="#BGPGraph.update-66"><span class="linenos">66</span></a><span class="sd">        &quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPGraph.update-15"><a href="#BGPGraph.update-15"><span class="linenos">15</span></a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="BGPGraph.update-16"><a href="#BGPGraph.update-16"><span class="linenos">16</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BGPGraph.update-17"><a href="#BGPGraph.update-17"><span class="linenos">17</span></a><span class="sd">        Insert or delete paths in the graph.</span>
+</span><span id="BGPGraph.update-18"><a href="#BGPGraph.update-18"><span class="linenos">18</span></a><span class="sd">        Return true if graph changed.</span>
+</span><span id="BGPGraph.update-19"><a href="#BGPGraph.update-19"><span class="linenos">19</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="BGPGraph.update-20"><a href="#BGPGraph.update-20"><span class="linenos">20</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="BGPGraph.update-21"><a href="#BGPGraph.update-21"><span class="linenos">21</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">cpt</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="BGPGraph.update-22"><a href="#BGPGraph.update-22"><span class="linenos">22</span></a>        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;A&quot;</span><span class="p">:</span>
+</span><span id="BGPGraph.update-23"><a href="#BGPGraph.update-23"><span class="linenos">23</span></a>            <span class="c1"># Node attributes : prefix, time</span>
+</span><span id="BGPGraph.update-24"><a href="#BGPGraph.update-24"><span class="linenos">24</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span>
+</span><span id="BGPGraph.update-25"><a href="#BGPGraph.update-25"><span class="linenos">25</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span>
+</span><span id="BGPGraph.update-26"><a href="#BGPGraph.update-26"><span class="linenos">26</span></a>                <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;as-path&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+</span><span id="BGPGraph.update-27"><a href="#BGPGraph.update-27"><span class="linenos">27</span></a>                <span class="n">prefix</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">],</span>
+</span><span id="BGPGraph.update-28"><a href="#BGPGraph.update-28"><span class="linenos">28</span></a>                <span class="n">date</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+</span><span id="BGPGraph.update-29"><a href="#BGPGraph.update-29"><span class="linenos">29</span></a>                <span class="n">source</span><span class="o">=</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">,</span>
+</span><span id="BGPGraph.update-30"><a href="#BGPGraph.update-30"><span class="linenos">30</span></a>            <span class="p">)</span>
+</span><span id="BGPGraph.update-31"><a href="#BGPGraph.update-31"><span class="linenos">31</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span>
+</span><span id="BGPGraph.update-32"><a href="#BGPGraph.update-32"><span class="linenos">32</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">source</span><span class="p">:</span> <span class="p">{</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]:</span> <span class="n">record</span><span class="o">.</span><span class="n">time</span><span class="p">}}</span>
+</span><span id="BGPGraph.update-33"><a href="#BGPGraph.update-33"><span class="linenos">33</span></a>            <span class="p">)</span>
+</span><span id="BGPGraph.update-34"><a href="#BGPGraph.update-34"><span class="linenos">34</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="BGPGraph.update-35"><a href="#BGPGraph.update-35"><span class="linenos">35</span></a>            <span class="c1"># remove path</span>
+</span><span id="BGPGraph.update-36"><a href="#BGPGraph.update-36"><span class="linenos">36</span></a>            <span class="c1"># check if edge has any prefix/ as ? if yes remove the edge</span>
+</span><span id="BGPGraph.update-37"><a href="#BGPGraph.update-37"><span class="linenos">37</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">del_prefix</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s2">&quot;prefix&quot;</span><span class="p">]</span>
+</span><span id="BGPGraph.update-38"><a href="#BGPGraph.update-38"><span class="linenos">38</span></a>            <span class="c1"># for self.graph.edges()</span>
+</span><span id="BGPGraph.update-39"><a href="#BGPGraph.update-39"><span class="linenos">39</span></a>            <span class="n">view</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">subgraph_view</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">filter_edge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
+</span><span id="BGPGraph.update-40"><a href="#BGPGraph.update-40"><span class="linenos">40</span></a>            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">view</span><span class="o">.</span><span class="n">edges</span><span class="p">():</span>
+</span><span id="BGPGraph.update-41"><a href="#BGPGraph.update-41"><span class="linenos">41</span></a>                <span class="nb">print</span>
+</span><span id="BGPGraph.update-42"><a href="#BGPGraph.update-42"><span class="linenos">42</span></a>            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+</span><span id="BGPGraph.update-43"><a href="#BGPGraph.update-43"><span class="linenos">43</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">view</span><span class="p">)</span>
+</span><span id="BGPGraph.update-44"><a href="#BGPGraph.update-44"><span class="linenos">44</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+</span><span id="BGPGraph.update-45"><a href="#BGPGraph.update-45"><span class="linenos">45</span></a>            <span class="n">nx</span><span class="o">.</span><span class="n">draw_shell</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">with_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">font_weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+</span><span id="BGPGraph.update-46"><a href="#BGPGraph.update-46"><span class="linenos">46</span></a>            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</span><span id="BGPGraph.update-47"><a href="#BGPGraph.update-47"><span class="linenos">47</span></a>            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</span><span id="BGPGraph.update-48"><a href="#BGPGraph.update-48"><span class="linenos">48</span></a>
+</span><span id="BGPGraph.update-49"><a href="#BGPGraph.update-49"><span class="linenos">49</span></a>        <span class="k">return</span> <span class="kc">True</span>
+</span><span id="BGPGraph.update-50"><a href="#BGPGraph.update-50"><span class="linenos">50</span></a>
+</span><span id="BGPGraph.update-51"><a href="#BGPGraph.update-51"><span class="linenos">51</span></a>        <span class="c1"># Check if graph is updated</span>
+</span><span id="BGPGraph.update-52"><a href="#BGPGraph.update-52"><span class="linenos">52</span></a>        <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="BGPGraph.update-53"><a href="#BGPGraph.update-53"><span class="linenos">53</span></a><span class="sd">        if self.cpt == 100:</span>
+</span><span id="BGPGraph.update-54"><a href="#BGPGraph.update-54"><span class="linenos">54</span></a><span class="sd">            nx.draw(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
+</span><span id="BGPGraph.update-55"><a href="#BGPGraph.update-55"><span class="linenos">55</span></a><span class="sd">            nx.draw_shell(self.graph, with_labels=True, font_weight=&#39;bold&#39;)</span>
+</span><span id="BGPGraph.update-56"><a href="#BGPGraph.update-56"><span class="linenos">56</span></a><span class="sd">            plt.show()</span>
+</span><span id="BGPGraph.update-57"><a href="#BGPGraph.update-57"><span class="linenos">57</span></a><span class="sd">            time.sleep(10)</span>
+</span><span id="BGPGraph.update-58"><a href="#BGPGraph.update-58"><span class="linenos">58</span></a><span class="sd">            exit(0)</span>
+</span><span id="BGPGraph.update-59"><a href="#BGPGraph.update-59"><span class="linenos">59</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span></pre></div>
 
 
@@ -446,7 +407,11 @@ Return true if graph changed.</p>
                 let heading;
                 switch (result.doc.type) {
                     case "function":
-                        heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span><span class="signature">${doc.signature}:</span>`;
+                        if (doc.fullname.endsWith(".__init__")) {
+                            heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
+                        } else {
+                            heading = `<span class="def">${doc.funcdef}</span> <span class="name">${doc.fullname}</span>${doc.signature}`;
+                        }
                         break;
                     case "class":
                         heading = `<span class="def">class</span> <span class="name">${doc.fullname}</span>`;
