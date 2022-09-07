@@ -21,12 +21,27 @@ COLLECTORS_URL = "http://bgpstream.caida.org/broker/meta/collectors"
 COLLECTORS = get_collectors()
 '''
 
+from inspect import getmembers
+import pickle
+import pprint
+import dill
 import pybgpstream
 import time
 
 if __name__ == "__main__":
 
     stream = pybgpstream.BGPStream(
-        from_time=int(time.time()),until_time=0, record_type="updates", project="ris-live"
+        until_time=0, record_type="updates", project="ris-live"
     )
-    print(stream.get_data_interface_options('broker'))
+
+    print(stream.__dict__)
+    for e in stream:
+#        for el in getmembers(e.record.rec.rec):
+        print(e.record.rec)
+        #dill.dumps(e)
+        #dill.detect.trace(True)
+        #dill.detect.baditems(e)
+#        with open("bruh.bin","wb") as f:
+#            myvar = pickle.dump(e, f)
+
+        exit(0)

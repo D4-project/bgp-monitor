@@ -11,3 +11,4 @@ redis
 matplotlib
 configobj
 psycopg2-binary
+faster_fifo

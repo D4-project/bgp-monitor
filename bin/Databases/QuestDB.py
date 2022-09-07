@@ -50,13 +50,13 @@ class QuestDB(Database):
         
         Args:
             record (BGPElem)
-        """
+        """ 
 
-        self.send_utf8((f"bgp,type={record.type},collector={record.collector},"
-                        f"country={record.country_code or ''} peerasn={record.peer_asn},"
-                        f'peeraddress="{record.peer_address}",prefix="{record.prefix}",'
-                        f'aspath="{record.path}",source="{record.source}"'
-                        f" {int(record.time*1000000000)}\n"))
+        self.send_utf8((f"bgp,type={record['type']},collector={record['collector']},"
+                        f"country={record['country_code'] or ''} peerasn={record['peer_asn']},"
+                        f'peeraddress="{record["peer_address"]}",prefix="{record["prefix"]}",'
+                        f'aspath="{record["path"]}",source="{record["source"]}"'
+                        f" {int(record['time']*1000000000)}\n"))
 
     def send_utf8(self, msg):
         """Encode message and send it to server"""

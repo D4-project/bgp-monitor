@@ -29,7 +29,7 @@ class ClickHouseDB(Database):
         super().__init__()
         self.BATCH_SIZE = int(config["batch_size"]) if "batch_size" in config else 10000
         self.client = Client(host=config["host"], port=int(config["port"]), compression="lz4")
-        #self.queue = Queue()
+        self.queue = Queue()
         self.started = False
 
     def start(self):
@@ -75,7 +75,6 @@ class ClickHouseDB(Database):
         Args:
             data (BGPElem): bgp element to save
         """
-        
         self.queue.put(data)
 
     def get_data(self):
@@ -86,16 +85,16 @@ class ClickHouseDB(Database):
             
         """
         for idx in range(self.BATCH_SIZE):
-            record = self.queue.get()
+            rec = self.queue.get()
             yield {
-                    "time": int(record.time),
-                    "type": record.type,
-                    "peerasn": record.peer_asn,
-                    "collector": record.collector or "",
-                    "country": record.country_code or "",
-                    "sourceasn": record.source or "",
-                    "prefix": record.prefix or "",
-                    "aspath": record.path or "",
+                    "time": int(rec.time),
+                    "type": rec.type,
+                    "peerasn": rec.peer_asn,
+                    "collector": rec.collector or "",
+                    "country": rec.country_code or "",
+                    "sourceasn": rec.source or "",
+                    "prefix": rec.prefix or "",
+                    "aspath": rec["path"] or "",
                 }
             if self.queue.qsize() == 0 and not self.started: # Return 
                 return

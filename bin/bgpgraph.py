@@ -1,7 +1,7 @@
-# import time
+import time
 import networkx as nx
 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 class BGPGraph:
@@ -22,24 +22,24 @@ class BGPGraph:
         """
         return True
         self.cpt += 1
-        if record.type == "A":
+        if record["type"] == "A":
             # Node attributes : prefix, time
             nx.add_path(
                 self.graph,
-                record.fields["as-path"].split(),
-                **{record.fields["prefix"]: record.time, "source": record.source}
+                record["path"].split(),
+                **{record["prefix"]: record["time"], "source": record["source"]}
             )
             nx.set_node_attributes(
-                self.graph, {record.source: {record.fields["prefix"]: record.time}}
+                self.graph, {record["source"]: {record["prefix"]: record["time"]}}
             )
         else:
             # remove path
             # check if edge has any prefix/ as ? if yes remove the edge
-            self.del_prefix = record.fields["prefix"]
+            self.del_prefix = record["prefix"]
 
-            for n, v in self.graph.nodes(data=True):
-                if self.graph.edges[record.fields["prefix"]]:
-                    del self.graph.edges[n][v]
+            #for n, v in self.graph.nodes(data=True):
+            #    if self.graph.edges[record["prefix"]]:
+            #        del self.graph.edges[n][v]
 
             # for self.graph.edges()
             # view = nx.subgraph_view(self.graph, filter_edge=self.filter_edge)
@@ -52,14 +52,14 @@ class BGPGraph:
             # plt.show()
             # time.sleep(10)
 
-        return True
 
         # Check if graph is updated
-        """
-        if self.cpt == 100:
+
+        if self.cpt == 50:
             nx.draw(self.graph, with_labels=True, font_weight='bold')
             nx.draw_shell(self.graph, with_labels=True, font_weight='bold')
             plt.show()
             time.sleep(10)
             exit(0)
-        """
+
+        return True

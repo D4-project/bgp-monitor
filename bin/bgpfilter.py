@@ -7,17 +7,19 @@ __all__ = ["BGPFilter"]
 
 import os
 import re
+import sys
+import time
 import json
+import bgpout
+import datetime
 import ipaddress
 import maxminddb
 import pycountry
 import pybgpstream
+import faster_fifo
 import urllib.request
-from time import time
-from datetime import datetime
+import multiprocessing
 from typing import List, Tuple
-
-from bgpout import BGPOut
 
 
 def get_collectors():
@@ -46,8 +48,6 @@ class BGPFilter:
         self.__isRecord = False
         self.__start_time = ""
         self.__end_time = ""
-        self.__f_country_path = "../mmdb_files/latest.mmdb"
-        self.__countries_filter = None
         self.__asn_filter = None
         self.__ipversion = ""
         self.__prefix_filter = None
@@ -56,8 +56,11 @@ class BGPFilter:
         self.__project = PROJECTS[0]
         self.__collectors = None
         self.__data_source = {"source_type": "broker"}
-        self.out: BGPOut = None
+        self.out: bgpout.BGPOut = None
         """`bgpout.BGPOut()` instance that will receive all records"""
+        multiprocessing.set_start_method("fork")
+        self.queue = faster_fifo.Queue()
+        self.process = multiprocessing.Process(target=self.process, args=(self.queue,), daemon=True)
 
     ###############
     #   GETTERS   #
@@ -80,27 +83,6 @@ class BGPFilter:
         """End of the interval for record mode.
         see `BGPFilter.record_mode()`"""
         return self.__end_time
-
-    @property
-    def country_file(self) -> str:
-        """Path to the Geo Open MaxMindDB File"""
-        return self.__f_country_path
-
-    @property
-    def countries_filter(self) -> List[str]:
-        """
-        List of country codes to filter
-
-        Filter using specified country.
-            Keep records that the origin of their prefix is contained in country_list.
-
-        Args:
-            country_list (List[str]): List of country codes
-
-        Raises:
-            LookupError: If an element in country_list is not valid.
-        """
-        return self.__countries_filter
 
     @property
     def prefix_filter(self) -> List[str]:
@@ -162,8 +144,8 @@ class BGPFilter:
                     "Record mode requires the from_time and until_time arguments"
                 )
             try:
-                st = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
-                en = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
+                st = datetime.datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
+                en = datetime.datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
             except ValueError:
                 raise ValueError(
                     "Invalid record mode date format. Must be %Y-%m-%d %H:%M:%S"
@@ -176,9 +158,8 @@ class BGPFilter:
             self.__start_time = start
             self.__end_time = end
         else:
-            self.__start_time = int(time())
+            self.__start_time = int(time.time())
             self.__end_time = 0
-            
 
     def data_source(self, record_type: str, file_format: str, file_path: str):
         """
@@ -209,20 +190,8 @@ class BGPFilter:
             "file_path": file_path,
         }
 
-    @country_file.setter
-    def country_file(self, country_file_path: str):
-        """
-        Setter for the GeoOpen country mmdb file
-
-        Args:
-            country_file_path (String): Path to Geo Open MaxMindDB File
-        """
-        if not os.path.isfile(country_file_path):
-            raise FileNotFoundError
-        self.__f_country_path = country_file_path
-
     @prefix_filter.setter
-    def prefix_filter(self, values: Tuple[List[str], str]):
+    def prefix_filter(self, values: Tuple[List[str], str]):        
         """
         Prefix filter option
             Keep records that match to one of specified prefixes (cidr format).
@@ -241,7 +210,6 @@ class BGPFilter:
             raise ValueError(
                 "match type and prefixes list are required for filtering by prefixes"
             )
-
         if cidr_list is not None:
             if len(cidr_list) == 0:
                 # "Please specify one or more prefixes when filtering by prefix"
@@ -255,23 +223,6 @@ class BGPFilter:
                 ipaddress.ip_network(c)
             self.__prefix_match_type_filter = match_type
             self.__prefix_filter = cidr_list
-
-    @countries_filter.setter
-    def countries_filter(self, country_list: List[str]):
-        """
-        Filter using specified country.
-            Keep records that the origin of their prefix is contained in country_list.
-
-        Args:
-            country_list (List[str]): List of country codes
-
-        Raises:
-            LookupError: If an element in country_list is not valid.
-        """
-        if country_list is not None:
-            for c in country_list:
-                pycountry.countries.lookup(c)
-        self.__countries_filter = country_list
 
     @asn_filter.setter
     def asn_filter(self, asn_list):
@@ -332,8 +283,78 @@ class BGPFilter:
         self.__ipversion = " and ipversion " + version if version in ["4", "6"] else ""
 
     ###############
-    #   PRINTERS  #
+    #             #
     ###############
+
+    @property
+    def country_file(self) -> str:
+        """Path to the Geo Open MaxMindDB File"""
+        return self.__f_country_path
+
+    @property
+    def countries_filter(self) -> List[str]:
+        """
+        List of country codes to filter
+
+        Filter using specified country.
+            Keep records that the origin of their prefix is contained in country_list.
+
+        Args:
+            country_list (List[str]): List of country codes
+
+        Raises:
+            LookupError: If an element in country_list is not valid.
+        """
+        return self.__countries_filter
+
+    @countries_filter.setter
+    def countries_filter(self, country_list: List[str]):
+        """
+        Filter using specified country.
+            Keep records that the origin of their prefix is contained in country_list.
+
+        Args:
+            country_list (List[str]): List of country codes
+
+        Raises:
+            LookupError: If an element in country_list is not valid.
+        """
+        if country_list is not None:
+            for c in country_list:
+                pycountry.countries.lookup(c)
+        self.__countries_filter = country_list
+
+    @country_file.setter
+    def country_file(self, country_file_path: str):
+        """
+        Setter for the GeoOpen country mmdb file
+
+        Args:
+            country_file_path (String): Path to Geo Open MaxMindDB File
+        """
+        if not os.path.isfile(country_file_path):
+            raise FileNotFoundError
+        self.__f_country_path = country_file_path
+
+        self.__f_country_path = "../mmdb_files/latest.mmdb"
+        self.__countries_filter = None
+        
+        self.__f_country = maxminddb.open_database(self.__f_country_path, maxminddb.MODE_MMAP_EXT)
+        print(f"Loaded Geo Open database : {self.__f_country_path}")
+        
+    def __check_country(self, e):
+        """
+        Args:
+            e (bgp dict)
+
+
+        Returns:
+            boolean: if e.["country code"] is in self.__countries_filter list
+        """
+        return not (
+            self.__countries_filter is not None
+            and e["country_code"] not in self.__countries_filter
+        )
 
     def __country_by_prefix(self, p):
         """
@@ -348,37 +369,18 @@ class BGPFilter:
             return None
         else:
             r = self.__f_country.get(p.split("/", 1)[0])
-            return r["country"]["iso_code"] if r is not None else None
-
-    def __check_country(self, e):
-        """
-        Args:
-            e (bgp record)
-
-
-        Returns:
-            boolean: if e.country code is in self.__countries_filter list
-        """
-        return not (
-            self.__countries_filter is not None
-            and e.country_code not in self.__countries_filter
-        )
+            return None if r is None else r["country"]["iso_code"]
 
     ####################
     # PUBLIC FUNCTIONS #
     ####################
 
-    def start(self):
+    def _build_stream(self):
+        """Build the stream with the used filters
+
+        Returns:
+            (BGPStream)
         """
-        Start retrieving stream/records and filtering them
-        - Load Geo Open database
-        - Start stream with args
-        - Print each record as JSON format
-        """
-        self.__f_country = maxminddb.open_database(self.__f_country_path)
-        print(f"Loaded Geo Open database : {self.__f_country_path}")
-        print("Loading stream ...")
-        
         self._stream = pybgpstream.BGPStream(
             from_time=self.start_time,
             until_time=self.end_time,
@@ -397,8 +399,6 @@ class BGPFilter:
             self._stream._maybe_add_filter(
                 "prefix-" + self.__prefix_match_type_filter, None, self.__prefix_filter
             )
-
-        print("Starting")
 
         if self.__data_source["source_type"] != "broker":
             self._stream.set_data_interface_option(
@@ -420,37 +420,60 @@ class BGPFilter:
 
         if self.__isRecord:
             self._stream.stream.set_live_mode()
-        '''
-        self._stream = pybgpstream.BGPStream(
-            from_time=int(time()),until_time=0, record_type="updates", project="ris-live"
-        )
-        self._stream.stream.set_live_mode()'''
-        cpt = 0 
-        tmp = None
-        ot = time()
-        self.out.start()
+        return self._stream
 
-        cpt = 0
+    def cpt_update(self):
+        if not hasattr(self,"timer"):
+            self.timer = {
+                "cpt": 0,
+                "tmp": None,
+                "ft": time.time(),
+                "ot": time.time()
+            }
+        self.timer["cpt"] += 1
+        if self.timer["cpt"] % 100000 == 0:
+            self.timer["nt"] = time.time()
+            print(f'Counter : {self.timer["cpt"]} - Time {self.timer["nt"] - self.timer["ft"]} - {self.timer["nt"] - self.timer["ot"]}s', file=sys.stderr)
+            #sys.stderr.write(f"Queue size : {self.queue.qsize()}")
+            self.timer["ot"] = self.timer["nt"]
+
+    def start(self):
+        """
+        Start retrieving stream/records and filtering them
+        - Load Geo Open database
+        - Start stream with args
+        - Print each record as JSON format
+        """
+
+        print("Loading stream...")
+        self._build_stream()
+        print("Starting")
+        self.isStarted = True
+
         for e in self._stream:
-            cpt+=1
+            self.cpt_update()
 
-            if cpt % 10000 == 0:
-                nt = time()
-                print(f"Counter : {cpt} - Time {e.time} - {nt - ot}s")
-                ot = nt
+            msg = {
+                'type' : e.type,
+                'time' : e.time,
+                'peer_address' : e.peer_address,
+                'peer_asn' : e.peer_asn,
+                'collector' : e.collector,
+                'record_type' : e.record_type,
+                'project' : e.project,
+                'router' : e.router,
+                'router_ip' : e.router_ip,
+                }
+            msg |= e.fields
+            msg["country_code"] = self.__country_by_prefix(msg["prefix"])
+            msg["source"] = msg["as-path"].split()[-1] if "as-path" in msg else None
 
-            e.prefix = e._maybe_field("prefix") or ""
-            e.country_code = self.__country_by_prefix(e.prefix) or ""
-            e.path = e._maybe_field("as-path") or ""
-            e.source = e.path.split()[-1] if e.path != "" else ""
-
-            if self.__check_country(e):
-                self.out.input_data(e)
+            self.out.iteration(msg)
 
     def stop(self):
         """
         Close JSON output file and stop BGPStream
         """
-        self.out.stop()
         print("Stream ended")
+        self.out.stop()
         exit(0)

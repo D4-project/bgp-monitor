@@ -7,13 +7,17 @@ __all__ = ["BGPOut"]
 import os
 import sys
 import json
-import threading
-from queue import Queue
 from pybgpstream import BGPElem
 from typing import TextIO
 from Databases.database import BGPDatabases
 from bgpgraph import BGPGraph
+from deprecated import deprecated
 
+class SetEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
 
 class BGPOut:
     """
@@ -33,19 +37,11 @@ class BGPOut:
         self.isStarted: bool = False
         """Is the stream started or not"""
         self.databases = BGPDatabases({})
+        self.graph = BGPGraph()
 
     #######################
     #   GETTERS/SETTERS   #
     #######################
-
-    @property
-    def isQueue(self) -> bool:
-        """Are the records queued, can prevent from blocking BGPStream"""
-        return self.__queue is not None
-
-    @isQueue.setter
-    def isQueue(self, isQueue):
-        self.__queue = Queue() if isQueue else None
 
     @property
     def json_out(self) -> TextIO:
@@ -87,20 +83,26 @@ class BGPOut:
     # MAIN #
     ########
 
-    def start(self):
+    def start(self, pipe):
         """
         Start output
 
         - Init json output if specified
         - Start queue if enabled
+
+        Args:
+            pipe (Pipe): Where to get data from
         """
+        
         if self.__json_out:
             self.__json_out.write("[")
         self.isStarted = True
-        if self.__queue:
-            threading.Thread(
-                target=self.__process_queue, daemon=True, name="BGP monitor out"
-            ).start()
+        
+        p_output, p_input = pipe
+        p_input.close() # We won't send data to bgpfilter
+
+        while self.isStarted:
+            self.__iteration(p_output.recv())
 
     def stop(self):
         """
@@ -121,6 +123,7 @@ class BGPOut:
                         else "Result is not as expected"
                     )
 
+    @deprecated(reason="Not needed anymore")
     def __bgp_conv(self, e: BGPElem) -> dict:
         """Return a `BGPElem` formatted in json
 
@@ -146,36 +149,18 @@ class BGPOut:
 
         return data
 
-    def __iteration(self, e):
+    def iteration(self, e):
+        """Iterate over queue to process each bgp element"""
+
         if self.verbose or self.json_out:
-            r = self.__bgp_conv(e)
             if self.verbose:
-                print("\n" + json.dumps(r, sort_keys=True) + ",")
+                print("\n" + json.dumps(e, sort_keys=True, cls=SetEncoder) + ",")
             if self.__json_out:
                 self.json_out.write(
-                    "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
+                    "\n" + json.dumps(e, sort_keys=True, indent=4, cls=SetEncoder) + ","
                 )
-
-        #if self.graph.update(e):
+        self.graph.update(e)
         self.databases.save(e)
-
-    def __process_queue(self):
-        """Iterate over queue to process each bgp element"""
-        while self.isStarted or self.__queue.qsize():
-            # print("Queue size : " + str(self.__queue.qsize()), file=sys.stderr)
-            self.__iteration(self.__queue.get())
-            self.__queue.task_done()
-
-    def input_data(self, data: BGPElem) -> None:
-        """
-        Input BGP element
-
-        - Put it in queue if enable
-        - Else process it immediatly
-        Args:
-            data (`BGPElem`)
-        """
-        self.__queue.put(data) if self.__queue else self.__iteration(data)
 
     def closeFile(self, file):
         """Close a JSON file
@@ -189,8 +174,7 @@ class BGPOut:
         file.truncate()
         file.write("]")
         file.close()
-
-
+ 
 def checkFiles(f1, f2) -> bool:
     """
     Check if two json files are equal

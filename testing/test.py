@@ -34,6 +34,7 @@ if __name__ == "__main__":
     ot = time.time()
 
     for e in stream:
+
         if not stream.started:
             print(f"tmp: {tmp}")
             print(f"e: {e}")
