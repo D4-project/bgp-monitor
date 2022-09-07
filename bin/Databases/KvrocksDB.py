@@ -10,7 +10,8 @@ class KvrocksDB(Database):
         self.client = redis.Redis(
             host=config["host"], port=config["port"], db=config["db"]
         )
-#        self.pipe = self.client.pipeline(True)
+
+    #        self.pipe = self.client.pipeline(True)
 
     def start(self):
         print(f"Database size : {self.client.dbsize()}")
@@ -18,7 +19,9 @@ class KvrocksDB(Database):
     def stop(self):
         pass
 
-    ### INSERT ###
+    ###############
+    #   INSERTS   #
+    ###############
 
     def save(self, record):
         """Store data in a sorted set named "bgp" with a scorebased on Time
@@ -32,13 +35,19 @@ class KvrocksDB(Database):
         e = record
 
         if e.type == "A":
-            self.client.sadd(f"prefixes-{e.source}", e.prefix)  # prefixes-{ASN} : (cidr, cidr)
-            self.client.sadd(f"prefixes-{e.country_code}", e.prefix)  # prefixes-{LU} : (cidr, cidr)
+            self.client.sadd(
+                f"prefixes-{e.source}", e.prefix
+            )  # prefixes-{ASN} : (cidr, cidr)
+            self.client.sadd(
+                f"prefixes-{e.country_code}", e.prefix
+            )  # prefixes-{LU} : (cidr, cidr)
             self.client.sadd(f"as-{e.prefix}", e.source)  # as-{cidr} : (as, as, as)
             self.client.sadd(
                 f"countries-{e.prefix}", e.country_code
             )  # countries-{cidr} : (LU, FR)
-            self.client.sadd(f"paths-{e.prefix}", e.path)  # paths-{cidr} : (path, path, path)
+            self.client.sadd(
+                f"paths-{e.prefix}", e.path
+            )  # paths-{cidr} : (path, path, path)
 
             self.client.zadd(
                 "bgp-{}:{}:{}".format(e.prefix, e.path, e.source),
@@ -47,11 +56,13 @@ class KvrocksDB(Database):
                     f"{e.collector}:{e.country_code}": int(float(e.time))
                 },
             )
-#            self.client.execute()
+        #            self.client.execute()
 
         elif e.type == "W":
             for as_source in self.client.smembers(f"as-{e.prefix}"):
-                self.client.srem(f"prefixes-{as_source}", e.prefix)  # pr AS {cidr, cidr}
+                self.client.srem(
+                    f"prefixes-{as_source}", e.prefix
+                )  # pr AS {cidr, cidr}
 
             for pr in self.client.smembers(f"country-{e.prefix}"):
                 self.client.srem(f"prefixes-{e.country_code}", pr)  # pr LU {cidr, cidr}
@@ -72,8 +83,9 @@ class KvrocksDB(Database):
                 },
             )
 
-
-    ### GET ###
+    ##############
+    #   GETTER   #
+    ##############
 
     def get(
         self,
@@ -88,5 +100,4 @@ class KvrocksDB(Database):
         as_paths=None,
     ):
         """Can't be tested now"""
-
         pass

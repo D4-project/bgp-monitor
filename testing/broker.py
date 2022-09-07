@@ -36,12 +36,12 @@ if __name__ == "__main__":
 
     print(stream.__dict__)
     for e in stream:
-#        for el in getmembers(e.record.rec.rec):
+        #        for el in getmembers(e.record.rec.rec):
         print(e.record.rec)
-        #dill.dumps(e)
-        #dill.detect.trace(True)
-        #dill.detect.baditems(e)
-#        with open("bruh.bin","wb") as f:
-#            myvar = pickle.dump(e, f)
+        # dill.dumps(e)
+        # dill.detect.trace(True)
+        # dill.detect.baditems(e)
+        #        with open("bruh.bin","wb") as f:
+        #            myvar = pickle.dump(e, f)
 
         exit(0)

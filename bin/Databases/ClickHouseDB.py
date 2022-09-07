@@ -19,7 +19,7 @@ class ClickHouseDB(Database):
         "prefixes": "prefix",
         "as_paths": "aspath",
     }
-    
+
     def __init__(self, config):
         """_summary_
 
@@ -28,14 +28,16 @@ class ClickHouseDB(Database):
         """
         super().__init__()
         self.BATCH_SIZE = int(config["batch_size"]) if "batch_size" in config else 10000
-        self.client = Client(host=config["host"], port=int(config["port"]), compression="lz4")
+        self.client = Client(
+            host=config["host"], port=int(config["port"]), compression="lz4"
+        )
         self.queue = Queue()
         self.started = False
 
     def start(self):
         """
-        Create bgp table (time DateTime, type, peerasn, collector, country, sourceasn, prefix, aspath)
-        
+        Create bgp table
+        (time DateTime, type, peerasn, collector, country, sourceasn, prefix, aspath)
         Start thread for batch inserts
         """
         # self.client.execute("DROP TABLE IF EXISTS bgp")
@@ -65,9 +67,9 @@ class ClickHouseDB(Database):
             print("Clickhouse : Inserting last batch")
             # self.client.execute("INSERT INTO bgp VALUES ", self.get_data())
 
-
-
-    ### INSERT ###
+    ###############
+    #   INSERTS   #
+    ###############
 
     def save(self, data):
         """Input data in queue for processing
@@ -78,37 +80,35 @@ class ClickHouseDB(Database):
         self.queue.put(data)
 
     def get_data(self):
-        """Retrieve data for 
-
+        """Retrieve data for inserts
         Yields:
             dict: Data to insert
-            
         """
         for idx in range(self.BATCH_SIZE):
             rec = self.queue.get()
             yield {
-                    "time": int(rec.time),
-                    "type": rec.type,
-                    "peerasn": rec.peer_asn,
-                    "collector": rec.collector or "",
-                    "country": rec.country_code or "",
-                    "sourceasn": rec.source or "",
-                    "prefix": rec.prefix or "",
-                    "aspath": rec["path"] or "",
-                }
-            if self.queue.qsize() == 0 and not self.started: # Return 
+                "time": int(rec.time),
+                "type": rec.type,
+                "peerasn": rec.peer_asn,
+                "collector": rec.collector or "",
+                "country": rec.country_code or "",
+                "sourceasn": rec.source or "",
+                "prefix": rec.prefix or "",
+                "aspath": rec["path"] or "",
+            }
+            if self.queue.qsize() == 0 and not self.started:  # Return
                 return
 
     def insert_batches(self):
         """
         Insert BATCH_SIZE(15000 lines) batches
-        
         https://clickhouse.com/docs/en/about-us/performance/"""
         while self.started:
             self.client.execute("INSERT INTO bgp VALUES ", self.get_data())
 
-
-    ### GET ###
+    ##############
+    #   GETTER   #
+    ##############
 
     def get(
         self,

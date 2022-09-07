@@ -37,7 +37,7 @@ class BGPGraph:
             # check if edge has any prefix/ as ? if yes remove the edge
             self.del_prefix = record["prefix"]
 
-            #for n, v in self.graph.nodes(data=True):
+            # for n, v in self.graph.nodes(data=True):
             #    if self.graph.edges[record["prefix"]]:
             #        del self.graph.edges[n][v]
 
@@ -52,12 +52,11 @@ class BGPGraph:
             # plt.show()
             # time.sleep(10)
 
-
         # Check if graph is updated
 
         if self.cpt == 50:
-            nx.draw(self.graph, with_labels=True, font_weight='bold')
-            nx.draw_shell(self.graph, with_labels=True, font_weight='bold')
+            nx.draw(self.graph, with_labels=True, font_weight="bold")
+            nx.draw_shell(self.graph, with_labels=True, font_weight="bold")
             plt.show()
             time.sleep(10)
             exit(0)

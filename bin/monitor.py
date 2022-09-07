@@ -4,9 +4,11 @@ Main execution, handle arguments, init each instances
 """
 
 import os
+import sys
 import signal
 import bgpout
 import argparse
+import urllib.request
 from configobj import ConfigObj
 from bgpfilter import BGPFilter
 from Databases.database import BGPDatabases
@@ -247,8 +249,14 @@ if __name__ == "__main__":
             args.input_record_type, args.input_file_format, args.input_data
         )
 
-    if "geoopen" in config:
-        filter.country_file = config["geoopen"]["path"]
+    if "geo-open" in config:
+        if "download_url" in config["geo-open"]:
+            print("Downloading latest Geo Open Database", file=sys.stderr)
+            urllib.request.urlretrieve(
+                config["geo-open"]["download_url"], "../geo-open/latest.mmdb"
+            )
+
+        filter.country_file = config["geo-open"]["path"]
 
     if args.filter_list is not None:
         res = asnPrefixFromFile(args.filter_list)

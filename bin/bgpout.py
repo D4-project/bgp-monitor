@@ -7,17 +7,17 @@ __all__ = ["BGPOut"]
 import os
 import sys
 import json
-from pybgpstream import BGPElem
 from typing import TextIO
 from Databases.database import BGPDatabases
 from bgpgraph import BGPGraph
-from deprecated import deprecated
+
 
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
+
 
 class BGPOut:
     """
@@ -93,13 +93,13 @@ class BGPOut:
         Args:
             pipe (Pipe): Where to get data from
         """
-        
+
         if self.__json_out:
             self.__json_out.write("[")
         self.isStarted = True
-        
+
         p_output, p_input = pipe
-        p_input.close() # We won't send data to bgpfilter
+        p_input.close()  # We won't send data to bgpfilter
 
         while self.isStarted:
             self.__iteration(p_output.recv())
@@ -123,42 +123,15 @@ class BGPOut:
                         else "Result is not as expected"
                     )
 
-    @deprecated(reason="Not needed anymore")
-    def __bgp_conv(self, e: BGPElem) -> dict:
-        """Return a `BGPElem` formatted in json
-
-        Parameters:
-            e (BGPElem)
-        """
-
-        data = {
-            "bgp:type": e.type,
-            "bgp:time": e.time,
-            "bgp:peer": e.peer_address,
-            "bgp:peer_asn": e.peer_asn,
-            "bgp:collector": e.collector,
-        }
-
-        if e.type in ["A", "R", "W"]:  # updateribs
-            data["bgp:prefix"] = e._maybe_field("prefix") or ""
-            data["bgp:country_code"] = e.country_code
-        if e.type in ["A", "R"]:  # updateribs
-            data["bgp:as-path"] = e._maybe_field("as-path") or ""
-            data["bgp:as-source"] = e.source or ""  # data["bgp:as-path"].split()[-1]
-            data["bgp:next-hop"] = e._maybe_field("next-hop") or ""
-
-        return data
-
     def iteration(self, e):
         """Iterate over queue to process each bgp element"""
 
-        if self.verbose or self.json_out:
-            if self.verbose:
-                print("\n" + json.dumps(e, sort_keys=True, cls=SetEncoder) + ",")
-            if self.__json_out:
-                self.json_out.write(
-                    "\n" + json.dumps(e, sort_keys=True, indent=4, cls=SetEncoder) + ","
-                )
+        if self.verbose:
+            print("\n" + json.dumps(e, sort_keys=True, cls=SetEncoder) + ",")
+        if self.json_out:
+            self.json_out.write(
+                "\n" + json.dumps(e, sort_keys=True, indent=4, cls=SetEncoder) + ","
+            )
         self.graph.update(e)
         self.databases.save(e)
 
@@ -174,7 +147,8 @@ class BGPOut:
         file.truncate()
         file.write("]")
         file.close()
- 
+
+
 def checkFiles(f1, f2) -> bool:
     """
     Check if two json files are equal

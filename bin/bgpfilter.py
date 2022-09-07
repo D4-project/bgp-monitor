@@ -16,9 +16,7 @@ import ipaddress
 import maxminddb
 import pycountry
 import pybgpstream
-import faster_fifo
 import urllib.request
-import multiprocessing
 from typing import List, Tuple
 
 
@@ -58,9 +56,11 @@ class BGPFilter:
         self.__data_source = {"source_type": "broker"}
         self.out: bgpout.BGPOut = None
         """`bgpout.BGPOut()` instance that will receive all records"""
-        multiprocessing.set_start_method("fork")
-        self.queue = faster_fifo.Queue()
-        self.process = multiprocessing.Process(target=self.process, args=(self.queue,), daemon=True)
+        # multiprocessing.set_start_method("fork")
+        # self.queue = faster_fifo.Queue()
+        # self.process = multiprocessing.Process(
+        # target=self.process, args=(self.queue,
+        # ), daemon=True)
 
     ###############
     #   GETTERS   #
@@ -191,7 +191,7 @@ class BGPFilter:
         }
 
     @prefix_filter.setter
-    def prefix_filter(self, values: Tuple[List[str], str]):        
+    def prefix_filter(self, values: Tuple[List[str], str]):
         """
         Prefix filter option
             Keep records that match to one of specified prefixes (cidr format).
@@ -338,10 +338,12 @@ class BGPFilter:
 
         self.__f_country_path = "../mmdb_files/latest.mmdb"
         self.__countries_filter = None
-        
-        self.__f_country = maxminddb.open_database(self.__f_country_path, maxminddb.MODE_MMAP_EXT)
+
+        self.__f_country = maxminddb.open_database(
+            self.__f_country_path, maxminddb.MODE_MMAP_EXT
+        )
         print(f"Loaded Geo Open database : {self.__f_country_path}")
-        
+
     def __check_country(self, e):
         """
         Args:
@@ -423,18 +425,19 @@ class BGPFilter:
         return self._stream
 
     def cpt_update(self):
-        if not hasattr(self,"timer"):
-            self.timer = {
-                "cpt": 0,
-                "tmp": None,
-                "ft": time.time(),
-                "ot": time.time()
-            }
+        """For debugging. Print time each 100000 elem"""
+        if not hasattr(self, "timer"):
+            self.timer = {"cpt": 0, "tmp": None, "ft": time.time(), "ot": time.time()}
         self.timer["cpt"] += 1
         if self.timer["cpt"] % 100000 == 0:
             self.timer["nt"] = time.time()
-            print(f'Counter : {self.timer["cpt"]} - Time {self.timer["nt"] - self.timer["ft"]} - {self.timer["nt"] - self.timer["ot"]}s', file=sys.stderr)
-            #sys.stderr.write(f"Queue size : {self.queue.qsize()}")
+            print(
+                f'Counter : {self.timer["cpt"]} '
+                '- Time {self.timer["nt"] - self.timer["ft"]} '
+                '- {self.timer["nt"] - self.timer["ot"]}s',
+                file=sys.stderr,
+            )
+            # sys.stderr.write(f"Queue size : {self.queue.qsize()}")
             self.timer["ot"] = self.timer["nt"]
 
     def start(self):
@@ -454,16 +457,16 @@ class BGPFilter:
             self.cpt_update()
 
             msg = {
-                'type' : e.type,
-                'time' : e.time,
-                'peer_address' : e.peer_address,
-                'peer_asn' : e.peer_asn,
-                'collector' : e.collector,
-                'record_type' : e.record_type,
-                'project' : e.project,
-                'router' : e.router,
-                'router_ip' : e.router_ip,
-                }
+                "type": e.type,
+                "time": e.time,
+                "peer_address": e.peer_address,
+                "peer_asn": e.peer_asn,
+                "collector": e.collector,
+                "record_type": e.record_type,
+                "project": e.project,
+                "router": e.router,
+                "router_ip": e.router_ip,
+            }
             msg |= e.fields
             msg["country_code"] = self.__country_by_prefix(msg["prefix"])
             msg["source"] = msg["as-path"].split()[-1] if "as-path" in msg else None

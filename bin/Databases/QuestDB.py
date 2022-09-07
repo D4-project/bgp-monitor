@@ -1,5 +1,4 @@
 import collections
-from time import sleep
 from Databases.database import Database
 import socket
 import psycopg2
@@ -19,19 +18,30 @@ class QuestDB(Database):
         "prefixes": "prefix",
         "as_paths": "aspath",
     }
+
     def __init__(self, config):
         super().__init__()
-        # For UDP, change socket.SOCK_STREAM to socket.SOCK_DGRAM / Requires to change server config
+        # For UDP, change socket.SOCK_STREAM to socket.SOCK_DGRAM
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
+
         # Required args for line protocol and postgre connection
-        self.conf = {'host': config["host"], "tcp_port" : int(config["tcp_port"]), "pg_port": int(config["pg_port"])}
+        self.conf = {
+            "host": config["host"],
+            "tcp_port": int(config["tcp_port"]),
+            "pg_port": int(config["pg_port"]),
+        }
         self.connection = None
 
     def start(self):
         """Connect to server using etc/config.cfg file"""
-        self.sock.connect((self.conf['host'], self.conf['tcp_port']))
-        self.connection = psycopg2.connect(host=self.conf['host'], port=self.conf['pg_port'], user="admin", password="quest", database="qdb")
+        self.sock.connect((self.conf["host"], self.conf["tcp_port"]))
+        self.connection = psycopg2.connect(
+            host=self.conf["host"],
+            port=self.conf["pg_port"],
+            user="admin",
+            password="quest",
+            database="qdb",
+        )
 
     def stop(self):
         """Close connection to server"""
@@ -40,30 +50,39 @@ class QuestDB(Database):
             self.connection.close()
             print("PostgreSQL connection is closed")
 
+    ###############
+    #   INSERTS   #
+    ###############
 
-    ### INSERTS ###
-    
     def save(self, record):
         """Save bgp record using InfluxDB Line protocol
-        
-        Format : bgp,type={record.type},collector={record.collector},country={record.country_code or ''} peerasn={record.peer_asn},peeraddress="{record.peer_address}",prefix="{record.prefix}",aspath="{record.path}",source="{record.source}" {int(record.time*1000000000)}\n
-        
+
+        Format : bgp,type={record.type},collector={record.collector},
+        country={record.country_code or ''} peerasn={record.peer_asn},
+        peeraddress="{record.peer_address}",prefix="{record.prefix}",
+        aspath="{record.path}",source="{record.source}" {int(record.time*1000000000)}\n
+
         Args:
             record (BGPElem)
-        """ 
+        """
 
-        self.send_utf8((f"bgp,type={record['type']},collector={record['collector']},"
-                        f"country={record['country_code'] or ''} peerasn={record['peer_asn']},"
-                        f'peeraddress="{record["peer_address"]}",prefix="{record["prefix"]}",'
-                        f'aspath="{record["path"]}",source="{record["source"]}"'
-                        f" {int(record['time']*1000000000)}\n"))
+        self.send_utf8(
+            (
+                f"bgp,type={record['type']},collector={record['collector']},"
+                f"country={record['country_code'] or ''} peerasn={record['peer_asn']},"
+                f'peeraddress="{record["peer_address"]}",prefix="{record["prefix"]}",'
+                f'aspath="{record["path"]}",source="{record["source"]}"'
+                f" {int(record['time']*1000000000)}\n"
+            )
+        )
 
     def send_utf8(self, msg):
         """Encode message and send it to server"""
         self.sock.sendall(msg.encode())
 
-
-    ### GET ###
+    ##############
+    #   GETTER   #
+    ##############
 
     def get(
         self,

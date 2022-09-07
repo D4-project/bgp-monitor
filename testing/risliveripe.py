@@ -39,13 +39,15 @@ for data in ws:
         ot = nt
 """
 
-messages = SSEClient('https://ris-live.ripe.net/v1/stream/?format=sse&client=cli-example-2')
+messages = SSEClient(
+    "https://ris-live.ripe.net/v1/stream/?format=sse&client=cli-example-2"
+)
 for msg in messages:
-    if cpt %10000 ==0:
+    if cpt % 10000 == 0:
         nt = time()
         print(f"Counter : {cpt} - {nt - ot}s")
         print(msg)
         ot = nt
-    cpt+=1
+    cpt += 1
 
     print(msg)
