@@ -153,7 +153,7 @@ class BGPOut:
         if self.verbose or self.json_out:
             r = self.__bgp_conv(e)
             if self.verbose:
-                print("\n" + json.dumps(r, sort_keys=True) + ",")
+                print(json.dumps(r, sort_keys=True) + "\n", flush=True)
             if self.__json_out:
                 self.json_out.write(
                     "\n" + json.dumps(r, sort_keys=True, indent=4) + ","
