@@ -11,7 +11,8 @@ class ClickHouseDB(Database):
     def __init__(self, config):
         """
         Args:
-            config (dict): Format : {"host":"127.0.0.1", "port":9000, "batch_size":15000}
+            config (dict): Format :
+                            {"host":"127.0.0.1", "port":9000, "batch_size":15000}
         """
         super().__init__()
         self.started = False
