@@ -59,7 +59,8 @@ class QuestDB(Database):
         self.send_utf8(
             (
                 f"bgp,type={record['type']},project={record['project']},"
-                f"collector={record['collector']},country={record['country_code'] or ''}"
+                f"collector={record['collector']},"
+                f"country={record['country_code'] or ''}"
                 f' peer={record["peer_asn"]},prefix="{record["prefix"]}",'
                 f'path="{record.get("as-path", "")}",source="{record["source"]}"'
                 f" {int(record['time']*1000000000)}\n"
@@ -116,7 +117,7 @@ class QuestDB(Database):
                 query += (
                     f" {QuestDB.var_names[k]} "
                     + ("IN " if isinstance(v, collections.Sequence) else "== ")
-                    + f"%s and"
+                    + "%s and"
                 )
             query += query.rsplit(" ", 1)[0]
 
