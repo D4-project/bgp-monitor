@@ -12,11 +12,11 @@ class Database(ABC):
         time_end,
         record_type=None,
         peer_asn=None,
-        collectors=None,
-        countries=None,
-        as_numbers=None,
-        prefixes=None,
-        as_paths=None,
+        collector=None,
+        country=None,
+        asn=None,
+        prefix=None,
+        path=None,
     ):
         pass
 

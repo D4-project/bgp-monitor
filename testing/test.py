@@ -32,7 +32,8 @@ if __name__ == "__main__":
         filter="elemtype announcements withdrawals",
     )
     # stream.stream.set_live_mode()
-    # stream.set_data_interface_option('broker', 'url', 'https://broker.bgpstream.caida.org/v2')
+    # stream.set_data_interface_option('broker', 'url',
+    #   'https://broker.bgpstream.caida.org/v2')
     cpt = 0
     tmp = None
     ot = time.time()

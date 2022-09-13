@@ -8,54 +8,42 @@ from queue import Queue
 class ClickHouseDB(Database):
     name = "clickhouse"
 
-    var_names = {
-        "time_start": "time_start",
-        "time_end": "time_end",
-        "record_type": "type",
-        "peer_asn": "peerasn",
-        "collectors": "collector",
-        "countries": "country",
-        "as_numbers": "sourceasn",
-        "prefixes": "prefix",
-        "as_paths": "aspath",
-    }
-
     def __init__(self, config):
-        """_summary_
-
+        """
         Args:
-            config (dict): Format : {"host":"127.0.0.1", "port":9000}
+            config (dict): Format : {"host":"127.0.0.1", "port":9000, "batch_size":15000}
         """
         super().__init__()
-        self.BATCH_SIZE = int(config["batch_size"]) if "batch_size" in config else 10000
+        self.started = False
+        self.BATCH_SIZE = int(config["batch_size"]) if "batch_size" in config else 15000
+        self.queue = Queue()
         self.client = Client(
             host=config["host"], port=int(config["port"]), compression="lz4"
         )
-        self.queue = Queue()
-        self.started = False
-
-    def start(self):
-        """
-        Create bgp table
-        (time DateTime, type, peerasn, collector, country, sourceasn, prefix, aspath)
-        Start thread for batch inserts
-        """
-        # self.client.execute("DROP TABLE IF EXISTS bgp")
-        self.started = True
         self.client.execute(
             "CREATE TABLE IF NOT EXISTS bgp ("
             "time DateTime,"
             "type FixedString(1),"
-            "peerasn Int32,"
+            "peer Int32,"
             "collector String,"
+            "project String,"
             "country String,"
-            "sourceasn String,"
+            "source String,"
             "prefix String,"
-            "aspath String"
-            ") ENGINE = MergeTree ORDER BY (time, prefix, aspath)"
+            "path String"
+            ") ENGINE = MergeTree ORDER BY (time, prefix, path)"
             "SETTINGS old_parts_lifetime=10"
         )
         print("Clickhouse : Generated BGP table :D")
+
+    def start(self):
+        """
+        Create bgp table
+        (time DateTime, type, peer, collector, country, source, prefix, path)
+        Start thread for batch inserts
+        """
+        # self.client.execute("DROP TABLE IF EXISTS bgp")
+        self.started = True
         threading.Thread(
             target=self.insert_batches, daemon=True, name="BGP monitor - clickhouse"
         ).start()
@@ -64,8 +52,6 @@ class ClickHouseDB(Database):
         """Stop inserts"""
         if self.started:
             self.started = False
-            print("Clickhouse : Inserting last batch")
-            # self.client.execute("INSERT INTO bgp VALUES ", self.get_data())
 
     ###############
     #   INSERTS   #
@@ -87,16 +73,18 @@ class ClickHouseDB(Database):
         for idx in range(self.BATCH_SIZE):
             rec = self.queue.get()
             yield {
-                "time": int(rec.time),
-                "type": rec.type,
-                "peerasn": rec.peer_asn,
-                "collector": rec.collector or "",
-                "country": rec.country_code or "",
-                "sourceasn": rec.source or "",
-                "prefix": rec.prefix or "",
-                "aspath": rec["path"] or "",
+                "time": int(rec["time"]),
+                "type": rec["type"],
+                "peer": rec["peer_asn"],
+                "collector": rec["collector"],
+                "country": rec["country_code"] or "",
+                "source": rec["source"] or "",
+                "prefix": rec["prefix"],
+                "path": rec.get("as-path", ""),
+                "project": rec["project"],
             }
-            if self.queue.qsize() == 0 and not self.started:  # Return
+            if self.queue.qsize() == 0 and not self.started:
+                print("Clickhouse : Inserting last batch")
                 return
 
     def insert_batches(self):
@@ -109,6 +97,19 @@ class ClickHouseDB(Database):
     ##############
     #   GETTER   #
     ##############
+
+    var_names = {
+        "time_start": "time_start",
+        "time_end": "time_end",
+        "record_type": "type",
+        "peer_asn": "peer",
+        "collectors": "collector",
+        "countries": "country",
+        "as_numbers": "source",
+        "prefixes": "prefix",
+        "as_paths": "path",
+    }
+    # Used in `ClickHouseDB.get` function as arg_name:db_column_name
 
     def get(
         self,

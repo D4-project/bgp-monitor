@@ -21,12 +21,7 @@ COLLECTORS_URL = "http://bgpstream.caida.org/broker/meta/collectors"
 COLLECTORS = get_collectors()
 '''
 
-from inspect import getmembers
-import pickle
-import pprint
-import dill
 import pybgpstream
-import time
 
 if __name__ == "__main__":
 

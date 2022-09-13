@@ -2,14 +2,15 @@
 Subscribe to a RIS Live stream and output every message to stdout.
 
 IMPORTANT: this example requires 'websocket-client' for Python 2 or 3.
-
-If you use the 'websockets' package instead (Python 3 only) you will need to change the code because it has a somewhat different API.
+If you use the 'websockets' package instead (Python 3 only) you will
+need to change the code because it has a somewhat different API.
 """
-import json
+# from email import message
+# import json
 from time import time
-import websocket
+# import websocket
 
-from sseclient import SSEClient
+# from sseclient import SSEClient
 
 cpt = 0
 ot = time()
@@ -25,8 +26,8 @@ params = {
     }
 }
 ws.send(json.dumps({
-	"type": "ris_subscribe",
-	"data": params
+"type": "ris_subscribe",
+"data": params
 }))
 
 
@@ -39,9 +40,10 @@ for data in ws:
         ot = nt
 """
 
-messages = SSEClient(
-    "https://ris-live.ripe.net/v1/stream/?format=sse&client=cli-example-2"
-)
+# messages = SSEClient(
+#    "https://ris-live.ripe.net/v1/stream/?format=sse&client=cli-example-2"
+# )
+messages = []
 for msg in messages:
     if cpt % 10000 == 0:
         nt = time()

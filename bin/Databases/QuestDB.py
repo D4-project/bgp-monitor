@@ -7,18 +7,6 @@ import psycopg2
 class QuestDB(Database):
     name = "quest"
 
-    var_names = {
-        "time_start": "time_start",
-        "time_end": "time_end",
-        "record_type": "type",
-        "peer_asn": "peerasn",
-        "collectors": "collector",
-        "countries": "country",
-        "as_numbers": "sourceasn",
-        "prefixes": "prefix",
-        "as_paths": "aspath",
-    }
-
     def __init__(self, config):
         super().__init__()
         # For UDP, change socket.SOCK_STREAM to socket.SOCK_DGRAM
@@ -57,10 +45,12 @@ class QuestDB(Database):
     def save(self, record):
         """Save bgp record using InfluxDB Line protocol
 
-        Format : bgp,type={record.type},collector={record.collector},
-        country={record.country_code or ''} peerasn={record.peer_asn},
-        peeraddress="{record.peer_address}",prefix="{record.prefix}",
-        aspath="{record.path}",source="{record.source}" {int(record.time*1000000000)}\n
+        Format :
+                bgp,type={record['type']},project={record['project']},
+                collector={record['collector']},country={record['country_code'] or ''}
+                 peer={record["peer_asn"]},prefix="{record["prefix"]}",
+                path="{record.get("as-path", "")}",source="{record["source"]}"
+                 {int(record['time']*1000000000)}\n
 
         Args:
             record (BGPElem)
@@ -68,10 +58,10 @@ class QuestDB(Database):
 
         self.send_utf8(
             (
-                f"bgp,type={record['type']},collector={record['collector']},"
-                f"country={record['country_code'] or ''} peerasn={record['peer_asn']},"
-                f'peeraddress="{record["peer_address"]}",prefix="{record["prefix"]}",'
-                f'aspath="{record["path"]}",source="{record["source"]}"'
+                f"bgp,type={record['type']},project={record['project']},"
+                f"collector={record['collector']},country={record['country_code'] or ''}"
+                f' peer={record["peer_asn"]},prefix="{record["prefix"]}",'
+                f'path="{record.get("as-path", "")}",source="{record["source"]}"'
                 f" {int(record['time']*1000000000)}\n"
             )
         )
@@ -83,6 +73,20 @@ class QuestDB(Database):
     ##############
     #   GETTER   #
     ##############
+    # The followings aren't used
+
+    var_names = {
+        "time_start": "time_start",
+        "time_end": "time_end",
+        "record_type": "type",
+        "peer_asn": "peerasn",
+        "collectors": "collector",
+        "countries": "country",
+        "as_numbers": "sourceasn",
+        "prefixes": "prefix",
+        "as_paths": "aspath",
+    }
+    # Used in `QuestDB.get` function as arg_name:db_column_name
 
     def get(
         self,

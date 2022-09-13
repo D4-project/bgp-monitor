@@ -83,10 +83,14 @@ For more details, you can consult the following links:
 
 ### From source
 
-1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
+1. First, you must install the following C libraries :
+
+- [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream)
    Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
 
-2. Clone repo and Install requirements:
+- [libMaxMindDB](https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa)
+
+2. Clone repo and Install required python packages:
 
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git

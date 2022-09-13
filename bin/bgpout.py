@@ -83,26 +83,16 @@ class BGPOut:
     # MAIN #
     ########
 
-    def start(self, pipe):
+    def start(self):
         """
         Start output
 
         - Init json output if specified
         - Start queue if enabled
-
-        Args:
-            pipe (Pipe): Where to get data from
         """
-
         if self.__json_out:
             self.__json_out.write("[")
         self.isStarted = True
-
-        p_output, p_input = pipe
-        p_input.close()  # We won't send data to bgpfilter
-
-        while self.isStarted:
-            self.__iteration(p_output.recv())
 
     def stop(self):
         """
@@ -127,10 +117,10 @@ class BGPOut:
         """Iterate over queue to process each bgp element"""
 
         if self.verbose:
-            print("\n" + json.dumps(e, sort_keys=True, cls=SetEncoder) + ",")
+            print(json.dumps(e, sort_keys=True, cls=SetEncoder) + "\n", flush=True)
         if self.json_out:
             self.json_out.write(
-                "\n" + json.dumps(e, sort_keys=True, indent=4, cls=SetEncoder) + ","
+                json.dumps(e, sort_keys=True, indent=4, cls=SetEncoder) + ",\n"
             )
         self.graph.update(e)
         self.databases.save(e)

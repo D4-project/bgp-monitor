@@ -3,6 +3,11 @@ import redis
 
 
 class KvrocksDB(Database):
+    """
+    This database store data as live
+    --> When a withdraw is received, concerned prefixes are removed
+    """
+
     name = "kvrocks"
 
     def __init__(self, config):
@@ -10,8 +15,6 @@ class KvrocksDB(Database):
         self.client = redis.Redis(
             host=config["host"], port=config["port"], db=config["db"]
         )
-
-    #        self.pipe = self.client.pipeline(True)
 
     def start(self):
         print(f"Database size : {self.client.dbsize()}")
@@ -34,52 +37,61 @@ class KvrocksDB(Database):
         """
         e = record
 
-        if e.type == "A":
+        if e["type"] == "A":
             self.client.sadd(
-                f"prefixes-{e.source}", e.prefix
+                f"prefixes-{e['source']}", e["prefix"]
             )  # prefixes-{ASN} : (cidr, cidr)
             self.client.sadd(
-                f"prefixes-{e.country_code}", e.prefix
+                f"prefixes-{e['country_code']}", e["prefix"]
             )  # prefixes-{LU} : (cidr, cidr)
-            self.client.sadd(f"as-{e.prefix}", e.source)  # as-{cidr} : (as, as, as)
             self.client.sadd(
-                f"countries-{e.prefix}", e.country_code
+                f"as-{e['prefix']}", e["source"]
+            )  # as-{cidr} : (as, as, as)
+            self.client.sadd(
+                f"countries-{e['prefix'] or ''}", e["country_code"]
             )  # countries-{cidr} : (LU, FR)
             self.client.sadd(
-                f"paths-{e.prefix}", e.path
+                f"paths-{e['prefix']}", e.get("as-path")
             )  # paths-{cidr} : (path, path, path)
 
             self.client.zadd(
-                "bgp-{}:{}:{}".format(e.prefix, e.path, e.source),
+                "bgp-{}:{}:{}".format(e["prefix"], e.get("as-path"), e["source"]),
                 {
-                    f"{e.time}:{e.type}:{e.peer_asn}:"
-                    f"{e.collector}:{e.country_code}": int(float(e.time))
+                    f"{e['time']}:{e['type']}:{e['peer_asn']}:"
+                    f"{e['collector']}:{e['country_code']}": int(float(e["time"]))
                 },
             )
         #            self.client.execute()
 
-        elif e.type == "W":
-            for as_source in self.client.smembers(f"as-{e.prefix}"):
+        elif e["type"] == "W":
+            return
+            for as_source in self.client.smembers(f"as-{e['prefix']}"):
                 self.client.srem(
-                    f"prefixes-{as_source}", e.prefix
+                    f"prefixes-{as_source}", e["prefix"]
                 )  # pr AS {cidr, cidr}
 
-            for pr in self.client.smembers(f"country-{e.prefix}"):
-                self.client.srem(f"prefixes-{e.country_code}", pr)  # pr LU {cidr, cidr}
+            for pr in self.client.smembers(f"country-{e['prefix']}"):
+                self.client.srem(
+                    f"prefixes-{e['country_code']}", pr
+                )  # pr LU {cidr, cidr}
 
-            self.client.delete(f"countries-{e.prefix}")  # countries-cidr {LU, FR}
-            self.client.delete(f"as-{e.prefix}")  # as-cidr {as, as, as }
-            self.client.delete(f"paths-{e.prefix}")  # paths-cidr {path, path, path}
+            self.client.delete(f"countries-{e['prefix']}")  # countries-cidr {LU, FR}
+            self.client.delete(f"as-{e['prefix']}")  # as-cidr {as, as, as }
+            self.client.delete(f"paths-{e['prefix']}")  # paths-cidr {path, path, path}
 
             self.client.zadd(
-                "bgp-{}".format(e.prefix),
-                {f"{e.time}:{e.type}:{e.peer_asn}:{e.collector}": int(float(e.time))},
+                "bgp-{}".format(e["prefix"]),
+                {
+                    f"{e['time']}:{e['type']}:{e['peer_asn']}:{e['collector']}": int(
+                        float(e["time"])
+                    )
+                },
             )
             self.client.zadd(
-                "bgp-{}:{}".format(record.prefix, record._maybe_field("as-path")),
+                "bgp-{}:{}".format(e["prefix"], e.get("as-path")),
                 {
-                    f"{record.time}:{record.type}:{record.peer_asn}:"
-                    f"{record.collector}": int(float(record.time))
+                    f"{e['time']}:{e['type']}:{e['peer_asn']}:"
+                    f"{e['collector']}": int(float(e["time"]))
                 },
             )
 

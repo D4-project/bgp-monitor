@@ -283,7 +283,7 @@ class BGPFilter:
         self.__ipversion = " and ipversion " + version if version in ["4", "6"] else ""
 
     ###############
-    #             #
+    #   COUNTRY   #
     ###############
 
     @property
@@ -335,8 +335,6 @@ class BGPFilter:
         if not os.path.isfile(country_file_path):
             raise FileNotFoundError
         self.__f_country_path = country_file_path
-
-        self.__f_country_path = "../mmdb_files/latest.mmdb"
         self.__countries_filter = None
 
         self.__f_country = maxminddb.open_database(
@@ -433,8 +431,8 @@ class BGPFilter:
             self.timer["nt"] = time.time()
             print(
                 f'Counter : {self.timer["cpt"]} '
-                '- Time {self.timer["nt"] - self.timer["ft"]} '
-                '- {self.timer["nt"] - self.timer["ot"]}s',
+                f'- Time {self.timer["nt"] - self.timer["ft"]} '
+                f'- {self.timer["nt"] - self.timer["ot"]}s',
                 file=sys.stderr,
             )
             # sys.stderr.write(f"Queue size : {self.queue.qsize()}")
@@ -443,11 +441,12 @@ class BGPFilter:
     def start(self):
         """
         Start retrieving stream/records and filtering them
-        - Load Geo Open database
-        - Start stream with args
-        - Print each record as JSON format
+        - Download and load Geo-Open database
+        - Build Stream
+        - Send messages to bgpout.py
         """
 
+        self.out.start()
         print("Loading stream...")
         self._build_stream()
         print("Starting")
@@ -455,14 +454,12 @@ class BGPFilter:
 
         for e in self._stream:
             self.cpt_update()
-
             msg = {
                 "type": e.type,
                 "time": e.time,
                 "peer_address": e.peer_address,
                 "peer_asn": e.peer_asn,
                 "collector": e.collector,
-                "record_type": e.record_type,
                 "project": e.project,
                 "router": e.router,
                 "router_ip": e.router_ip,
@@ -471,11 +468,12 @@ class BGPFilter:
             msg["country_code"] = self.__country_by_prefix(msg["prefix"])
             msg["source"] = msg["as-path"].split()[-1] if "as-path" in msg else None
 
-            self.out.iteration(msg)
+            if self.__check_country(msg):
+                self.out.iteration(msg)
 
     def stop(self):
         """
-        Close JSON output file and stop BGPStream
+        Close output (JSON, Databases, etc) and stop BGPStream
         """
         print("Stream ended")
         self.out.stop()
