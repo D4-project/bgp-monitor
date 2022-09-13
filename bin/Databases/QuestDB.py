@@ -79,12 +79,12 @@ class QuestDB(Database):
         "time_start": "time_start",
         "time_end": "time_end",
         "record_type": "type",
-        "peer_asn": "peerasn",
+        "peer_asn": "peer",
         "collectors": "collector",
         "countries": "country",
-        "as_numbers": "sourceasn",
+        "as_numbers": "source",
         "prefixes": "prefix",
-        "as_paths": "aspath",
+        "as_paths": "path",
     }
     # Used in `QuestDB.get` function as arg_name:db_column_name
 
