@@ -1,11 +1,1 @@
-{
-  "bgp:type": "A",
-  "bgp:time": 1650632262.23,
-  "bgp:peer": "202.69.160.152",
-  "bgp:peer_asn": 17639,
-  "bgp:collector": "None",
-  "bgp:prefix": "172.225.195.0/24",
-  "bgp:country_code": "US",
-  "bgp:as-path": "",
-  "bgp:next-hop": "2.56.11.1"
-}
+{  "bgp:type": "A",  "bgp:time": 1650632262.23,  "bgp:peer": "202.69.160.152",  "bgp:peer_asn": 17639,  "bgp:collector": "None",  "bgp:prefix": "172.225.195.0/24",  "bgp:country_code": "US",  "bgp:as-path": "",  "bgp:next-hop": "2.56.11.1"}
