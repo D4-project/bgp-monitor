@@ -34,8 +34,8 @@ else:
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--fields", nargs="+", help="fields to check", required=True)
 parser.add_argument("-ttl", "--timetolive", help="time to keep key in db")
-parser.add_argument("-v", "--verbose", help="more display")
-parser.add_argument("-d", "--debug", help="debug mode")
+parser.add_argument("-v", "--verbose", help="more display", action='store_true')
+parser.add_argument("-d", "--debug", help="debug mode", action='store_true')
 args = parser.parse_args()
 
 verbose = args.verbose
@@ -84,6 +84,6 @@ while True:
 
                 if not debug:
                     meta_dict = {}
-                    source = 'bgp-monitor'
+                    source = 'bgp_monitor'
                     source_uuid = uuid
                     pyail.feed_json_item(js, meta_dict, source, source_uuid, 'utf-8')
