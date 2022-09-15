@@ -179,10 +179,6 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--queue", action="store_true", help="Enable queue option. Use a lot of memory"
-    )
-
-    parser.add_argument(
         "-id",
         "--input_data",
         type=str,
@@ -275,7 +271,6 @@ if __name__ == "__main__":
     bout = bgpout.BGPOut()
     bout.json_out = args.json_output
     bout.expected_result = args.expected_result
-    bout.queue = args.queue  # Boolean
     bout.verbose = args.verbose
     bout.databases = BGPDatabases(config["databases"])
 

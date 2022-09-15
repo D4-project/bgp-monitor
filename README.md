@@ -45,7 +45,6 @@ options:
   --stop <end>          End of the interval.
                           -> Timestamp format : YYYY-MM-DD hh:mm:ss.
                              Example: 2022-01-01 10:10:00
-  --queue               Enable queue option. Use a lot of memory
   -id <path>, --input_data <path>
                         Retrieve data from a single file instead of a broker.
   -ir {upd,rib}, --input_record_type {upd,rib}

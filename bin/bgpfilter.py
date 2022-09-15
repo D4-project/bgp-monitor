@@ -53,6 +53,7 @@ class BGPFilter:
         self.__prefix_match_type_filter = None
         self.__project = PROJECTS[0]
         self.__collectors = None
+        self.__countries_filter = None
         self.__data_source = {"source_type": "broker"}
         self.out: bgpout.BGPOut = None
         """`bgpout.BGPOut()` instance that will receive all records"""
@@ -335,7 +336,6 @@ class BGPFilter:
         if not os.path.isfile(country_file_path):
             raise FileNotFoundError
         self.__f_country_path = country_file_path
-        self.__countries_filter = None
 
         self.__f_country = maxminddb.open_database(
             self.__f_country_path, maxminddb.MODE_MMAP_EXT
