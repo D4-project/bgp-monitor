@@ -5,6 +5,7 @@ Script to avoid duplication of json regarding some fields of the json.
 ## Requirements
 
 - [redis](https://github.com/redis/redis-py)
+- [pyail](https://github.com/ail-project/PyAIL)
 
 
 
@@ -13,6 +14,7 @@ Script to avoid duplication of json regarding some fields of the json.
 ~~~bash
 dacru@dacru:~/git/bgp-monitor/dedupe-json/bin$ python dedupe-json.py -h
 usage: dedupe-json.py [-h] -f FIELDS [FIELDS ...] [-ttl TIMETOLIVE]
+                      [-v VERBOSE] [-d DEBUG]
 
 options:
   -h, --help            show this help message and exit
@@ -20,6 +22,10 @@ options:
                         fields to check
   -ttl TIMETOLIVE, --timetolive TIMETOLIVE
                         time to keep key in db
+  -v VERBOSE, --verbose VERBOSE
+                        more display
+  -d DEBUG, --debug DEBUG
+
 
 ~~~
 

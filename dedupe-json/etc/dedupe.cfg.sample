@@ -1,0 +1,11 @@
+[general]
+uuid = 7c27e84a-e03d-4a5f-b584-b978167f9748
+
+[ail]
+url = https://127.0.0.1:7000
+apikey = <YOURAPIKEY> 
+
+[redis]
+host = 127.0.0.1
+port = 6379
+db = 5
