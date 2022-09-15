@@ -83,10 +83,14 @@ For more details, you can consult the following links:
 
 ### From source
 
-1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
+1. First, you must install the following C libraries :
+
+- [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream)
    Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
 
-2. Clone repo and Install requirements:
+- [libMaxMindDB](https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa)
+
+2. Clone repo and Install required python packages:
 
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git
@@ -145,8 +149,6 @@ You can install generated images from **Dockerhub**:
 ```shell
 docker run -it ustaenes/bgp-monitor:latest
 ```
-
-:warning: Not yet available :warning: :
 
 ```shell
 docker run -it -P ustaenes/bgp-monitor:kvrocks
@@ -238,14 +240,19 @@ It will be easier to work with static data instead of ris-live stream:
 
 Note that you can use options like `--json_out` (to save the output) or `--expected_result` (check if json_out is equal to the specified file)
 
-# How it works?
-
-
 # License
 
 # Contribution
 
-UML of different classes + class docs + Scheme
+This repository is open to any contribution.
 
-# How it's made?
-You can check the following UML :
+## Add your own Database
+To process data in you own way, here are the steps:
+1. Copy SampleDatabase.py and implement it in your own way
+    It must be in the `Databases` folder
+2. To load and use it, you must then add your class name to `etc/config.cfg`
+3. Be careful used technologies and implementation are important for performances
+
+
+## How it's made?
+To update or upgrade a specific part of the code, check the following diagram

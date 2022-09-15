@@ -1,0 +1,178 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "target": {
+            "limit": 100,
+            "matchAny": false,
+            "tags": [],
+            "type": "dashboard"
+          },
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 1,
+    "links": [],
+    "liveNow": false,
+    "panels": [
+      {
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "yJtY1267z"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "lineInterpolation": "stepAfter",
+              "lineWidth": 1,
+              "pointSize": 0,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 13,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom"
+          },
+          "tooltip": {
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "builderOptions": {
+              "database": "default",
+              "fields": [],
+              "filters": [],
+              "groupBy": [
+                "country"
+              ],
+              "limit": 1000,
+              "metrics": [
+                {
+                  "aggregation": "count",
+                  "alias": "_",
+                  "field": "*"
+                }
+              ],
+              "mode": "trend",
+              "orderBy": [],
+              "table": "bgp",
+              "timeField": "time",
+              "timeFieldType": "DateTime"
+            },
+            "datasource": {
+              "type": "grafana-clickhouse-datasource",
+              "uid": "yJtY1267z"
+            },
+            "format": 0,
+            "meta": {
+              "builderOptions": {
+                "database": "default",
+                "fields": [
+                  "time",
+                  "country"
+                ],
+                "filters": [],
+                "groupBy": [
+                  "country",
+                  "time"
+                ],
+                "limit": 100,
+                "metrics": [],
+                "mode": "aggregate",
+                "orderBy": [],
+                "table": "bgp"
+              }
+            },
+            "queryType": "builder",
+            "rawSql": "SELECT $__timeInterval(time) as time, country, count(*) _ FROM default.bgp WHERE $__timeFilter(time) GROUP BY country, time ORDER BY time ASC LIMIT 1000",
+            "refId": "A"
+          }
+        ],
+        "title": "BGP Messages by Country",
+        "transformations": [],
+        "type": "timeseries"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 37,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "",
+    "title": "BGP Monitoring",
+    "uid": "JXC--h67z",
+    "version": 3,
+    "weekStart": ""
+  }

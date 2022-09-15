@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+- name: BGP_Monitoring
+  folder: ''
+  type: file
+  disableDeletion: false
+  editable: true
+  isDefault: true
+  options:
+    path: /etc/grafana/provisioning/dashboards/BGP_Monitoring.json

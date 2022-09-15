@@ -1,16 +1,21 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python
 """
 Main execution, handle arguments, init each instances
 """
 
 import os
+import sys
 import signal
 import bgpout
 import argparse
+import urllib.request
 from configobj import ConfigObj
 from bgpfilter import BGPFilter
 from Databases.database import BGPDatabases
 
+DEFAULT_GEOOPEN_URL = "https://cra.circl.lu/opendata/geo-open/mmdb-country-asn/latest.mmdb"
+
+# define bin/ as default workdir
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -174,9 +179,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--queue",
-        action="store_true",
-        help="Enable queue option. Use a lot of memory",
+        "--queue", action="store_true", help="Enable queue option. Use a lot of memory"
     )
 
     parser.add_argument(
@@ -248,8 +251,14 @@ if __name__ == "__main__":
             args.input_record_type, args.input_file_format, args.input_data
         )
 
-    if "geoopen" in config:
-        filter.country_file = config["geoopen"]["path"]
+    if "geo-open" in config:
+        url = config["geo-open"] or DEFAULT_GEOOPEN_URL# if "download_url"
+        print("Downloading latest Geo Open Database", file=sys.stderr)
+        urllib.request.urlretrieve(
+            config["geo-open"]["download_url"], "../geo-open/latest.mmdb"
+        )
+
+        filter.country_file = config["geo-open"]["path"]
 
     if args.filter_list is not None:
         res = asnPrefixFromFile(args.filter_list)

@@ -2,19 +2,12 @@ from abc import ABC, abstractmethod
 
 
 class Database(ABC):
-    def __init__(self):
-        pass
+    name = None
+    """This variable is used for configuration file
 
-    @abstractmethod
-    def get(
-        self,
-        as_numbers=None,
-        prefixes=None,
-        match_type="more",
-        start_time=None,
-        end_time=None,
-        countries=None,
-    ):
+    You must specify it in config to load an instance"""
+
+    def __init__(self):
         pass
 
     @abstractmethod
@@ -27,6 +20,21 @@ class Database(ABC):
 
     @abstractmethod
     def stop(self):
+        pass
+
+    @abstractmethod
+    def get(
+        self,
+        time_start,
+        time_end,
+        record_type=None,
+        peer_asn=None,
+        collector=None,
+        country=None,
+        asn=None,
+        prefix=None,
+        path=None,
+    ):
         pass
 
 

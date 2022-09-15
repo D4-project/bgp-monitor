@@ -3,13 +3,12 @@
 ## Usage
 
 ```shell
-usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [--config <path>] [-jo [<path>]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]] [-ip <version>]
-                  [-pf <prefix> [<prefix> ...]] [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r] [--start <begin>] [--stop <end>] [--queue] [-id <path>]
-                  [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
+usage: monitor.py [-h] [-v] [--verbose] [--filter_list [<path>]] [--config <path>] [-jo [<path>]] [-cf <country code> [<country code> ...]] [-af <AS number> [<AS number> ...]] [-ip <version>] [-pf <prefix> [<prefix> ...]]
+                  [--match {more,less,exact,any}] [-p {ris,routeviews}] [-c <collector> [<collector> ...]] [-r] [--start <begin>] [--stop <end>] [--queue] [-id <path>] [-ir {upd,rib}] [-if {mrt,bmp,ris-live}] [--expected_result [<path>]]
 
 Tool for BGP filtering and monitoring
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -v, --version         show program\'s version number and exit
   --verbose             Print BGP records in console
@@ -65,10 +64,14 @@ optional arguments:
 
 ### From source
 
-1. First, you must install [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream) C library
+1. First, you must install the following C libraries :
+
+- [libBGPStream](https://bgpstream.caida.org/docs/install/bgpstream)
    Check supported OS before install (eg. Ubuntu 22.04 is not supported)  
 
-2. Clone repo and Install requirements:
+- [libMaxMindDB](https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa)
+
+2. Clone repo and Install required python packages:
 
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git
@@ -86,7 +89,7 @@ export PATH=$PATH:/path/to/repo/bgp-monitor/bin/
 
 Therefore, you can install the desired database:
 
-- [kvrocks](https://github.com/apache/incubator-kvrocks)
+- [kvrocks](https://github.com/apache/incubator-kvrocks) :warning: Doesn't work
 - [Questdb](https://github.com/questdb/questdb)
 - [Clickhouse](https://clickhouse.com/docs/en/quick-start)
 
@@ -116,7 +119,7 @@ docker run -it bgp-monitor:{dbname}
 
 Available dbname :
 
-- kvrocks
+- kvrocks :warning: Doesn't work
 - clickhouse
 - quest
 
@@ -128,8 +131,7 @@ You can install generated images from **Dockerhub**:
 docker run -it ustaenes/bgp-monitor:latest
 ```
 
-:warning: Not yet available :warning: :
-
+:warning: Doesn't work
 ```shell
 docker run -it -P ustaenes/bgp-monitor:kvrocks
 ```
@@ -141,6 +143,16 @@ docker run -it -P ustaenes/bgp-monitor:quest
 ```shell
 docker run -it -P ustaenes/bgp-monitor:clickhouse
 ```
+
+### BGP Messages by country
+If you are interested about getting a handy dashboard
+
+```shell
+cd path/to/bgp-monitor/docker/grafana_dashboard
+docker-compose up -d
+```
+
+You can then access to Grafana dashboard at [http://localhost:3000](http://localhost:3000)
 
 ---
 
@@ -207,27 +219,39 @@ Note that you can use options like `--json_out` (to save the output) or `--expec
   - W: prefix withdrawal
   - S: peer state change
 - `time` : Timestamp
-- `peer` : The IP address of the peer that this element was received from.
+- `peer_address` : The IP address of the peer that this element was received from.
 - `peer_asn`: The ASN of the peer that this element was received from.
 - `collector`: The name of the collector that generated this element.
 - `prefix` : The prefix of the source ASN that this element was generated from. [A and W types]
 - `country_code`: The country of the source ASN that this element was generated from. [A and W types]
 - `next-hop`: The next-hop IP address [A type]
 - `as-path`: String list separated by spaces of AS numbers, ordered by the near peer ASN to the source ASN. Therefore, Source ASN is at the end of the string. [A type]
+- `source`: Source AS in the as-path (also last AS number)
 
 ## Example of json output
 
 ```json
 {
-  "bgp:type": "A",
-  "bgp:time": 1650632262.23,
-  "bgp:peer": "202.69.160.152",
-  "bgp:peer_asn": 17639,
-  "bgp:collector": "None",
-  "bgp:prefix": "172.225.195.0/24",
-  "bgp:country_code": "US",
-  "bgp:as-path": "",
-  "bgp:next-hop": "2.56.11.1"
+    "as-path": "25160 2914 5511 8697 8376",
+    "collector": "rrc03",
+    "communities": [
+        "2914:3200",
+        "2914:420",
+        "2914:2202",
+        "25160:22010",
+        "2914:1201"
+    ],
+    "country_code": "JO",
+    "next-hop": "80.249.210.85",
+    "peer_address": "80.249.210.85",
+    "peer_asn": 25160,
+    "prefix": "149.200.178.0/24",
+    "project": "ris-live",
+    "router": null,
+    "router_ip": null,
+    "source": "8376",
+    "time": 1663080130.13,
+    "type": "A"
 }
 ```
 
@@ -243,3 +267,14 @@ See [BGPElem](https://bgpstream.caida.org/docs/api/pybgpstream/_pybgpstream.html
 - [Geo Open Databases](<https://data.public.lu/en/datasets/geo-open-ip-address-geolocation-per-country-in-mmdb-format/>)
 - Wikipedia [EN](https://en.wikipedia.org/wiki/Border_Gateway_Protocol)
 - Wikipedia [FR](https://fr.wikipedia.org/wiki/Border_Gateway_Protocol)
+
+# Contribution
+
+This repository is open to any contribution.
+
+## Add your own Database
+To process data in you own way, here are the steps:
+1. Copy SampleDatabase.py and implement it in your own way
+    It must be in the `Databases` folder
+2. To load and use it, you must then add your class name to `etc/config.cfg`
+3. Be careful used technologies and implementation are important for performances

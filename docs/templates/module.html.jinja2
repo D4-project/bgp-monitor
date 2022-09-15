@@ -7,77 +7,96 @@
     {% defaultmacro module_name() %}<h1 class="modulename">BGP monitor</h1>{% enddefaultmacro%}
 {% endif %}
 
+{% set edit_url = "https://github.com/D4-project/bgp-monitor/" %}
+
+
 {% block module_contents %}
     {{ super() }}
     {% if module.modulename == 'bin' %}
         <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
         <div class="mermaid">
             classDiagram
-                class BGPFilter{
-                    -isRecord : Boolean
-                    -start_time : String
-                    -end_time : String
-                    -f_country_path : String ~get/set~
-                    -f_country_path : MaxminDB
-                    -countries_filter : List[String] ~get/set~
-                    -asn_filter : String ~get/set~
-                    -ipversion : String ~get/set~
-                    -prefix_filter : String ~get~
-                    -asn_list : String
-                    -prefix_match_type_filter : String ~get~
-                    -project : String ~get/set~
-                    -collectors : Array ~get/set~
-                    -data_source : String
-                    #stream : BGPStream
-                    +out : BGPOut
-                    +record_mode(isRecord, start, end)
-                    +data_source(record_type: Boolean, file_format: String, file_path: String)
-                    +prefix_filter(prefix_list: List[String], match_type: String)
-                    +start()
-                    +stop()
-                }
-                
-                class BGPOut{
-                    -json_out : File ~get/set~
-                    -queue : Queue
-                    +self.isQueue : Boolean ~get/set~
-                    +expected_result : File ~get/set~
-                    -bgp_conv(e: BGPElem): dict
-                    -iteration(e: BGPElem)
-                    -process_queue()
-                    +input_data(data: BGPElem)
-                    +closeFile(file: File)
-                    +start()
-                    +stop()
-                }
-
-                class Database{
-                    String name$
-                    start()*
-                    stop()*
-                    save(record: BGPElement)*
-                    get(as_numbers, prefixes, match_type, start_time, end_time, countries)*
-                }
-                
-                class BGPDatabases{
-                    -databases : ~List~Databases~ get/ Array set~
-                    +start()
-                    +stop()
-                    +save(record: BGPElement)
-                }
-
-                class BGPGraph
-                class ClickHouseDB~Database~
-                class QuestDB~Database~
-                class KvrocksDB~Database~
-
-                BGPFilter "1" -- "0" BGPOut
-                BGPOut "1" --> BGPDatabases : send data
-                BGPOut --> BGPGraph : send data
-                BGPDatabases "0..*" -- "" Database
-                Database <|-- KvrocksDB : extends
-                Database <|-- QuestDB : extends
-                Database <|-- ClickHouseDB : extends
+            class BGPFilter{
+                -isRecord : Boolean
+                -start_time : String
+                -end_time : String
+                -country_file : String ~get/set~
+                -f_country : MaxmindDB
+                -countries_filter : List[String] ~get/set~
+                -asn_filter : String ~get/set~
+                -ipversion : String ~get/set~
+                -prefix_filter : String ~get~
+                -asn_list : String
+                -prefix_match_type_filter : String ~get~
+                -project : String ~get/set~
+                -collectors : Array ~get/set~
+                -data_source : String
+                #_stream : BGPStream
+                +out : BGPOut
+                +record_mode(isRecord, start, end)
+                +data_source(record_type: Boolean, file_format: String, file_path: String)
+                +prefix_filter(prefix_list: List[String], match_type: String)
+                +start()
+                +stop()
+            }
+            
+            class BGPOut{
+                -json_out : File ~get/set~
+                +expected_result : File ~get/set~
+                +iteration(e: BGPElem)
+                +closeFile(file: File)
+                +start()
+                +stop()
+            }
+        
+            class Database{
+                <<abstract>>
+                String name$
+                start()*
+                stop()*
+                save(record: BGPElement)*
+                get(as_numbers, prefixes, match_type, start_time, end_time, countries)*
+            }
+            
+            class BGPDatabases{
+                -databases : ~List~Databases~ get/ Array set~
+                +start()
+                +stop()
+                +save(record: BGPElement)
+            }
+        
+            class BGPGraph{
+                +graph
+                +filter_edge()
+                +get()
+                +update(record: BGPElement)
+            }
+        
+            class ClickHouseDB~Database~{
+                +BATCH_SIZE : Integer
+                +started : Boolean
+                +queue : Queue
+                +client
+                get_data() : Iterable[dict]
+                insert_batches()
+            }
+            class QuestDB~Database~{
+                sock : socket
+                connection
+                conf : dict
+                send_utf8(msg)
+            }
+            class KvrocksDB~Database~{
+                client : Redis
+            }
+        
+            BGPFilter "1" --> "0" BGPOut : iterate
+            BGPOut "1" *--> BGPDatabases : send data
+            BGPOut *--> BGPGraph : send data
+            BGPDatabases "0..*" *-- "" Database
+            Database <|.. KvrocksDB
+            Database <|.. QuestDB
+            Database <|.. ClickHouseDB
         </div>
 
         <script>mermaid.initialize({startOnLoad:true});</script>

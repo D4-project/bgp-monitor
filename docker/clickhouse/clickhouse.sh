@@ -4,7 +4,6 @@
 set -m
   
 # Start the primary process and put it in the background
-echo "azdazd"
 sudo /opt/clickhouse/clickhouse start &
 # Start the helper process
 /bin/bash
