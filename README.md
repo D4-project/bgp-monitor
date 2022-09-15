@@ -144,6 +144,16 @@ docker run -it -P ustaenes/bgp-monitor:quest
 docker run -it -P ustaenes/bgp-monitor:clickhouse
 ```
 
+### BGP Messages by country
+If you are interested about getting a handy dashboard
+
+```shell
+cd path/to/bgp-monitor/docker/grafana_dashboard
+docker-compose up -d
+```
+
+You can then access to Grafana dashboard at [http://localhost:3000](http://localhost:3000)
+
 ---
 
 ## Usage

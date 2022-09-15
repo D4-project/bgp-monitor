@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#! /usr/bin/env python
 """
 Main execution, handle arguments, init each instances
 """
@@ -12,6 +12,8 @@ import urllib.request
 from configobj import ConfigObj
 from bgpfilter import BGPFilter
 from Databases.database import BGPDatabases
+
+DEFAULT_GEOOPEN_URL = "https://cra.circl.lu/opendata/geo-open/mmdb-country-asn/latest.mmdb"
 
 # define bin/ as default workdir
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -250,11 +252,11 @@ if __name__ == "__main__":
         )
 
     if "geo-open" in config:
-        if "download_url" in config["geo-open"]:
-            print("Downloading latest Geo Open Database", file=sys.stderr)
-            urllib.request.urlretrieve(
-                config["geo-open"]["download_url"], "../geo-open/latest.mmdb"
-            )
+        url = config["geo-open"] or DEFAULT_GEOOPEN_URL# if "download_url"
+        print("Downloading latest Geo Open Database", file=sys.stderr)
+        urllib.request.urlretrieve(
+            config["geo-open"]["download_url"], "../geo-open/latest.mmdb"
+        )
 
         filter.country_file = config["geo-open"]["path"]
 

@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  bgp-monitor:
+    build:
+      context: ../../
+      dockerfile: docker/Dockerfile
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./grafana/config.cfg:/opt/bgp-monitor/etc/config.cfg
+    command: "/opt/bgp-monitor/bin/monitor.py"
+    depends_on:
+      clickhouse-server:
+        condition: service_healthy
+
+  clickhouse-server:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "8123:8123" # for clickhouse-server http interface
+    volumes:
+      - clickhouse-storage:/var/lib/clickhouse
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-cache --spider -nv -t1  http://localhost:8123/ping || exit 1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-clickhouse-datasource
+    depends_on:
+      clickhouse-server:
+        condition: service_healthy
+
+volumes:
+  grafana-storage:
+  clickhouse-storage:

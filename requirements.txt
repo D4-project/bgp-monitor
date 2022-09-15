@@ -1,6 +1,5 @@
 maxminddb
 pycountry
-pybgpstream
 pytz
 pyyaml
 clickhouse-driver[lz4,zstd]
@@ -11,4 +10,4 @@ redis
 matplotlib
 configobj
 psycopg2-binary
-faster_fifo
+pybgpstream

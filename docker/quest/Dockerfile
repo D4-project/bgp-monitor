@@ -1,5 +1,5 @@
 FROM bgp-monitor:latest
-LABEL version="1.0" org="CIRCL" description="Tool for BGP monitoring"
+LABEL version="1.0" org="CIRCL" description="Tool for BGP monitoring with QuestDB install"
 
 
 WORKDIR /opt/
