@@ -28,11 +28,11 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          dockerfile: ./docker/Dockerfile
+          file: ./docker/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:latest
       - name: Databases - Build and push
         uses: docker/build-push-action@v3
         with:
           push: true
-          dockerfile: ./docker/${{ matrix.database }}/Dockerfile
+          file: ./docker/${{ matrix.database }}/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/bgp-monitor:${{ matrix.database }}
