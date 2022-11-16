@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.3.0"/>
     <title>BGP monitor</title>
             <link rel="icon" href="https://d4-project.org/assets/images/logo.png"/>
 
@@ -88,9 +88,9 @@
                         <div class="docstring"><p>Ingest all records, queue, reformat, send, publish, save them.</p>
 </div>
 
-                        <input id="bgpout-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-bgpout-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="bgpout-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-bgpout-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">Ingest all records, queue, reformat, send, publish, save them.</span>
@@ -209,43 +209,44 @@
 </span><span id="L-115"><a href="#L-115"><span class="linenos">115</span></a>
 </span><span id="L-116"><a href="#L-116"><span class="linenos">116</span></a>    <span class="k">def</span> <span class="nf">iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 </span><span id="L-117"><a href="#L-117"><span class="linenos">117</span></a>        <span class="sd">&quot;&quot;&quot;Iterate over queue to process each bgp element&quot;&quot;&quot;</span>
-</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>
-</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="p">:</span>
-</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>            <span class="p">)</span>
-</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>
-</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>    <span class="k">def</span> <span class="nf">closeFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
-</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>        <span class="sd">&quot;&quot;&quot;Close a JSON file</span>
-</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>
-</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a><span class="sd">        Args:</span>
-</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">            file (File): The file to close</span>
-</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a>        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>            <span class="k">return</span>
-</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
-</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
-</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
-</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>
+</span><span id="L-118"><a href="#L-118"><span class="linenos">118</span></a>        <span class="c1"># self.redis.xadd()</span>
+</span><span id="L-119"><a href="#L-119"><span class="linenos">119</span></a>
+</span><span id="L-120"><a href="#L-120"><span class="linenos">120</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+</span><span id="L-121"><a href="#L-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="L-122"><a href="#L-122"><span class="linenos">122</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="p">:</span>
+</span><span id="L-123"><a href="#L-123"><span class="linenos">123</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+</span><span id="L-124"><a href="#L-124"><span class="linenos">124</span></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="L-125"><a href="#L-125"><span class="linenos">125</span></a>            <span class="p">)</span>
+</span><span id="L-126"><a href="#L-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span id="L-127"><a href="#L-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span id="L-128"><a href="#L-128"><span class="linenos">128</span></a>
+</span><span id="L-129"><a href="#L-129"><span class="linenos">129</span></a>    <span class="k">def</span> <span class="nf">closeFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+</span><span id="L-130"><a href="#L-130"><span class="linenos">130</span></a>        <span class="sd">&quot;&quot;&quot;Close a JSON file</span>
+</span><span id="L-131"><a href="#L-131"><span class="linenos">131</span></a>
+</span><span id="L-132"><a href="#L-132"><span class="linenos">132</span></a><span class="sd">        Args:</span>
+</span><span id="L-133"><a href="#L-133"><span class="linenos">133</span></a><span class="sd">            file (File): The file to close</span>
+</span><span id="L-134"><a href="#L-134"><span class="linenos">134</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-135"><a href="#L-135"><span class="linenos">135</span></a>        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-136"><a href="#L-136"><span class="linenos">136</span></a>            <span class="k">return</span>
+</span><span id="L-137"><a href="#L-137"><span class="linenos">137</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+</span><span id="L-138"><a href="#L-138"><span class="linenos">138</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+</span><span id="L-139"><a href="#L-139"><span class="linenos">139</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
+</span><span id="L-140"><a href="#L-140"><span class="linenos">140</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span><span id="L-141"><a href="#L-141"><span class="linenos">141</span></a>
-</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a><span class="k">def</span> <span class="nf">checkFiles</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>    <span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a><span class="sd">    Check if two json files are equal</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>
-</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a><span class="sd">    Args:</span>
-</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">        f1, f2 (File): json files</span>
-</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>    <span class="n">f1</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
-</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">f2</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
-</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="n">json1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
-</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="n">json2</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
-</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>    <span class="k">return</span> <span class="n">json1</span> <span class="o">==</span> <span class="n">json2</span>
+</span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
+</span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a><span class="k">def</span> <span class="nf">checkFiles</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+</span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>    <span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a><span class="sd">    Check if two json files are equal</span>
+</span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
+</span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a><span class="sd">    Args:</span>
+</span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a><span class="sd">        f1, f2 (File): json files</span>
+</span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>
+</span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="n">f1</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+</span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>    <span class="n">f2</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+</span><span id="L-153"><a href="#L-153"><span class="linenos">153</span></a>    <span class="n">json1</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f1</span><span class="p">)</span>
+</span><span id="L-154"><a href="#L-154"><span class="linenos">154</span></a>    <span class="n">json2</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f2</span><span class="p">)</span>
+</span><span id="L-155"><a href="#L-155"><span class="linenos">155</span></a>    <span class="k">return</span> <span class="n">json1</span> <span class="o">==</span> <span class="n">json2</span>
 </span></pre></div>
 
 
@@ -357,28 +358,29 @@
 </span><span id="BGPOut-116"><a href="#BGPOut-116"><span class="linenos">116</span></a>
 </span><span id="BGPOut-117"><a href="#BGPOut-117"><span class="linenos">117</span></a>    <span class="k">def</span> <span class="nf">iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 </span><span id="BGPOut-118"><a href="#BGPOut-118"><span class="linenos">118</span></a>        <span class="sd">&quot;&quot;&quot;Iterate over queue to process each bgp element&quot;&quot;&quot;</span>
-</span><span id="BGPOut-119"><a href="#BGPOut-119"><span class="linenos">119</span></a>
-</span><span id="BGPOut-120"><a href="#BGPOut-120"><span class="linenos">120</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-</span><span id="BGPOut-121"><a href="#BGPOut-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="BGPOut-122"><a href="#BGPOut-122"><span class="linenos">122</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="p">:</span>
-</span><span id="BGPOut-123"><a href="#BGPOut-123"><span class="linenos">123</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-</span><span id="BGPOut-124"><a href="#BGPOut-124"><span class="linenos">124</span></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="BGPOut-125"><a href="#BGPOut-125"><span class="linenos">125</span></a>            <span class="p">)</span>
-</span><span id="BGPOut-126"><a href="#BGPOut-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</span><span id="BGPOut-127"><a href="#BGPOut-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</span><span id="BGPOut-128"><a href="#BGPOut-128"><span class="linenos">128</span></a>
-</span><span id="BGPOut-129"><a href="#BGPOut-129"><span class="linenos">129</span></a>    <span class="k">def</span> <span class="nf">closeFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
-</span><span id="BGPOut-130"><a href="#BGPOut-130"><span class="linenos">130</span></a>        <span class="sd">&quot;&quot;&quot;Close a JSON file</span>
-</span><span id="BGPOut-131"><a href="#BGPOut-131"><span class="linenos">131</span></a>
-</span><span id="BGPOut-132"><a href="#BGPOut-132"><span class="linenos">132</span></a><span class="sd">        Args:</span>
-</span><span id="BGPOut-133"><a href="#BGPOut-133"><span class="linenos">133</span></a><span class="sd">            file (File): The file to close</span>
-</span><span id="BGPOut-134"><a href="#BGPOut-134"><span class="linenos">134</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="BGPOut-135"><a href="#BGPOut-135"><span class="linenos">135</span></a>        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="BGPOut-136"><a href="#BGPOut-136"><span class="linenos">136</span></a>            <span class="k">return</span>
-</span><span id="BGPOut-137"><a href="#BGPOut-137"><span class="linenos">137</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
-</span><span id="BGPOut-138"><a href="#BGPOut-138"><span class="linenos">138</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
-</span><span id="BGPOut-139"><a href="#BGPOut-139"><span class="linenos">139</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
-</span><span id="BGPOut-140"><a href="#BGPOut-140"><span class="linenos">140</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="BGPOut-119"><a href="#BGPOut-119"><span class="linenos">119</span></a>        <span class="c1"># self.redis.xadd()</span>
+</span><span id="BGPOut-120"><a href="#BGPOut-120"><span class="linenos">120</span></a>
+</span><span id="BGPOut-121"><a href="#BGPOut-121"><span class="linenos">121</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+</span><span id="BGPOut-122"><a href="#BGPOut-122"><span class="linenos">122</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="BGPOut-123"><a href="#BGPOut-123"><span class="linenos">123</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="p">:</span>
+</span><span id="BGPOut-124"><a href="#BGPOut-124"><span class="linenos">124</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+</span><span id="BGPOut-125"><a href="#BGPOut-125"><span class="linenos">125</span></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="BGPOut-126"><a href="#BGPOut-126"><span class="linenos">126</span></a>            <span class="p">)</span>
+</span><span id="BGPOut-127"><a href="#BGPOut-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span id="BGPOut-128"><a href="#BGPOut-128"><span class="linenos">128</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span id="BGPOut-129"><a href="#BGPOut-129"><span class="linenos">129</span></a>
+</span><span id="BGPOut-130"><a href="#BGPOut-130"><span class="linenos">130</span></a>    <span class="k">def</span> <span class="nf">closeFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+</span><span id="BGPOut-131"><a href="#BGPOut-131"><span class="linenos">131</span></a>        <span class="sd">&quot;&quot;&quot;Close a JSON file</span>
+</span><span id="BGPOut-132"><a href="#BGPOut-132"><span class="linenos">132</span></a>
+</span><span id="BGPOut-133"><a href="#BGPOut-133"><span class="linenos">133</span></a><span class="sd">        Args:</span>
+</span><span id="BGPOut-134"><a href="#BGPOut-134"><span class="linenos">134</span></a><span class="sd">            file (File): The file to close</span>
+</span><span id="BGPOut-135"><a href="#BGPOut-135"><span class="linenos">135</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="BGPOut-136"><a href="#BGPOut-136"><span class="linenos">136</span></a>        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="BGPOut-137"><a href="#BGPOut-137"><span class="linenos">137</span></a>            <span class="k">return</span>
+</span><span id="BGPOut-138"><a href="#BGPOut-138"><span class="linenos">138</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+</span><span id="BGPOut-139"><a href="#BGPOut-139"><span class="linenos">139</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+</span><span id="BGPOut-140"><a href="#BGPOut-140"><span class="linenos">140</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
+</span><span id="BGPOut-141"><a href="#BGPOut-141"><span class="linenos">141</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -577,15 +579,16 @@ Parameters:
     <a class="headerlink" href="#BGPOut.iteration"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="BGPOut.iteration-117"><a href="#BGPOut.iteration-117"><span class="linenos">117</span></a>    <span class="k">def</span> <span class="nf">iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
 </span><span id="BGPOut.iteration-118"><a href="#BGPOut.iteration-118"><span class="linenos">118</span></a>        <span class="sd">&quot;&quot;&quot;Iterate over queue to process each bgp element&quot;&quot;&quot;</span>
-</span><span id="BGPOut.iteration-119"><a href="#BGPOut.iteration-119"><span class="linenos">119</span></a>
-</span><span id="BGPOut.iteration-120"><a href="#BGPOut.iteration-120"><span class="linenos">120</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
-</span><span id="BGPOut.iteration-121"><a href="#BGPOut.iteration-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="BGPOut.iteration-122"><a href="#BGPOut.iteration-122"><span class="linenos">122</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="p">:</span>
-</span><span id="BGPOut.iteration-123"><a href="#BGPOut.iteration-123"><span class="linenos">123</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
-</span><span id="BGPOut.iteration-124"><a href="#BGPOut.iteration-124"><span class="linenos">124</span></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="BGPOut.iteration-125"><a href="#BGPOut.iteration-125"><span class="linenos">125</span></a>            <span class="p">)</span>
-</span><span id="BGPOut.iteration-126"><a href="#BGPOut.iteration-126"><span class="linenos">126</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</span><span id="BGPOut.iteration-127"><a href="#BGPOut.iteration-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span id="BGPOut.iteration-119"><a href="#BGPOut.iteration-119"><span class="linenos">119</span></a>        <span class="c1"># self.redis.xadd()</span>
+</span><span id="BGPOut.iteration-120"><a href="#BGPOut.iteration-120"><span class="linenos">120</span></a>
+</span><span id="BGPOut.iteration-121"><a href="#BGPOut.iteration-121"><span class="linenos">121</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+</span><span id="BGPOut.iteration-122"><a href="#BGPOut.iteration-122"><span class="linenos">122</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="BGPOut.iteration-123"><a href="#BGPOut.iteration-123"><span class="linenos">123</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="p">:</span>
+</span><span id="BGPOut.iteration-124"><a href="#BGPOut.iteration-124"><span class="linenos">124</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">json_out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+</span><span id="BGPOut.iteration-125"><a href="#BGPOut.iteration-125"><span class="linenos">125</span></a>                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">SetEncoder</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="BGPOut.iteration-126"><a href="#BGPOut.iteration-126"><span class="linenos">126</span></a>            <span class="p">)</span>
+</span><span id="BGPOut.iteration-127"><a href="#BGPOut.iteration-127"><span class="linenos">127</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</span><span id="BGPOut.iteration-128"><a href="#BGPOut.iteration-128"><span class="linenos">128</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </span></pre></div>
 
 
@@ -605,18 +608,18 @@ Parameters:
 
     </div>
     <a class="headerlink" href="#BGPOut.closeFile"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPOut.closeFile-129"><a href="#BGPOut.closeFile-129"><span class="linenos">129</span></a>    <span class="k">def</span> <span class="nf">closeFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
-</span><span id="BGPOut.closeFile-130"><a href="#BGPOut.closeFile-130"><span class="linenos">130</span></a>        <span class="sd">&quot;&quot;&quot;Close a JSON file</span>
-</span><span id="BGPOut.closeFile-131"><a href="#BGPOut.closeFile-131"><span class="linenos">131</span></a>
-</span><span id="BGPOut.closeFile-132"><a href="#BGPOut.closeFile-132"><span class="linenos">132</span></a><span class="sd">        Args:</span>
-</span><span id="BGPOut.closeFile-133"><a href="#BGPOut.closeFile-133"><span class="linenos">133</span></a><span class="sd">            file (File): The file to close</span>
-</span><span id="BGPOut.closeFile-134"><a href="#BGPOut.closeFile-134"><span class="linenos">134</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="BGPOut.closeFile-135"><a href="#BGPOut.closeFile-135"><span class="linenos">135</span></a>        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="BGPOut.closeFile-136"><a href="#BGPOut.closeFile-136"><span class="linenos">136</span></a>            <span class="k">return</span>
-</span><span id="BGPOut.closeFile-137"><a href="#BGPOut.closeFile-137"><span class="linenos">137</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
-</span><span id="BGPOut.closeFile-138"><a href="#BGPOut.closeFile-138"><span class="linenos">138</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
-</span><span id="BGPOut.closeFile-139"><a href="#BGPOut.closeFile-139"><span class="linenos">139</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
-</span><span id="BGPOut.closeFile-140"><a href="#BGPOut.closeFile-140"><span class="linenos">140</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="BGPOut.closeFile-130"><a href="#BGPOut.closeFile-130"><span class="linenos">130</span></a>    <span class="k">def</span> <span class="nf">closeFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+</span><span id="BGPOut.closeFile-131"><a href="#BGPOut.closeFile-131"><span class="linenos">131</span></a>        <span class="sd">&quot;&quot;&quot;Close a JSON file</span>
+</span><span id="BGPOut.closeFile-132"><a href="#BGPOut.closeFile-132"><span class="linenos">132</span></a>
+</span><span id="BGPOut.closeFile-133"><a href="#BGPOut.closeFile-133"><span class="linenos">133</span></a><span class="sd">        Args:</span>
+</span><span id="BGPOut.closeFile-134"><a href="#BGPOut.closeFile-134"><span class="linenos">134</span></a><span class="sd">            file (File): The file to close</span>
+</span><span id="BGPOut.closeFile-135"><a href="#BGPOut.closeFile-135"><span class="linenos">135</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="BGPOut.closeFile-136"><a href="#BGPOut.closeFile-136"><span class="linenos">136</span></a>        <span class="k">if</span> <span class="n">file</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">or</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="BGPOut.closeFile-137"><a href="#BGPOut.closeFile-137"><span class="linenos">137</span></a>            <span class="k">return</span>
+</span><span id="BGPOut.closeFile-138"><a href="#BGPOut.closeFile-138"><span class="linenos">138</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_SET</span><span class="p">)</span>
+</span><span id="BGPOut.closeFile-139"><a href="#BGPOut.closeFile-139"><span class="linenos">139</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+</span><span id="BGPOut.closeFile-140"><a href="#BGPOut.closeFile-140"><span class="linenos">140</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
+</span><span id="BGPOut.closeFile-141"><a href="#BGPOut.closeFile-141"><span class="linenos">141</span></a>        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span></pre></div>
 
 
@@ -731,7 +734,7 @@ Parameters:
                 }
 
                 let heading;
-                switch (result.doc.type) {
+                switch (result.doc.kind) {
                     case "function":
                         if (doc.fullname.endsWith(".__init__")) {
                             heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
@@ -758,7 +761,7 @@ Parameters:
                 }
                 html += `
                         <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
                         <div class="docstring">${doc.doc}</div>
                         </section>
                     `;

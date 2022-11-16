@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.3.0"/>
     <title>BGP monitor</title>
             <link rel="icon" href="https://d4-project.org/assets/images/logo.png"/>
 
@@ -59,6 +59,10 @@
                 <li><a href="bin/bgpout.html">bgpout</a></li>
                 <li><a href="bin/monitor.html">monitor</a></li>
         </ul>
+
+        <h2>API Documentation</h2>
+            <ul class="memberlist">
+    </ul>
 
 
 
@@ -176,21 +180,31 @@ Used to send error codes</li>
 <li><p><a href="https://bgpstream.caida.org/docs/install/bgpstream">libBGPStream</a>
 Check supported OS before install (eg. Ubuntu 22.04 is not supported)  </p></li>
 <li><p><a href="https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa">libMaxMindDB</a></p></li>
+<li><p>Cython</p></li>
 </ul>
 
+<div class="pdoc-code codehilite">
+<pre><span></span><code>apt install cython
+</code></pre>
+</div>
+
 <ol>
-<li>Clone repo and Install required python packages:</li>
+<li>Clone repo and Install required Python 3.9+ (venv recommended) packages:</li>
 </ol>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>git clone https://github.com/D4-project/bgp-monitor.git
+<div class="pdoc-code codehilite">
+<pre><span></span><code>git clone https://github.com/D4-project/bgp-monitor.git
 pip3 install -r requirements.txt
-</code></pre></div>
+</code></pre>
+</div>
 
 <p>You can export the path to the repo if you want to execute it from anywhere:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
+<div class="pdoc-code codehilite">
+<pre><span></span><code>chmod +x /path/to/repo/bgp-monitor/bin/monitor.py
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:/path/to/repo/bgp-monitor/bin/
-</code></pre></div>
+</code></pre>
+</div>
 
 <ol>
 <li>Database</li>
@@ -214,17 +228,21 @@ pip3 install -r requirements.txt
 
 <p>You can run bgp-monitor without database and run your own instance separately :</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>git clone https://github.com/D4-project/bgp-monitor.git
+<div class="pdoc-code codehilite">
+<pre><span></span><code>git clone https://github.com/D4-project/bgp-monitor.git
 docker build -f docker/Dockerfile -t bgp-monitor . <span class="c1"># Build bgp-monitor image</span>
-</code></pre></div>
+</code></pre>
+</div>
 
 <h4 id="database">Database</h4>
 
 <p>You run an other docker image with pre-installed database (require bgp-monitor:latest / previous step) :</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker build -f docker/<span class="o">{</span>dbname<span class="o">}</span>/Dockerfile -t bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span> . <span class="c1"># Generate an other image from the previous</span>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker build -f docker/<span class="o">{</span>dbname<span class="o">}</span>/Dockerfile -t bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span> . <span class="c1"># Generate an other image from the previous</span>
 docker run -it bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span>
-</code></pre></div>
+</code></pre>
+</div>
 
 <p>Available dbname :</p>
 
@@ -238,17 +256,25 @@ docker run -it bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span
 
 <p>You can install generated images from <strong>Dockerhub</strong>:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it ustaenes/bgp-monitor:latest
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker run -it ustaenes/bgp-monitor:latest
+</code></pre>
+</div>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:kvrocks
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:kvrocks
+</code></pre>
+</div>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:quest
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:quest
+</code></pre>
+</div>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:clickhouse
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>docker run -it -P ustaenes/bgp-monitor:clickhouse
+</code></pre>
+</div>
 
 <hr />
 
@@ -258,33 +284,45 @@ docker run -it bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span
 
 <p><strong>Default</strong> stream testing (No filtering, massive print):</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>monitor.py --verbose
+</code></pre>
+</div>
 
 <p><strong>Filter ip addresses</strong> 84.205.67.0 through 84.205.67.255:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py -pf <span class="m">84</span>.205.67.0/24 --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>monitor.py -pf <span class="m">84</span>.205.67.0/24 --verbose
+</code></pre>
+</div>
 
 <p>You can <strong>filter many AS numbers and/or prefixes</strong> in <code>etc/filter_file.cfg.sample</code> instead of using long command line:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --filter_file etc/filter_file.cfg.sample --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>monitor.py --filter_file etc/filter_file.cfg.sample --verbose
+</code></pre>
+</div>
 
 <p><strong>Retrieve past records</strong> instead of live stream</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --record --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>monitor.py --record --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
+</code></pre>
+</div>
 
 <p>Specify a project / list of collectors:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py -p routeviews --collectors route-views.bdix --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>monitor.py -p routeviews --collectors route-views.bdix --start <span class="s2">&quot;2022-01-01 10:00:00&quot;</span> --stop <span class="s2">&quot;2022-01-01 10:10:00&quot;</span> --verbose
+</code></pre>
+</div>
 
 <p><strong>Retrieve</strong> records <strong>from single file</strong> as source instead of a broker:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+</code></pre>
+</div>
 
 <h2 id="output">Output</h2>
 
@@ -321,8 +359,10 @@ docker run -it bgp-monitor:<span class="o">{</span>dbname<span class="o">}</span
 
 <p>It will be easier to work with static data instead of ris-live stream:</p>
 
-<div class="pdoc-code codehilite"><pre><span></span><code>./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
-</code></pre></div>
+<div class="pdoc-code codehilite">
+<pre><span></span><code>./monitor.py --input_data ../datasets/updates.20220425.1215 --verbose
+</code></pre>
+</div>
 
 <p>Note that you can use options like <code>--json_out</code> (to save the output) or <code>--expected_result</code> (check if json_out is equal to the specified file)</p>
 
@@ -348,9 +388,9 @@ It must be in the <code>Databases</code> folder</li>
 <p>To update or upgrade a specific part of the code, check the following diagram</p>
 </div>
 
-                        <input id="bin-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-bin-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="bin-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-bin-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="sd">.. include:: ../docs/home.md</span>
@@ -401,7 +441,6 @@ It must be in the <code>Databases</code> folder</li>
             }
         
             class Database{
-                <<abstract>>
                 String name$
                 start()*
                 stop()*
@@ -553,7 +592,7 @@ It must be in the <code>Databases</code> folder</li>
                 }
 
                 let heading;
-                switch (result.doc.type) {
+                switch (result.doc.kind) {
                     case "function":
                         if (doc.fullname.endsWith(".__init__")) {
                             heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
@@ -580,7 +619,7 @@ It must be in the <code>Databases</code> folder</li>
                 }
                 html += `
                         <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
                         <div class="docstring">${doc.doc}</div>
                         </section>
                     `;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.3.0"/>
     <title>BGP monitor</title>
             <link rel="icon" href="https://d4-project.org/assets/images/logo.png"/>
 
@@ -57,9 +57,6 @@
                                 <a class="function" href="#ClickHouseDB.insert_batches">insert_batches</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ClickHouseDB.var_names">var_names</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ClickHouseDB.get">get</a>
                         </li>
                 </ul>
@@ -83,9 +80,9 @@
 <a href="./../../bin.html">bin</a><wbr>.<a href="./../Databases.html">Databases</a><wbr>.ClickHouseDB    </h1>
 
                 
-                        <input id="ClickHouseDB-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-ClickHouseDB-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="ClickHouseDB-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-ClickHouseDB-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="kn">import</span> <span class="nn">collections</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="kn">import</span> <span class="nn">threading</span>
@@ -594,17 +591,6 @@ Yields:
 
 
                             </div>
-                            <div id="ClickHouseDB.var_names" class="classattr">
-                                <div class="attr variable">
-            <span class="name">var_names</span><span class="default_value"> = {&#39;time_start&#39;: &#39;time_start&#39;, &#39;time_end&#39;: &#39;time_end&#39;, &#39;record_type&#39;: &#39;type&#39;, &#39;peer_asn&#39;: &#39;peer&#39;, &#39;collectors&#39;: &#39;collector&#39;, &#39;countries&#39;: &#39;country&#39;, &#39;as_numbers&#39;: &#39;source&#39;, &#39;prefixes&#39;: &#39;prefix&#39;, &#39;as_paths&#39;: &#39;path&#39;}</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ClickHouseDB.var_names"></a>
-    
-    
-
-                            </div>
                             <div id="ClickHouseDB.get" class="classattr">
                                         <input id="ClickHouseDB.get-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -749,7 +735,7 @@ Yields:
                 }
 
                 let heading;
-                switch (result.doc.type) {
+                switch (result.doc.kind) {
                     case "function":
                         if (doc.fullname.endsWith(".__init__")) {
                             heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
@@ -776,7 +762,7 @@ Yields:
                 }
                 html += `
                         <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
                         <div class="docstring">${doc.doc}</div>
                         </section>
                     `;

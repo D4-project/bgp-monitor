@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="generator" content="pdoc 12.1.0"/>
+    <meta name="generator" content="pdoc 12.3.0"/>
     <title>BGP monitor</title>
             <link rel="icon" href="https://d4-project.org/assets/images/logo.png"/>
 
@@ -110,9 +110,9 @@
  as numbers, countries, etc ...</p>
 </div>
 
-                        <input id="bgpfilter-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                        <input id="mod-bgpfilter-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
-                        <label class="view-source-button" for="bgpfilter-view-source"><span>View Source</span></label>
+                        <label class="view-source-button" for="mod-bgpfilter-view-source"><span>View Source</span></label>
 
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">  1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos">  2</span></a><span class="sd">Contains a whole class and methods that retrieves bgp records filtered by prefixes,</span>
@@ -1622,7 +1622,7 @@ see <code><a href="#BGPFilter.record_mode">BGPFilter.record_mode()</a></code></p
                 }
 
                 let heading;
-                switch (result.doc.type) {
+                switch (result.doc.kind) {
                     case "function":
                         if (doc.fullname.endsWith(".__init__")) {
                             heading = `<span class="name">${doc.fullname.replace(/\.__init__$/, "")}</span>${doc.signature}`;
@@ -1649,7 +1649,7 @@ see <code><a href="#BGPFilter.record_mode">BGPFilter.record_mode()</a></code></p
                 }
                 html += `
                         <section class="search-result">
-                        <a href="${url}" class="attr ${doc.type}">${heading}</a>
+                        <a href="${url}" class="attr ${doc.kind}">${heading}</a>
                         <div class="docstring">${doc.doc}</div>
                         </section>
                     `;
