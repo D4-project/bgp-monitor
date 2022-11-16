@@ -9,7 +9,7 @@ jobs:
   docker:
     strategy:
       matrix:
-        database: [kvrocks, quest, clickhouse]
+        database: [quest, clickhouse]
     runs-on: ubuntu-20.04
     environment:
       name: Docker
