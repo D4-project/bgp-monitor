@@ -70,7 +70,12 @@ options:
 
 - [libMaxMindDB](https://github.com/maxmind/libmaxminddb#on-ubuntu-via-ppa)
 
-2. Clone repo and Install required python packages:
+- Cython
+```shell
+apt install cython
+```
+
+2. Clone repo and Install required Python 3.9+ (venv recommended) packages:
 
 ```shell
 git clone https://github.com/D4-project/bgp-monitor.git

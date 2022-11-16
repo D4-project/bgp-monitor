@@ -8,6 +8,7 @@ need to change the code because it has a somewhat different API.
 # from email import message
 # import json
 from time import time
+
 # import websocket
 
 # from sseclient import SSEClient

@@ -1,4 +1,5 @@
-FROM bgp-monitor:latest
+ARG name
+FROM $name/bgp-monitor:latest
 LABEL version="1.0" org="CIRCL" description="Tool for BGP monitoring with kvrocks install"
 
 WORKDIR /opt/incubator-kvrocks

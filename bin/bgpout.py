@@ -115,6 +115,7 @@ class BGPOut:
 
     def iteration(self, e):
         """Iterate over queue to process each bgp element"""
+        # self.redis.xadd()
 
         if self.verbose:
             print(json.dumps(e, sort_keys=True, cls=SetEncoder) + "\n", flush=True)
